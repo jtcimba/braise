@@ -1,118 +1,123 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
+  TextInput,
+  Pressable,
+  SafeAreaView,
 } from 'react-native';
-
+import {generateClient} from 'aws-amplify/api';
+import {createTodo} from './src/graphql/mutations';
+import {listTodos} from './src/graphql/queries';
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  withAuthenticator,
+  useAuthenticator,
+} from '@aws-amplify/ui-react-native';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const userSelector = (context: any) => [context.user];
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const SignOutButton = () => {
+  const {user, signOut} = useAuthenticator(userSelector);
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
+    <Pressable onPress={signOut} style={styles.buttonContainer}>
+      <Text style={styles.buttonText}>
+        Hello, {user.username}! Click here to sign out!
       </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    </Pressable>
   );
-}
+};
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const initialState = {name: '', description: ''};
+const client = generateClient();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+const App = () => {
+  const [formState, setFormState] = useState(initialState);
+  const [todos, setTodos] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchTodos();
+  }, []);
+
+  function setInput(key: any, value: any) {
+    setFormState({...formState, [key]: value});
+  }
+
+  async function fetchTodos() {
+    try {
+      const todoData = await client.graphql({
+        query: listTodos,
+      });
+      const temp_todos = todoData.data.listTodos.items;
+      setTodos(temp_todos);
+    } catch (err) {
+      console.log('error fetching todos');
+    }
+  }
+
+  async function addTodo() {
+    try {
+      if (!formState.name || !formState.description) return;
+      const todo = {...formState};
+      setTodos([...todos, todo]);
+      setFormState(initialState);
+      await client.graphql({
+        query: createTodo,
+        variables: {
+          input: todo,
+        },
+      });
+    } catch (err) {
+      console.log('error creating todo:', err);
+    }
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <SignOutButton />
+        <TextInput
+          onChangeText={(value: any) => setInput('name', value)}
+          style={styles.input}
+          value={formState.name}
+          placeholder="Name"
+        />
+        <TextInput
+          onChangeText={(value: any) => setInput('description', value)}
+          style={styles.input}
+          value={formState.description}
+          placeholder="Description"
+        />
+        <Pressable onPress={addTodo} style={styles.buttonContainer}>
+          <Text style={styles.buttonText}>Create todo</Text>
+        </Pressable>
+        {todos.map((todo: any, index) => (
+          <View key={todo.id ? todo.id : index} style={styles.todo}>
+            <Text style={styles.todoName}>{todo.name}</Text>
+            <Text>{todo.description}</Text>
+          </View>
+        ))}
+      </View>
     </SafeAreaView>
   );
-}
+};
+
+export default withAuthenticator(App);
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
+  container: {width: 400, flex: 1, padding: 20, alignSelf: 'center'},
+  todo: {marginBottom: 15},
+  input: {
+    backgroundColor: '#ddd',
+    marginBottom: 10,
+    padding: 8,
     fontSize: 18,
-    fontWeight: '400',
   },
-  highlight: {
-    fontWeight: '700',
+  todoName: {fontSize: 20, fontWeight: 'bold'},
+  buttonContainer: {
+    alignSelf: 'center',
+    backgroundColor: 'black',
+    paddingHorizontal: 8,
   },
+  buttonText: {color: 'white', padding: 16, fontSize: 18},
 });
-
-export default App;

@@ -1,0 +1,23 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-braiseapp-dev-93440-authRole",
+      "UnauthRoleArn": "arn:aws:iam::301096229532:role/amplify-braiseapp-dev-93440-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::301096229532:role/amplify-braiseapp-dev-93440-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-braiseapp-dev-93440-deployment",
+      "UnauthRoleName": "amplify-braiseapp-dev-93440-unauthRole",
+      "StackName": "amplify-braiseapp-dev-93440",
+      "StackId": "arn:aws:cloudformation:us-east-1:301096229532:stack/amplify-braiseapp-dev-93440/39ab8e00-aefc-11ee-8b23-0af30df0f903",
+      "AmplifyAppId": "d1chjsydpdklt3"
+    },
+    "categories": {
+      "api": {
+        "braiseapp": {}
+      },
+      "auth": {
+        "braiseapp219ea184": {}
+      }
+    }
+  }
+}

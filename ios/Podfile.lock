@@ -1,4 +1,6 @@
 PODS:
+  - AmplifyRTNCore (1.0.10):
+    - React-Core
   - boost (1.83.0)
   - CocoaAsyncSocket (7.6.5)
   - DoubleConversion (1.1.6)
@@ -944,6 +946,12 @@ PODS:
   - React-Mapbuffer (0.73.2):
     - glog
     - React-debug
+  - react-native-get-random-values (1.10.0):
+    - React-Core
+  - react-native-netinfo (11.2.1):
+    - React-Core
+  - react-native-safe-area-context (4.8.2):
+    - React-Core
   - React-nativeconfig (0.73.2)
   - React-NativeModulesApple (0.73.2):
     - glog
@@ -1111,10 +1119,13 @@ PODS:
     - React-jsi (= 0.73.2)
     - React-logger (= 0.73.2)
     - React-perflogger (= 0.73.2)
+  - RNCAsyncStorage (1.21.0):
+    - React-Core
   - SocketRocket (0.6.1)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
+  - "AmplifyRTNCore (from `../node_modules/@aws-amplify/react-native`)"
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -1167,6 +1178,9 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector-modern`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -1187,6 +1201,7 @@ DEPENDENCIES:
   - React-runtimescheduler (from `../node_modules/react-native/ReactCommon/react/renderer/runtimescheduler`)
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1206,6 +1221,8 @@ SPEC REPOS:
     - SocketRocket
 
 EXTERNAL SOURCES:
+  AmplifyRTNCore:
+    :path: "../node_modules/@aws-amplify/react-native"
   boost:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   DoubleConversion:
@@ -1261,6 +1278,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-get-random-values:
+    :path: "../node_modules/react-native-get-random-values"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
+  react-native-safe-area-context:
+    :path: "../node_modules/react-native-safe-area-context"
   React-nativeconfig:
     :path: "../node_modules/react-native/ReactCommon"
   React-NativeModulesApple:
@@ -1301,10 +1324,13 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/utils"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
+  AmplifyRTNCore: 74fc06365f08cabb0fa2e22869fe62fd89bda2c5
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
@@ -1344,6 +1370,9 @@ SPEC CHECKSUMS:
   React-jsinspector: 03644c063fc3621c9a4e8bf263a8150909129618
   React-logger: 66b168e2b2bee57bd8ce9e69f739d805732a5570
   React-Mapbuffer: 9ee041e1d7be96da6d76a251f92e72b711c651d6
+  react-native-get-random-values: 384787fd76976f5aec9465aff6fa9e9129af1e74
+  react-native-netinfo: 8a7fd3f7130ef4ad2fb4276d5c9f8d3f28d2df3d
+  react-native-safe-area-context: 0ee144a6170530ccc37a0fd9388e28d06f516a89
   React-nativeconfig: d753fbbc8cecc8ae413d615599ac378bbf6999bb
   React-NativeModulesApple: 964f4eeab1b4325e8b6a799cf4444c3fd4eb0a9c
   React-perflogger: 29efe63b7ef5fbaaa50ef6eaa92482f98a24b97e
@@ -1364,9 +1393,10 @@ SPEC CHECKSUMS:
   React-runtimescheduler: df8945a656356ff10f58f65a70820478bfcf33ad
   React-utils: f5bc61e7ea3325c0732ae2d755f4441940163b85
   ReactCommon: 45b5d4f784e869c44a6f5a8fad5b114ca8f78c53
+  RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Yoga: 13c8ef87792450193e117976337b8527b49e8c03
 
-PODFILE CHECKSUM: 035570fa59b51b0d43a98b7c4344e7d743f73340
+PODFILE CHECKSUM: 54cfbe713b378c0515248c8c2fae434a6a4e6147
 
 COCOAPODS: 1.14.3
