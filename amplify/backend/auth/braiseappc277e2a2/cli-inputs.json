@@ -1,10 +1,10 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "braiseapp219ea184_identitypool_219ea184",
+    "identityPoolName": "braiseappc277e2a2_identitypool_c277e2a2",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "braise219ea184",
-    "userPoolName": "braiseapp219ea184_userpool_219ea184",
+    "resourceNameTruncated": "braisec277e2a2",
+    "userPoolName": "braiseappc277e2a2_userpool_c277e2a2",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -31,12 +31,15 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "braise219ea184_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "braisec277e2a2_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "219ea184",
-    "resourceName": "braiseapp219ea184",
+    "sharedId": "c277e2a2",
+    "resourceName": "braiseappc277e2a2",
     "authSelections": "identityPoolAndUserPool",
     "useDefault": "default",
+    "usernameAttributes": [
+      "email"
+    ],
     "userPoolGroupList": [],
     "serviceName": "Cognito",
     "usernameCaseSensitive": false,
