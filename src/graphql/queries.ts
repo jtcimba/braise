@@ -8,33 +8,96 @@ type GeneratedQuery<InputType, OutputType> = string & {
   __generatedQueryOutput: OutputType;
 };
 
-export const getTodo = /* GraphQL */ `query GetTodo($id: ID!) {
-  getTodo(id: $id) {
+export const getUser = /* GraphQL */ `query GetUser($id: Int!) {
+  getUser(id: $id) {
     id
-    name
-    description
-    createdAt
-    updatedAt
+    email
+    last_name
+    sub
+    first_name
+    password
+    created_at
     __typename
   }
 }
-` as GeneratedQuery<APITypes.GetTodoQueryVariables, APITypes.GetTodoQuery>;
-export const listTodos = /* GraphQL */ `query ListTodos(
-  $filter: ModelTodoFilterInput
+` as GeneratedQuery<APITypes.GetUserQueryVariables, APITypes.GetUserQuery>;
+export const listUsers = /* GraphQL */ `query ListUsers(
+  $filter: TableUserFilterInput
   $limit: Int
+  $orderBy: [OrderByUserInput]
   $nextToken: String
 ) {
-  listTodos(filter: $filter, limit: $limit, nextToken: $nextToken) {
+  listUsers(
+    filter: $filter
+    limit: $limit
+    orderBy: $orderBy
+    nextToken: $nextToken
+  ) {
     items {
       id
-      name
-      description
-      createdAt
-      updatedAt
+      email
+      last_name
+      sub
+      first_name
+      password
+      created_at
       __typename
     }
     nextToken
     __typename
   }
 }
-` as GeneratedQuery<APITypes.ListTodosQueryVariables, APITypes.ListTodosQuery>;
+` as GeneratedQuery<APITypes.ListUsersQueryVariables, APITypes.ListUsersQuery>;
+export const getRecipe = /* GraphQL */ `query GetRecipe($id: Int!) {
+  getRecipe(id: $id) {
+    id
+    description
+    created_at
+    owner
+    duration
+    updated_at
+    title
+    source
+    instructions
+    servings
+    notes
+    ingredients
+    __typename
+  }
+}
+` as GeneratedQuery<APITypes.GetRecipeQueryVariables, APITypes.GetRecipeQuery>;
+export const listRecipes = /* GraphQL */ `query ListRecipes(
+  $filter: TableRecipeFilterInput
+  $limit: Int
+  $orderBy: [OrderByRecipeInput]
+  $nextToken: String
+) {
+  listRecipes(
+    filter: $filter
+    limit: $limit
+    orderBy: $orderBy
+    nextToken: $nextToken
+  ) {
+    items {
+      id
+      description
+      created_at
+      owner
+      duration
+      updated_at
+      title
+      source
+      instructions
+      servings
+      notes
+      ingredients
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListRecipesQueryVariables,
+  APITypes.ListRecipesQuery
+>;
