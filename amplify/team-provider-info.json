@@ -1,22 +1,19 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-braiseapp-dev-93440-authRole",
-      "UnauthRoleArn": "arn:aws:iam::301096229532:role/amplify-braiseapp-dev-93440-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::301096229532:role/amplify-braiseapp-dev-93440-authRole",
+      "AuthRoleName": "amplify-braise-dev-140503-authRole",
+      "UnauthRoleArn": "arn:aws:iam::301096229532:role/amplify-braise-dev-140503-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::301096229532:role/amplify-braise-dev-140503-authRole",
       "Region": "us-east-1",
-      "DeploymentBucketName": "amplify-braiseapp-dev-93440-deployment",
-      "UnauthRoleName": "amplify-braiseapp-dev-93440-unauthRole",
-      "StackName": "amplify-braiseapp-dev-93440",
-      "StackId": "arn:aws:cloudformation:us-east-1:301096229532:stack/amplify-braiseapp-dev-93440/39ab8e00-aefc-11ee-8b23-0af30df0f903",
-      "AmplifyAppId": "d1chjsydpdklt3"
+      "DeploymentBucketName": "amplify-braise-dev-140503-deployment",
+      "UnauthRoleName": "amplify-braise-dev-140503-unauthRole",
+      "StackName": "amplify-braise-dev-140503",
+      "StackId": "arn:aws:cloudformation:us-east-1:301096229532:stack/amplify-braise-dev-140503/7a55e200-bfa2-11ee-8c2f-0a1177b10f39",
+      "AmplifyAppId": "d29qiqnmh34xvu"
     },
     "categories": {
-      "api": {
-        "braiseapp": {}
-      },
       "auth": {
-        "braiseappc277e2a2": {}
+        "braise1aa53b70": {}
       }
     }
   }

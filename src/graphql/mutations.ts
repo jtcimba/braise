@@ -8,54 +8,126 @@ type GeneratedMutation<InputType, OutputType> = string & {
   __generatedMutationOutput: OutputType;
 };
 
-export const createTodo = /* GraphQL */ `mutation CreateTodo(
-  $input: CreateTodoInput!
-  $condition: ModelTodoConditionInput
-) {
-  createTodo(input: $input, condition: $condition) {
+export const createUser = /* GraphQL */ `mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
     id
-    name
-    description
-    createdAt
-    updatedAt
+    email
+    last_name
+    sub
+    first_name
+    password
+    created_at
     __typename
   }
 }
 ` as GeneratedMutation<
-  APITypes.CreateTodoMutationVariables,
-  APITypes.CreateTodoMutation
+  APITypes.CreateUserMutationVariables,
+  APITypes.CreateUserMutation
 >;
-export const updateTodo = /* GraphQL */ `mutation UpdateTodo(
-  $input: UpdateTodoInput!
-  $condition: ModelTodoConditionInput
+export const updateUser = /* GraphQL */ `mutation UpdateUser(
+  $input: UpdateUserInput!
+  $condition: TableUserConditionInput
 ) {
-  updateTodo(input: $input, condition: $condition) {
+  updateUser(input: $input, condition: $condition) {
     id
-    name
-    description
-    createdAt
-    updatedAt
+    email
+    last_name
+    sub
+    first_name
+    password
+    created_at
     __typename
   }
 }
 ` as GeneratedMutation<
-  APITypes.UpdateTodoMutationVariables,
-  APITypes.UpdateTodoMutation
+  APITypes.UpdateUserMutationVariables,
+  APITypes.UpdateUserMutation
 >;
-export const deleteTodo = /* GraphQL */ `mutation DeleteTodo(
-  $input: DeleteTodoInput!
-  $condition: ModelTodoConditionInput
+export const deleteUser = /* GraphQL */ `mutation DeleteUser(
+  $input: DeleteUserInput!
+  $condition: TableUserConditionInput
 ) {
-  deleteTodo(input: $input, condition: $condition) {
+  deleteUser(input: $input, condition: $condition) {
     id
-    name
-    description
-    createdAt
-    updatedAt
+    email
+    last_name
+    sub
+    first_name
+    password
+    created_at
     __typename
   }
 }
 ` as GeneratedMutation<
-  APITypes.DeleteTodoMutationVariables,
-  APITypes.DeleteTodoMutation
+  APITypes.DeleteUserMutationVariables,
+  APITypes.DeleteUserMutation
+>;
+export const createRecipe = /* GraphQL */ `mutation CreateRecipe($input: CreateRecipeInput!) {
+  createRecipe(input: $input) {
+    id
+    description
+    created_at
+    owner
+    duration
+    updated_at
+    title
+    source
+    instructions
+    servings
+    notes
+    ingredients
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.CreateRecipeMutationVariables,
+  APITypes.CreateRecipeMutation
+>;
+export const updateRecipe = /* GraphQL */ `mutation UpdateRecipe(
+  $input: UpdateRecipeInput!
+  $condition: TableRecipeConditionInput
+) {
+  updateRecipe(input: $input, condition: $condition) {
+    id
+    description
+    created_at
+    owner
+    duration
+    updated_at
+    title
+    source
+    instructions
+    servings
+    notes
+    ingredients
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.UpdateRecipeMutationVariables,
+  APITypes.UpdateRecipeMutation
+>;
+export const deleteRecipe = /* GraphQL */ `mutation DeleteRecipe(
+  $input: DeleteRecipeInput!
+  $condition: TableRecipeConditionInput
+) {
+  deleteRecipe(input: $input, condition: $condition) {
+    id
+    description
+    created_at
+    owner
+    duration
+    updated_at
+    title
+    source
+    instructions
+    servings
+    notes
+    ingredients
+    __typename
+  }
+}
+` as GeneratedMutation<
+  APITypes.DeleteRecipeMutationVariables,
+  APITypes.DeleteRecipeMutation
 >;
