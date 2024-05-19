@@ -1,0 +1,424 @@
+{
+  "data": [
+    {
+      "author": "Alexa Weibel",
+      "canonical_url": "https://cooking.nytimes.com/recipes/1025325-creamy-spicy-tomato-beans-and-greens",
+      "category": "dinner, easy, quick, weeknight, beans, one pot, main course",
+      "host": "cooking.nytimes.com",
+      "image": "https://static01.nyt.com/images/2024/04/24/multimedia/aw-tomato-beansrex-mwfq/aw-tomato-beansrex-mwfq-square640.jpg",
+      "ingredient_groups": [
+          {
+              "ingredients": [
+                  "6 tablespoons olive oil",
+                  "2/3 cup panko bread crumbs",
+                  "Salt and black pepper",
+                  "1 medium yellow onion, minced",
+                  "4 garlic cloves, minced",
+                  "1/2 teaspoon crushed red pepper",
+                  "1/3 cup tomato paste",
+                  "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+                  "1 cup heavy cream",
+                  "1/2 cup chopped jarred sun-dried tomatoes in oil",
+                  "2/3 cup finely grated Pecorino or Parmesan",
+                  "4 (packed) cups/3 ounces baby arugula",
+                  "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+                  "Toasted bread (optional), for serving"
+              ],
+              "purpose": null
+          }
+      ],
+      "ingredients": [
+          "6 tablespoons olive oil",
+          "2/3 cup panko bread crumbs",
+          "Salt and black pepper",
+          "1 medium yellow onion, minced",
+          "4 garlic cloves, minced",
+          "1/2 teaspoon crushed red pepper",
+          "1/3 cup tomato paste",
+          "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+          "1 cup heavy cream",
+          "1/2 cup chopped jarred sun-dried tomatoes in oil",
+          "2/3 cup finely grated Pecorino or Parmesan",
+          "4 (packed) cups/3 ounces baby arugula",
+          "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+          "Toasted bread (optional), for serving"
+      ],
+      "instructions": "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.\nAdd another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.\nAdd the tomato paste and stir until darkened and mixture is combined, about 3 minutes.\nStir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.\nIn a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired.",
+      "instructions_list": [
+          "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.",
+          "Add another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.",
+          "Add the tomato paste and stir until darkened and mixture is combined, about 3 minutes.",
+          "Stir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.",
+          "In a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired."
+      ],
+      "language": "en-US",
+      "nutrients": {
+          "calories": "841",
+          "unsaturatedFatContent": "27 grams",
+          "carbohydrateContent": "72 grams",
+          "fatContent": "52 grams",
+          "fiberContent": "13 grams",
+          "proteinContent": "29 grams",
+          "saturatedFatContent": "21 grams",
+          "sodiumContent": "1309 milligrams",
+          "sugarContent": "8 grams",
+          "transFatContent": "1 gram"
+      },
+      "ratings": 5.0,
+      "site_name": "NYT Cooking",
+      "title": "Creamy, Spicy Tomato Beans and Greens",
+      "total_time": 40,
+      "yields": "4 servings"
+    },
+    {
+      "author": "Alexa Weibel",
+      "canonical_url": "https://cooking.nytimes.com/recipes/1025325-creamy-spicy-tomato-beans-and-greens",
+      "category": "dinner, easy, quick, weeknight, beans, one pot, main course",
+      "host": "cooking.nytimes.com",
+      "image": "https://static01.nyt.com/images/2024/04/24/multimedia/aw-tomato-beansrex-mwfq/aw-tomato-beansrex-mwfq-square640.jpg",
+      "ingredient_groups": [
+          {
+              "ingredients": [
+                  "6 tablespoons olive oil",
+                  "2/3 cup panko bread crumbs",
+                  "Salt and black pepper",
+                  "1 medium yellow onion, minced",
+                  "4 garlic cloves, minced",
+                  "1/2 teaspoon crushed red pepper",
+                  "1/3 cup tomato paste",
+                  "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+                  "1 cup heavy cream",
+                  "1/2 cup chopped jarred sun-dried tomatoes in oil",
+                  "2/3 cup finely grated Pecorino or Parmesan",
+                  "4 (packed) cups/3 ounces baby arugula",
+                  "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+                  "Toasted bread (optional), for serving"
+              ],
+              "purpose": null
+          }
+      ],
+      "ingredients": [
+          "6 tablespoons olive oil",
+          "2/3 cup panko bread crumbs",
+          "Salt and black pepper",
+          "1 medium yellow onion, minced",
+          "4 garlic cloves, minced",
+          "1/2 teaspoon crushed red pepper",
+          "1/3 cup tomato paste",
+          "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+          "1 cup heavy cream",
+          "1/2 cup chopped jarred sun-dried tomatoes in oil",
+          "2/3 cup finely grated Pecorino or Parmesan",
+          "4 (packed) cups/3 ounces baby arugula",
+          "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+          "Toasted bread (optional), for serving"
+      ],
+      "instructions": "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.\nAdd another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.\nAdd the tomato paste and stir until darkened and mixture is combined, about 3 minutes.\nStir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.\nIn a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired.",
+      "instructions_list": [
+          "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.",
+          "Add another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.",
+          "Add the tomato paste and stir until darkened and mixture is combined, about 3 minutes.",
+          "Stir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.",
+          "In a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired."
+      ],
+      "language": "en-US",
+      "nutrients": {
+          "calories": "841",
+          "unsaturatedFatContent": "27 grams",
+          "carbohydrateContent": "72 grams",
+          "fatContent": "52 grams",
+          "fiberContent": "13 grams",
+          "proteinContent": "29 grams",
+          "saturatedFatContent": "21 grams",
+          "sodiumContent": "1309 milligrams",
+          "sugarContent": "8 grams",
+          "transFatContent": "1 gram"
+      },
+      "ratings": 5.0,
+      "site_name": "NYT Cooking",
+      "title": "Creamy, Spicy Tomato Beans and Greens",
+      "total_time": 40,
+      "yields": "4 servings"
+    },
+    {
+      "author": "Alexa Weibel",
+      "canonical_url": "https://cooking.nytimes.com/recipes/1025325-creamy-spicy-tomato-beans-and-greens",
+      "category": "dinner, easy, quick, weeknight, beans, one pot, main course",
+      "host": "cooking.nytimes.com",
+      "image": "https://static01.nyt.com/images/2024/04/24/multimedia/aw-tomato-beansrex-mwfq/aw-tomato-beansrex-mwfq-square640.jpg",
+      "ingredient_groups": [
+          {
+              "ingredients": [
+                  "6 tablespoons olive oil",
+                  "2/3 cup panko bread crumbs",
+                  "Salt and black pepper",
+                  "1 medium yellow onion, minced",
+                  "4 garlic cloves, minced",
+                  "1/2 teaspoon crushed red pepper",
+                  "1/3 cup tomato paste",
+                  "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+                  "1 cup heavy cream",
+                  "1/2 cup chopped jarred sun-dried tomatoes in oil",
+                  "2/3 cup finely grated Pecorino or Parmesan",
+                  "4 (packed) cups/3 ounces baby arugula",
+                  "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+                  "Toasted bread (optional), for serving"
+              ],
+              "purpose": null
+          }
+      ],
+      "ingredients": [
+          "6 tablespoons olive oil",
+          "2/3 cup panko bread crumbs",
+          "Salt and black pepper",
+          "1 medium yellow onion, minced",
+          "4 garlic cloves, minced",
+          "1/2 teaspoon crushed red pepper",
+          "1/3 cup tomato paste",
+          "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+          "1 cup heavy cream",
+          "1/2 cup chopped jarred sun-dried tomatoes in oil",
+          "2/3 cup finely grated Pecorino or Parmesan",
+          "4 (packed) cups/3 ounces baby arugula",
+          "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+          "Toasted bread (optional), for serving"
+      ],
+      "instructions": "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.\nAdd another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.\nAdd the tomato paste and stir until darkened and mixture is combined, about 3 minutes.\nStir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.\nIn a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired.",
+      "instructions_list": [
+          "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.",
+          "Add another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.",
+          "Add the tomato paste and stir until darkened and mixture is combined, about 3 minutes.",
+          "Stir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.",
+          "In a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired."
+      ],
+      "language": "en-US",
+      "nutrients": {
+          "calories": "841",
+          "unsaturatedFatContent": "27 grams",
+          "carbohydrateContent": "72 grams",
+          "fatContent": "52 grams",
+          "fiberContent": "13 grams",
+          "proteinContent": "29 grams",
+          "saturatedFatContent": "21 grams",
+          "sodiumContent": "1309 milligrams",
+          "sugarContent": "8 grams",
+          "transFatContent": "1 gram"
+      },
+      "ratings": 5.0,
+      "site_name": "NYT Cooking",
+      "title": "Creamy, Spicy Tomato Beans and Greens",
+      "total_time": 40,
+      "yields": "4 servings"
+    },
+    {
+      "author": "Alexa Weibel",
+      "canonical_url": "https://cooking.nytimes.com/recipes/1025325-creamy-spicy-tomato-beans-and-greens",
+      "category": "dinner, easy, quick, weeknight, beans, one pot, main course",
+      "host": "cooking.nytimes.com",
+      "image": "https://static01.nyt.com/images/2024/04/24/multimedia/aw-tomato-beansrex-mwfq/aw-tomato-beansrex-mwfq-square640.jpg",
+      "ingredient_groups": [
+          {
+              "ingredients": [
+                  "6 tablespoons olive oil",
+                  "2/3 cup panko bread crumbs",
+                  "Salt and black pepper",
+                  "1 medium yellow onion, minced",
+                  "4 garlic cloves, minced",
+                  "1/2 teaspoon crushed red pepper",
+                  "1/3 cup tomato paste",
+                  "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+                  "1 cup heavy cream",
+                  "1/2 cup chopped jarred sun-dried tomatoes in oil",
+                  "2/3 cup finely grated Pecorino or Parmesan",
+                  "4 (packed) cups/3 ounces baby arugula",
+                  "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+                  "Toasted bread (optional), for serving"
+              ],
+              "purpose": null
+          }
+      ],
+      "ingredients": [
+          "6 tablespoons olive oil",
+          "2/3 cup panko bread crumbs",
+          "Salt and black pepper",
+          "1 medium yellow onion, minced",
+          "4 garlic cloves, minced",
+          "1/2 teaspoon crushed red pepper",
+          "1/3 cup tomato paste",
+          "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+          "1 cup heavy cream",
+          "1/2 cup chopped jarred sun-dried tomatoes in oil",
+          "2/3 cup finely grated Pecorino or Parmesan",
+          "4 (packed) cups/3 ounces baby arugula",
+          "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+          "Toasted bread (optional), for serving"
+      ],
+      "instructions": "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.\nAdd another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.\nAdd the tomato paste and stir until darkened and mixture is combined, about 3 minutes.\nStir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.\nIn a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired.",
+      "instructions_list": [
+          "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.",
+          "Add another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.",
+          "Add the tomato paste and stir until darkened and mixture is combined, about 3 minutes.",
+          "Stir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.",
+          "In a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired."
+      ],
+      "language": "en-US",
+      "nutrients": {
+          "calories": "841",
+          "unsaturatedFatContent": "27 grams",
+          "carbohydrateContent": "72 grams",
+          "fatContent": "52 grams",
+          "fiberContent": "13 grams",
+          "proteinContent": "29 grams",
+          "saturatedFatContent": "21 grams",
+          "sodiumContent": "1309 milligrams",
+          "sugarContent": "8 grams",
+          "transFatContent": "1 gram"
+      },
+      "ratings": 5.0,
+      "site_name": "NYT Cooking",
+      "title": "Creamy, Spicy Tomato Beans and Greens",
+      "total_time": 40,
+      "yields": "4 servings"
+    },
+    {
+      "author": "Alexa Weibel",
+      "canonical_url": "https://cooking.nytimes.com/recipes/1025325-creamy-spicy-tomato-beans-and-greens",
+      "category": "dinner, easy, quick, weeknight, beans, one pot, main course",
+      "host": "cooking.nytimes.com",
+      "image": "https://static01.nyt.com/images/2024/04/24/multimedia/aw-tomato-beansrex-mwfq/aw-tomato-beansrex-mwfq-square640.jpg",
+      "ingredient_groups": [
+          {
+              "ingredients": [
+                  "6 tablespoons olive oil",
+                  "2/3 cup panko bread crumbs",
+                  "Salt and black pepper",
+                  "1 medium yellow onion, minced",
+                  "4 garlic cloves, minced",
+                  "1/2 teaspoon crushed red pepper",
+                  "1/3 cup tomato paste",
+                  "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+                  "1 cup heavy cream",
+                  "1/2 cup chopped jarred sun-dried tomatoes in oil",
+                  "2/3 cup finely grated Pecorino or Parmesan",
+                  "4 (packed) cups/3 ounces baby arugula",
+                  "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+                  "Toasted bread (optional), for serving"
+              ],
+              "purpose": null
+          }
+      ],
+      "ingredients": [
+          "6 tablespoons olive oil",
+          "2/3 cup panko bread crumbs",
+          "Salt and black pepper",
+          "1 medium yellow onion, minced",
+          "4 garlic cloves, minced",
+          "1/2 teaspoon crushed red pepper",
+          "1/3 cup tomato paste",
+          "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+          "1 cup heavy cream",
+          "1/2 cup chopped jarred sun-dried tomatoes in oil",
+          "2/3 cup finely grated Pecorino or Parmesan",
+          "4 (packed) cups/3 ounces baby arugula",
+          "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+          "Toasted bread (optional), for serving"
+      ],
+      "instructions": "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.\nAdd another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.\nAdd the tomato paste and stir until darkened and mixture is combined, about 3 minutes.\nStir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.\nIn a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired.",
+      "instructions_list": [
+          "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.",
+          "Add another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.",
+          "Add the tomato paste and stir until darkened and mixture is combined, about 3 minutes.",
+          "Stir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.",
+          "In a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired."
+      ],
+      "language": "en-US",
+      "nutrients": {
+          "calories": "841",
+          "unsaturatedFatContent": "27 grams",
+          "carbohydrateContent": "72 grams",
+          "fatContent": "52 grams",
+          "fiberContent": "13 grams",
+          "proteinContent": "29 grams",
+          "saturatedFatContent": "21 grams",
+          "sodiumContent": "1309 milligrams",
+          "sugarContent": "8 grams",
+          "transFatContent": "1 gram"
+      },
+      "ratings": 5.0,
+      "site_name": "NYT Cooking",
+      "title": "Creamy, Spicy Tomato Beans and Greens",
+      "total_time": 40,
+      "yields": "4 servings"
+    },
+    {
+      "author": "Alexa Weibel",
+      "canonical_url": "https://cooking.nytimes.com/recipes/1025325-creamy-spicy-tomato-beans-and-greens",
+      "category": "dinner, easy, quick, weeknight, beans, one pot, main course",
+      "host": "cooking.nytimes.com",
+      "image": "https://static01.nyt.com/images/2024/04/24/multimedia/aw-tomato-beansrex-mwfq/aw-tomato-beansrex-mwfq-square640.jpg",
+      "ingredient_groups": [
+          {
+              "ingredients": [
+                  "6 tablespoons olive oil",
+                  "2/3 cup panko bread crumbs",
+                  "Salt and black pepper",
+                  "1 medium yellow onion, minced",
+                  "4 garlic cloves, minced",
+                  "1/2 teaspoon crushed red pepper",
+                  "1/3 cup tomato paste",
+                  "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+                  "1 cup heavy cream",
+                  "1/2 cup chopped jarred sun-dried tomatoes in oil",
+                  "2/3 cup finely grated Pecorino or Parmesan",
+                  "4 (packed) cups/3 ounces baby arugula",
+                  "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+                  "Toasted bread (optional), for serving"
+              ],
+              "purpose": null
+          }
+      ],
+      "ingredients": [
+          "6 tablespoons olive oil",
+          "2/3 cup panko bread crumbs",
+          "Salt and black pepper",
+          "1 medium yellow onion, minced",
+          "4 garlic cloves, minced",
+          "1/2 teaspoon crushed red pepper",
+          "1/3 cup tomato paste",
+          "2 (14-ounce) cans cannellini beans or other creamy white beans, rinsed",
+          "1 cup heavy cream",
+          "1/2 cup chopped jarred sun-dried tomatoes in oil",
+          "2/3 cup finely grated Pecorino or Parmesan",
+          "4 (packed) cups/3 ounces baby arugula",
+          "2 teaspoons finely grated lemon zest plus 4 teaspoons juice (from 1 lemon)",
+          "Toasted bread (optional), for serving"
+      ],
+      "instructions": "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.\nAdd another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.\nAdd the tomato paste and stir until darkened and mixture is combined, about 3 minutes.\nStir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.\nIn a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired.",
+      "instructions_list": [
+          "In a medium skillet, heat 2 tablespoons olive oil over medium. Stir in the panko, season with salt and pepper, and cook, stirring frequently and shaking the pan, until toasted and golden, about 3 minutes. Transfer seasoned panko to a paper-towel lined plate, then wipe out the skillet.",
+          "Add another 2 tablespoons olive oil to the skillet and heat over medium. Add the onion, garlic and crushed red pepper, season with salt and pepper, and cook, stirring frequently, until softened, about 4 minutes.",
+          "Add the tomato paste and stir until darkened and mixture is combined, about 3 minutes.",
+          "Stir in beans, heavy cream, sun-dried tomatoes and 1/3 cup water, and simmer, stirring occasionally, until flavors meld, about 5 minutes. Stir in half the cheese, then season to taste with salt and pepper.",
+          "In a medium bowl, toss the arugula with the seasoned panko, lemon zest and juice, plus the remaining 1/3 cup cheese and 2 tablespoons olive oil; season with salt and pepper. Pile the greens at the center of the bean mixture. Serve with toasted bread, if desired."
+      ],
+      "language": "en-US",
+      "nutrients": {
+          "calories": "841",
+          "unsaturatedFatContent": "27 grams",
+          "carbohydrateContent": "72 grams",
+          "fatContent": "52 grams",
+          "fiberContent": "13 grams",
+          "proteinContent": "29 grams",
+          "saturatedFatContent": "21 grams",
+          "sodiumContent": "1309 milligrams",
+          "sugarContent": "8 grams",
+          "transFatContent": "1 gram"
+      },
+      "ratings": 5.0,
+      "site_name": "NYT Cooking",
+      "title": "Creamy, Spicy Tomato Beans and Greens",
+      "total_time": 40,
+      "yields": "4 servings"
+    }
+  ]
+}
