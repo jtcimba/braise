@@ -25,7 +25,6 @@ export default function AddScreen() {
           style={styles.contentView}>
           <View style={styles.content}>
             <Text style={styles.contentTitle}>Add recipe</Text>
-            <Text>By URL</Text>
           </View>
         </Modal>
       </View>
