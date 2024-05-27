@@ -1,6 +1,12 @@
-import React from 'react';
-import {Text, View, StyleSheet, FlatList, Image} from 'react-native';
-import data from '../data.json';
+import React, {useEffect, useState} from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  Image,
+  ActivityIndicator,
+} from 'react-native';
 
 type ItemProps = {title: string; image: string; time: number};
 
@@ -20,28 +26,52 @@ const Item = ({title, image, time}: ItemProps) => (
 );
 
 export default function RecipesScreen() {
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState<any[]>([]);
+
+  const getRecipes = async () => {
+    try {
+      const response = await fetch(`${process.env.API_URL}recipes?userid=1`);
+      const json = await response.json();
+      setData(json);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getRecipes();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <FlatList
-        data={data.data}
-        renderItem={({item}) => {
-          return (
-            <Item
-              title={item.title}
-              image={item.image}
-              time={item.total_time}
-            />
-          );
-        }}
-        keyExtractor={item => item.canonical_url}
-      />
+      {isLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <FlatList
+          style={styles.container}
+          data={data}
+          renderItem={({item}) => {
+            return (
+              <Item
+                title={item.title}
+                image={item.image}
+                time={item.total_time}
+              />
+            );
+          }}
+          keyExtractor={item => item.canonical_url}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
+    flex: 1,
   },
   item: {
     flexDirection: 'row',
