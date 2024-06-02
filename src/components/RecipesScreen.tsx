@@ -7,27 +7,32 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
-type ItemProps = {title: string; image: string; time: number};
-
-const Item = ({title, image, time}: ItemProps) => (
-  <View style={styles.item}>
+const Item = ({item, navigation}: any) => (
+  <TouchableOpacity
+    style={styles.item}
+    onPress={() => navigation.navigate('RecipeDetailsScreen', {item: item})}>
     <Image
       style={styles.image}
       source={{
-        uri: image,
+        uri: item.image,
       }}
     />
     <View style={styles.itemBody}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.time}>{time} min</Text>
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.time}>
+        {item.total_time ? item.total_time + ' min' : ''}
+      </Text>
     </View>
-  </View>
+  </TouchableOpacity>
 );
 
 export default function RecipesScreen() {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
+  const navigation = useNavigation();
 
   const getRecipes = async () => {
     try {
@@ -50,20 +55,20 @@ export default function RecipesScreen() {
       {isLoading ? (
         <ActivityIndicator />
       ) : (
-        <FlatList
-          style={styles.container}
-          data={data}
-          renderItem={({item}) => {
-            return (
-              <Item
-                title={item.title}
-                image={item.image}
-                time={item.total_time}
-              />
-            );
-          }}
-          keyExtractor={item => item.canonical_url}
-        />
+        <View style={styles.container}>
+          {isLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <FlatList
+              style={styles.container}
+              data={data}
+              renderItem={({item}) => {
+                return <Item item={item} navigation={navigation} />;
+              }}
+              keyExtractor={item => item.canonical_url}
+            />
+          )}
+        </View>
       )}
     </View>
   );
@@ -77,7 +82,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#eee',
   },
   itemBody: {
     flex: 1,

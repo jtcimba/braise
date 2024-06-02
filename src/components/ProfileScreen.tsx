@@ -1,10 +1,19 @@
 import React from 'react';
-import {Text, View, StyleSheet} from 'react-native';
+import {Button, View, StyleSheet} from 'react-native';
+import {signOut} from 'aws-amplify/auth';
 
 export default function ProfileScreen() {
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.log('error signing out: ', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text>Profile</Text>
+      <Button title="Sign Out" onPress={handleSignOut} />
     </View>
   );
 }
