@@ -1,6 +1,6 @@
 # Braise
 
-This is a recipe manager that I am developing using React Native, PostgreSQL, and a AWS including Lambda Functions, API Gateway, RDS, Amplify, and Cognito. The main function of this project is to store recipes that I find online and write from scratch in one app where I can quickly search and sort. It is a work in progress.
+This is a recipe manager that I am developing using React Native, PostgreSQL, and AWS (Lambda Functions, API Gateway, RDS, Amplify, and Cognito). The main function of this project is to store recipes that I find online and write from scratch in one app where I can quickly search and sort. It is a work in progress.
 
 Below are some screenshots of the UI which I designed in Figma:
 
