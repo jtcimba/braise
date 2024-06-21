@@ -3,7 +3,7 @@ import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default function AddScreen() {
+export default function AddScreen(size: number, color: string) {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <>
@@ -14,7 +14,7 @@ export default function AddScreen() {
         onPressIn={() => {}}
         activeOpacity={0.7}>
         <>
-          <Ionicons name={'add-circle'} color={'#C95238'} size={46} />
+          <Ionicons name={'add-circle-outline'} color={color} size={size} />
         </>
       </TouchableOpacity>
       <View>
