@@ -1,40 +1,17 @@
-import React, {useState} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import Modal from 'react-native-modal';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import React from 'react';
+import {StyleSheet, View, Text} from 'react-native';
 
-export default function AddScreen(size: number, color: string) {
-  const [modalVisible, setModalVisible] = useState(false);
+export default function AddScreen() {
   return (
-    <>
-      <TouchableOpacity
-        onPress={() => {
-          setModalVisible(true);
-        }}
-        onPressIn={() => {}}
-        activeOpacity={0.7}>
-        <>
-          <Ionicons name={'add-circle-outline'} color={color} size={size} />
-        </>
-      </TouchableOpacity>
-      <View>
-        <Modal
-          backdropOpacity={0.3}
-          isVisible={modalVisible}
-          onBackdropPress={() => setModalVisible(false)}
-          style={styles.contentView}>
-          <View style={styles.content}>
-            <Text style={styles.contentTitle}>Add recipe</Text>
-          </View>
-        </Modal>
-      </View>
-    </>
+    <View style={styles.content}>
+      <Text style={styles.contentTitle}>Add recipe</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   content: {
-    backgroundColor: 'white',
+    backgroundColor: '#EBE9E5',
     padding: 22,
     justifyContent: 'center',
     alignItems: 'center',

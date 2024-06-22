@@ -16,7 +16,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import RecipeDetailsScreen from './src/components/RecipeDetailsScreen';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import DiscoverScreen from './src/components/DiscoverScreen';
-import {TouchableOpacity} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -25,7 +25,11 @@ const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: 'white',
+    primary: '#D95931',
+    background: '#EBE9E5',
+    card: '#EBE9E5',
+    text: '#323232',
+    border: '#D4D4D4',
   },
   fonts: {
     regular: {
@@ -48,7 +52,11 @@ const LightTheme = {
 };
 
 function AddScreenComponent() {
-  return null;
+  return (
+    <View>
+      <Text>Add recipe</Text>
+    </View>
+  );
 }
 
 function tabBarIcon(name: string, color: string, size: number) {
@@ -79,7 +87,7 @@ function Home({navigation}: {navigation: any}) {
     <Tab.Navigator
       screenOptions={({route}) => ({
         tabBarIcon: ({color, size}) => tabBarIcon(route.name, color, size),
-        tabBarActiveTintColor: 'black',
+        tabBarActiveTintColor: '#323232',
         tabBarInactiveTintColor: 'gray',
       })}>
       <Tab.Screen
@@ -89,14 +97,19 @@ function Home({navigation}: {navigation: any}) {
           headerTitleAlign: 'left',
           headerRight: () => settingsIcon(navigation),
           headerRightContainerStyle: {paddingRight: 10},
+          headerShadowVisible: false,
         }}
       />
       <Tab.Screen
         name="Add"
         component={AddScreenComponent}
-        options={{
-          tabBarIcon: props => AddScreen(props.size, props.color),
-        }}
+        listeners={() => ({
+          tabPress: e => {
+            e.preventDefault();
+            navigation.navigate('Add');
+            navigation.removeListener('tabPress');
+          },
+        })}
       />
       <Tab.Screen
         name="Discover"
@@ -105,6 +118,7 @@ function Home({navigation}: {navigation: any}) {
           headerTitleAlign: 'left',
           headerRight: () => settingsIcon(navigation),
           headerRightContainerStyle: {paddingRight: 10},
+          headerShadowVisible: false,
         }}
       />
     </Tab.Navigator>
@@ -126,7 +140,7 @@ export function App(): React.JSX.Element {
     <NavigationContainer theme={LightTheme}>
       <Stack.Navigator>
         <Stack.Screen
-          name="Home"
+          name="DrawerNavigator"
           component={DrawerNavigator}
           options={{
             headerShown: false,
@@ -140,6 +154,14 @@ export function App(): React.JSX.Element {
               shadowColor: 'transparent',
             },
             headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="Add"
+          component={AddScreen}
+          options={{
+            headerShown: false,
+            presentation: 'modal',
           }}
         />
       </Stack.Navigator>
