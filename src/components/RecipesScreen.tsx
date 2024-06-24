@@ -22,6 +22,7 @@ const Item = ({item, navigation}: any) => (
     />
     <View style={styles.itemBody}>
       <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.subtext}>{item.author}</Text>
       <Text style={styles.time}>
         {item.total_time ? item.total_time + ' min' : ''}
       </Text>
@@ -98,5 +99,9 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     marginRight: 10,
+  },
+  subtext: {
+    color: '#666',
+    overflow: 'hidden',
   },
 });

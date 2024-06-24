@@ -2,24 +2,21 @@ import 'react-native-gesture-handler';
 import {withAuthenticator} from '@aws-amplify/ui-react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
-import {
-  NavigationContainer,
-  DefaultTheme,
-  DrawerActions,
-} from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import RecipesScreen from './src/components/RecipesScreen';
 import ProfileScreen from './src/components/ProfileScreen';
 import AddScreen from './src/components/AddScreen';
-export const Tab = createBottomTabNavigator();
 import {createStackNavigator} from '@react-navigation/stack';
 import RecipeDetailsScreen from './src/components/RecipeDetailsScreen';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import DiscoverScreen from './src/components/DiscoverScreen';
-import {Text, TouchableOpacity, View} from 'react-native';
+import TabBarIcon from './src/components/TabBarIcon';
+import SettingsIcon from './src/components/SettingsIcon';
+import BackIcon from './src/components/BackIcon';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
 
 const LightTheme = {
   ...DefaultTheme,
@@ -51,58 +48,42 @@ const LightTheme = {
   },
 };
 
-function AddScreenComponent() {
-  return (
-    <View>
-      <Text>Add recipe</Text>
-    </View>
-  );
+function AddComponent() {
+  return null;
 }
 
-function tabBarIcon(name: string, color: string, size: number) {
-  let iconName = '';
-  if (name === 'Recipes') {
-    iconName = 'file-tray-full-outline';
-  } else if (name === 'Discover') {
-    iconName = 'compass-outline';
-  } else if (name === 'Add') {
-    iconName = 'add-circle-outline';
-  }
-  return <Ionicons name={iconName} size={size} color={color} />;
-}
-
-function settingsIcon(navigation: any) {
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        navigation.dispatch(DrawerActions.openDrawer());
-      }}>
-      <Ionicons name={'settings-outline'} size={25} color={'gray'} />
-    </TouchableOpacity>
-  );
-}
-
-function Home({navigation}: {navigation: any}) {
+function TabNavigator({navigation}: {navigation: any}) {
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
-        tabBarIcon: ({color, size}) => tabBarIcon(route.name, color, size),
+        // eslint-disable-next-line react/no-unstable-nested-components
+        tabBarIcon: ({color, size}) => {
+          return (
+            <TabBarIcon
+              name={route.name}
+              color={color}
+              size={size}
+              onPressFunction={() => navigation.navigate(route.name)}
+            />
+          );
+        },
         tabBarActiveTintColor: '#323232',
         tabBarInactiveTintColor: 'gray',
+        tabBarShowLabel: false,
       })}>
       <Tab.Screen
         name="Recipes"
         component={RecipesScreen}
         options={{
           headerTitleAlign: 'left',
-          headerRight: () => settingsIcon(navigation),
+          headerRight: () => SettingsIcon(navigation),
           headerRightContainerStyle: {paddingRight: 10},
           headerShadowVisible: false,
         }}
       />
       <Tab.Screen
         name="Add"
-        component={AddScreenComponent}
+        component={AddComponent}
         listeners={() => ({
           tabPress: e => {
             e.preventDefault();
@@ -116,7 +97,7 @@ function Home({navigation}: {navigation: any}) {
         component={DiscoverScreen}
         options={{
           headerTitleAlign: 'left',
-          headerRight: () => settingsIcon(navigation),
+          headerRight: () => SettingsIcon(navigation),
           headerRightContainerStyle: {paddingRight: 10},
           headerShadowVisible: false,
         }}
@@ -130,7 +111,7 @@ function DrawerNavigator() {
     <Drawer.Navigator
       drawerContent={ProfileScreen}
       screenOptions={{headerShown: false, drawerPosition: 'right'}}>
-      <Drawer.Screen name="Home" component={Home} />
+      <Drawer.Screen name="Home" component={TabNavigator} />
     </Drawer.Navigator>
   );
 }
@@ -149,12 +130,14 @@ export function App(): React.JSX.Element {
         <Stack.Screen
           name="RecipeDetailsScreen"
           component={RecipeDetailsScreen}
-          options={{
+          options={({navigation}) => ({
             headerStyle: {
               shadowColor: 'transparent',
             },
             headerTitle: '',
-          }}
+            headerLeft: () => BackIcon(navigation),
+            headerLeftContainerStyle: {paddingLeft: 10},
+          })}
         />
         <Stack.Screen
           name="Add"
