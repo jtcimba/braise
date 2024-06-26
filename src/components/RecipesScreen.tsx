@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {getCurrentUser, AuthUser} from 'aws-amplify/auth';
 
 const Item = ({item, navigation}: any) => (
   <TouchableOpacity
@@ -34,22 +35,42 @@ export default function RecipesScreen() {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
   const navigation = useNavigation();
-
-  const getRecipes = async () => {
-    try {
-      const response = await fetch(`${process.env.API_URL}recipes?userid=1`);
-      const json = await response.json();
-      setData(json);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [awsId, setAwsId] = useState<string | undefined>('');
+  const [userId, setUserId] = useState<string | undefined>('');
 
   useEffect(() => {
-    getRecipes();
+    setLoading(true);
+    getCurrentUser()
+      .then((user: AuthUser | undefined) => {
+        if (user?.signInDetails) {
+          setAwsId(user.userId);
+        }
+      })
+      .catch(e => console.log(e.message));
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    if (awsId) {
+      fetch(`${process.env.API_URL}users?awsid=${awsId}`)
+        .then(response => response.json())
+        .then(json => setUserId(json[0]?.id))
+        .catch(e => console.log(e.message));
+    }
+    setLoading(false);
+  }, [awsId]);
+
+  useEffect(() => {
+    setLoading(true);
+    if (userId) {
+      fetch(`${process.env.API_URL}recipes?userid=${userId}`)
+        .then(response => response.json())
+        .then(json => setData(json))
+        .catch(e => console.log(e.message));
+    }
+    setLoading(false);
+  }, [userId]);
 
   return (
     <View style={styles.container}>
