@@ -14,7 +14,7 @@ import {getCurrentUser, AuthUser} from 'aws-amplify/auth';
 const Item = ({item, navigation}: any) => (
   <TouchableOpacity
     style={styles.item}
-    onPress={() => navigation.navigate('RecipeDetailsScreen', {item: item})}>
+    onPress={() => navigation.navigate('DetailsScreen', {item: item})}>
     <Image
       style={styles.image}
       source={{

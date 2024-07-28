@@ -21,7 +21,6 @@ const TabBarIcon: React.FC<TabBarIconProps> = ({
     Recipes: 'file-tray-full-outline',
     Discover: 'compass-outline',
     Add: 'add-circle-outline',
-    Settings: 'settings-outline',
   };
 
   const onPressIn = () => {
