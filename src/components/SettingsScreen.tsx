@@ -3,7 +3,7 @@ import {View, StyleSheet, Text, TouchableHighlight} from 'react-native';
 import {signOut, getCurrentUser, AuthUser} from 'aws-amplify/auth';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
-export default function ProfileScreen() {
+export default function SettingsScreen() {
   const [email, setEmail] = useState<string | undefined>('');
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.profile}>
+      <SafeAreaView style={styles.settings}>
         <Text style={styles.email}>{email}</Text>
         <TouchableHighlight
           onPress={handleSignOut}
@@ -48,9 +48,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#303030',
+    backgroundColor: '#EBE9E5',
   },
-  profile: {
+  settings: {
     flex: 1,
     alignItems: 'center',
     width: '100%',
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   email: {
-    color: 'white',
+    color: 'black',
     fontSize: 16,
     marginBottom: 20,
     marginTop: 20,
@@ -75,5 +75,12 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '100%',
     alignItems: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
   },
 });

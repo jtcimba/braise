@@ -4,18 +4,18 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
 import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
 import RecipesScreen from './src/components/RecipesScreen';
-import ProfileScreen from './src/components/ProfileScreen';
+import SettingsScreen from './src/components/SettingsScreen';
 import AddScreen from './src/components/AddScreen';
 import {createStackNavigator} from '@react-navigation/stack';
-import RecipeDetailsScreen from './src/components/RecipeDetailsScreen';
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import DetailsScreen from './src/components/DetailsScreen';
 import DiscoverScreen from './src/components/DiscoverScreen';
 import TabBarIcon from './src/components/TabBarIcon';
 import SettingsIcon from './src/components/SettingsIcon';
 import BackIcon from './src/components/BackIcon';
+import CloseIcon from './src/components/CloseIcon';
+import DetailsMenu from './src/components/DetailsMenu';
 
 const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
 const LightTheme = {
@@ -106,46 +106,51 @@ function TabNavigator({navigation}: {navigation: any}) {
   );
 }
 
-function DrawerNavigator() {
-  return (
-    <Drawer.Navigator
-      drawerContent={ProfileScreen}
-      screenOptions={{headerShown: false, drawerPosition: 'right'}}>
-      <Drawer.Screen name="Home" component={TabNavigator} />
-    </Drawer.Navigator>
-  );
-}
-
 export function App(): React.JSX.Element {
   return (
     <NavigationContainer theme={LightTheme}>
       <Stack.Navigator>
         <Stack.Screen
-          name="DrawerNavigator"
-          component={DrawerNavigator}
+          name="Home"
+          component={TabNavigator}
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="RecipeDetailsScreen"
-          component={RecipeDetailsScreen}
+          name="DetailsScreen"
+          component={DetailsScreen}
           options={({navigation}) => ({
-            headerStyle: {
-              shadowColor: 'transparent',
-            },
+            headerTransparent: true,
+            headerShadowVisible: false,
             headerTitle: '',
             headerLeft: () => BackIcon(navigation),
             headerLeftContainerStyle: {paddingLeft: 10},
+            headerRight: () => DetailsMenu(),
+            headerRightContainerStyle: {paddingRight: 10},
           })}
         />
         <Stack.Screen
           name="Add"
           component={AddScreen}
-          options={{
-            headerShown: false,
+          options={({navigation}) => ({
+            headerLeft: () => null,
+            headerRight: () => CloseIcon(navigation),
             presentation: 'modal',
-          }}
+            headerShadowVisible: false,
+            headerRightContainerStyle: {paddingRight: 10},
+          })}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={({navigation}) => ({
+            headerLeft: () => null,
+            headerRight: () => CloseIcon(navigation),
+            presentation: 'modal',
+            headerShadowVisible: false,
+            headerRightContainerStyle: {paddingRight: 10},
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
