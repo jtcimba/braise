@@ -1,12 +1,6 @@
 import React, {useState} from 'react';
-import {
-  TouchableOpacity,
-  StyleSheet,
-  View,
-  Text,
-  Modal,
-  TouchableWithoutFeedback,
-} from 'react-native';
+import {TouchableOpacity, StyleSheet, View, Text} from 'react-native';
+import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAppDispatch, useAppSelector} from '../hooks';
 import {changeViewMode} from '../features/viewModeSlice';
@@ -14,18 +8,18 @@ import {useTheme} from '@react-navigation/native';
 
 export default function DetailsMenu() {
   const {colors} = useTheme();
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
 
   const handleEditPress = () => {
-    setDropdownVisible(false);
+    setmodalVisible(false);
     dispatch(changeViewMode('edit'));
     console.log('Edit option pressed');
   };
 
   const handleDeletePress = () => {
-    setDropdownVisible(false);
+    setmodalVisible(false);
     console.log('Delete option pressed');
   };
 
@@ -43,7 +37,7 @@ export default function DetailsMenu() {
     <>
       {viewMode === 'view' && (
         <View style={styles(colors).container}>
-          <TouchableOpacity onPress={() => setDropdownVisible(true)}>
+          <TouchableOpacity onPress={() => setmodalVisible(true)}>
             <Ionicons name="ellipsis-horizontal" size={22} color="gray" />
           </TouchableOpacity>
         </View>
@@ -52,9 +46,7 @@ export default function DetailsMenu() {
         <View style={styles(colors).editContainer}>
           <View style={styles(colors).container}>
             <TouchableOpacity onPress={handleUndoPress}>
-              <Text style={[styles(colors).text, styles(colors).undo]}>
-                Undo
-              </Text>
+              <Ionicons name="arrow-undo-outline" size={22} color="gray" />
             </TouchableOpacity>
           </View>
           <View
@@ -67,47 +59,39 @@ export default function DetailsMenu() {
           </View>
         </View>
       )}
-      {dropdownVisible && (
-        <Modal
-          transparent={true}
-          animationType="fade"
-          visible={dropdownVisible}
-          onRequestClose={() => setDropdownVisible(false)}>
-          <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
-            <View style={styles(colors).modalOverlay} />
-          </TouchableWithoutFeedback>
-          <View style={styles(colors).dropdown}>
-            <TouchableOpacity
-              style={styles(colors).dropdownItem}
-              onPress={handleEditPress}>
-              <Text style={styles(colors).dropdownItemText}>Edit</Text>
-              <Ionicons
-                name="pencil"
-                size={16}
-                style={styles(colors).icon}
-                color="gray"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles(colors).dropdownItem}
-              onPress={handleDeletePress}>
-              <Text
-                style={[
-                  styles(colors).dropdownItemText,
-                  styles(colors).deleteText,
-                ]}>
-                Delete Recipe
-              </Text>
-              <Ionicons
-                name="trash-outline"
-                size={16}
-                color="red"
-                style={styles(colors).icon}
-              />
+      <Modal
+        isVisible={modalVisible}
+        onBackdropPress={() => setmodalVisible(false)}
+        onSwipeComplete={() => setmodalVisible(false)}
+        swipeDirection={['down']}
+        style={styles(colors).modalOverlay}>
+        <View style={styles(colors).modal}>
+          <View
+            style={[styles(colors).optionsView, styles(colors).borderBottom]}>
+            <Text style={styles(colors).optionsText}>Options</Text>
+            <TouchableOpacity onPress={() => setmodalVisible(false)}>
+              <Ionicons name="close-circle" size={25} color="gray" />
             </TouchableOpacity>
           </View>
-        </Modal>
-      )}
+          <TouchableOpacity
+            style={styles(colors).modalItem}
+            onPress={handleEditPress}>
+            <Ionicons name="pencil" size={16} style={styles(colors).icon} />
+            <Text style={styles(colors).editText}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles(colors).modalItem]}
+            onPress={handleDeletePress}>
+            <Ionicons
+              name="trash-outline"
+              size={16}
+              color="red"
+              style={styles(colors).icon}
+            />
+            <Text style={styles(colors).deleteText}>Delete Recipe</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -143,36 +127,54 @@ const styles = (colors: any) =>
       color: 'white',
     },
     modalOverlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+      margin: 0,
     },
-    dropdown: {
+    modal: {
+      width: '100%',
+      height: '100%',
+      backgroundColor: colors.background,
       position: 'absolute',
-      right: 10,
-      top: 30,
-      backgroundColor: 'white',
-      borderRadius: 5,
-      shadowColor: '#000',
-      shadowOffset: {width: 0, height: 2},
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
+      top: 450,
+      zIndex: 12000,
+      borderRadius: 25,
+      paddingStart: 25,
+      paddingEnd: 20,
+      paddingTop: 10,
     },
-    dropdownItem: {
+    optionsView: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginVertical: 10,
+    },
+    borderBottom: {
+      borderBottomWidth: 1,
+      borderBottomColor: '#D4D4D4',
+      paddingBottom: 10,
+    },
+    borderTop: {
+      borderTopWidth: 1,
+      borderTopColor: '#D4D4D4',
+      paddingTop: 10,
+    },
+    modalItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: 10,
+      marginVertical: 10,
     },
-    dropdownItemText: {
+    optionsText: {
       fontSize: 16,
-      color: 'gray',
+      fontWeight: 'bold',
+    },
+    editText: {
+      fontSize: 16,
     },
     deleteText: {
+      fontSize: 16,
       color: 'red',
-      marginRight: 5,
     },
     icon: {
-      marginLeft: 5,
+      marginRight: 15,
     },
   });

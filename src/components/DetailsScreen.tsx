@@ -1,8 +1,20 @@
-import React, {useEffect, useRef} from 'react';
-import {Text, View, StyleSheet, Image, Pressable, Animated} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Pressable,
+  Animated,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '../hooks';
 import {changeViewMode} from '../features/viewModeSlice';
+import {Slider} from '@miblanchard/react-native-slider';
+import InstructionsEditor from './InstructionsEditor';
+
 export default function DetailsScreen({route, navigation}: any) {
   const {
     title,
@@ -17,8 +29,10 @@ export default function DetailsScreen({route, navigation}: any) {
 
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
-  const instructionsList = instructions.toString().split('\\n');
-  const [editingData, onChangeEditingData] = React.useState(route.params.item);
+  const [editingData, onChangeEditingData] = useState({
+    ...route.params.item,
+    ingredients: route.params.item.ingredients.join('\n'),
+  });
   const yOffset = useRef(new Animated.Value(0)).current;
   const headerOpacity = yOffset.interpolate({
     inputRange: [0, 180],
@@ -27,8 +41,15 @@ export default function DetailsScreen({route, navigation}: any) {
   });
 
   useEffect(() => {
-    dispatch(changeViewMode('view'));
-  }, [dispatch]);
+    dispatch(changeViewMode('edit'));
+  }, [dispatch, route.params.item]);
+
+  useEffect(() => {
+    onChangeEditingData({
+      ...route.params.item,
+      ingredients: route.params.item.ingredients.join('\n'),
+    });
+  }, [viewMode, route.params.item]);
 
   useEffect(() => {
     function headerBackground() {
@@ -92,16 +113,28 @@ export default function DetailsScreen({route, navigation}: any) {
       );
     } else {
       return (
-        <TextInput
-          style={total_time ? styles.duration : null}
-          value={editingData.total_time?.toString()}
-          multiline={true}
-          placeholder="Duration"
-          keyboardType="numeric"
-          onChangeText={text =>
-            onChangeEditingData({...editingData, total_time: text})
-          }
-        />
+        <View>
+          <Text style={styles.sectionTitle}>Duration</Text>
+          <View style={styles.durationContainer}>
+            <View style={styles.slider}>
+              <Slider
+                minimumValue={0}
+                maximumValue={240}
+                step={1}
+                value={editingData.total_time?.toString()}
+                onValueChange={text =>
+                  onChangeEditingData({...editingData, total_time: text})
+                }
+              />
+            </View>
+            <Text style={styles.sliderValue}>
+              {editingData.total_time?.toString()}
+              {editingData.total_time ? (
+                <Text style={styles.subtext}> min</Text>
+              ) : null}
+            </Text>
+          </View>
+        </View>
       );
     }
   }
@@ -111,87 +144,126 @@ export default function DetailsScreen({route, navigation}: any) {
       return <Text style={styles.subtext}>{yields}</Text>;
     } else {
       return (
-        <TextInput
-          style={styles.subtext}
-          value={editingData.yields}
-          multiline={true}
-          placeholder="Yields"
-          onChangeText={text =>
-            onChangeEditingData({...editingData, yields: text})
-          }
-        />
+        <View>
+          <Text style={styles.sectionTitle}>Servings</Text>
+          <TextInput
+            style={styles.subtext}
+            value={editingData.yields}
+            multiline={true}
+            placeholder="Yields"
+            onChangeText={text =>
+              onChangeEditingData({...editingData, yields: text})
+            }
+          />
+        </View>
       );
     }
   }
 
   function renderIngredients() {
-    return ingredients.map((ingredient: any, index: any) => {
+    if (viewMode === 'view') {
+      return ingredients.map((ingredient: any, index: any) => {
+        return (
+          <View style={styles.itemContainer} key={index}>
+            <Text>{ingredient}</Text>
+          </View>
+        );
+      });
+    } else {
       return (
-        <View style={styles.itemContainer} key={index}>
-          <Text>{ingredient}</Text>
-        </View>
+        <TextInput
+          style={styles.editText}
+          value={editingData.ingredients}
+          placeholder="Enter ingredients, one per line"
+          onChangeText={(text: any) => {
+            console.log(text);
+            onChangeEditingData({
+              ...editingData,
+              ingredients: text,
+            });
+          }}
+          multiline
+        />
       );
-    });
+    }
   }
 
-  function renderInstructions() {
-    return instructionsList.map((instruction: any, index: any) => {
-      return (
-        <View style={styles.itemContainer} key={index}>
-          <Text style={styles.instructionCount}>{index + 1}.</Text>
-          <Text style={styles.instructionItem}>{instruction}</Text>
-        </View>
-      );
-    });
-  }
+  const renderInstructions = () => {
+    if (viewMode === 'view') {
+      return instructions.split('\\n').map((instruction: any, index: any) => {
+        return (
+          <View style={styles.itemContainer} key={index}>
+            <Text style={styles.instructionCount}>{index + 1}.</Text>
+            <Text style={styles.instructionItem}>{instruction}</Text>
+          </View>
+        );
+      });
+    } else {
+      const instructionsArray = instructions.split('\\n').map((item: any) => {
+        return {text: item, id: Math.random()};
+      });
+      return <InstructionsEditor instructionsArray={instructionsArray} />;
+    }
+  };
 
   return (
-    <Animated.ScrollView
-      onScroll={Animated.event(
-        [
-          {
-            nativeEvent: {
-              contentOffset: {
-                y: yOffset,
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}>
+      <Animated.ScrollView
+        automaticallyAdjustKeyboardInsets={true}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: yOffset,
+                },
               },
             },
-          },
-        ],
-        {useNativeDriver: true},
-      )}>
-      <Pressable onLongPress={onEdit}>
-        <View>
-          {renderImage()}
-          <View style={styles.container}>
-            {renderTitle()}
-            <View style={styles.subheader}>
-              <View style={styles.itemBody}>
-                <Text style={styles.subtext}>{author}</Text>
-                <Text style={styles.dot}>•</Text>
-                <Text style={styles.subtext}>{host}</Text>
+          ],
+          {useNativeDriver: true},
+        )}>
+        <Pressable onLongPress={onEdit}>
+          <View>
+            {renderImage()}
+            <View style={styles.bodyContainer}>
+              {renderTitle()}
+              <View style={styles.subheader}>
+                <View style={styles.itemBody}>
+                  <Text style={styles.subtext}>{author}</Text>
+                  <Text style={styles.dot}>•</Text>
+                  <Text style={styles.subtext}>{host}</Text>
+                </View>
+              </View>
+              <View
+                style={
+                  viewMode === 'view' ? styles.subheader : styles.editSubHeader
+                }>
+                {renderDuration()}
+                {renderYields()}
+              </View>
+              <Text style={styles.sectionTitle}>Ingredients</Text>
+              <View style={styles.ingredientsContainer}>
+                {renderIngredients()}
+              </View>
+              <Text style={styles.sectionTitle}>Instructions</Text>
+              <View style={styles.instructionsContainer}>
+                {renderInstructions()}
               </View>
             </View>
-            <View style={styles.subheader}>
-              {renderDuration()}
-              {renderYields()}
-            </View>
-            <Text style={styles.sectionTitle}>Ingredients</Text>
-            <View style={styles.ingredientsContainer}>
-              {renderIngredients()}
-            </View>
-            <Text style={styles.sectionTitle}>Instructions</Text>
-            <View style={styles.instructionsContainer}>
-              {renderInstructions()}
-            </View>
           </View>
-        </View>
-      </Pressable>
-    </Animated.ScrollView>
+        </Pressable>
+      </Animated.ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  bodyContainer: {
     flex: 1,
     paddingHorizontal: 20,
   },
@@ -212,7 +284,7 @@ const styles = StyleSheet.create({
   duration: {
     color: '#666',
     overflow: 'hidden',
-    paddingRight: 10,
+    paddingRight: 5,
   },
   image: {
     width: '100%',
@@ -221,6 +293,7 @@ const styles = StyleSheet.create({
   },
   subheader: {
     flexDirection: 'row',
+    alignContent: 'center',
     marginTop: 5,
     width: '100%',
   },
@@ -237,7 +310,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    marginBottom: 15,
+    marginBottom: 10,
     marginTop: 25,
     color: '#666',
   },
@@ -253,5 +326,34 @@ const styles = StyleSheet.create({
   instructionsContainer: {
     flex: 1,
     paddingBottom: 25,
+  },
+  slider: {
+    flex: 1,
+  },
+  sliderValue: {
+    textAlign: 'center',
+    marginTop: 10,
+    marginLeft: 10,
+    width: 55,
+  },
+  durationContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    width: '100%',
+  },
+  editSubHeader: {
+    flexDirection: 'column',
+    width: '100%',
+  },
+  editText: {
+    alignSelf: 'flex-start',
+    lineHeight: 30,
+  },
+  lineContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  lineNumber: {
+    marginRight: 4,
   },
 });
