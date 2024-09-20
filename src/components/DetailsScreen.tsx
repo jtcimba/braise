@@ -12,7 +12,6 @@ import {
 import {TextInput} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '../hooks';
 import {changeViewMode} from '../features/viewModeSlice';
-import {Slider} from '@miblanchard/react-native-slider';
 import InstructionsEditor from './InstructionsEditor';
 
 export default function DetailsScreen({route, navigation}: any) {
@@ -104,36 +103,21 @@ export default function DetailsScreen({route, navigation}: any) {
     }
   }
 
-  function renderDuration() {
+  function renderTime() {
     if (viewMode === 'view') {
-      return (
-        <Text style={total_time ? styles.duration : null}>
-          {total_time ? total_time + ' min' : null}
-        </Text>
-      );
+      return <Text style={styles.time}>{total_time}</Text>;
     } else {
       return (
         <View>
-          <Text style={styles.sectionTitle}>Duration</Text>
-          <View style={styles.durationContainer}>
-            <View style={styles.slider}>
-              <Slider
-                minimumValue={0}
-                maximumValue={240}
-                step={1}
-                value={editingData.total_time?.toString()}
-                onValueChange={text =>
-                  onChangeEditingData({...editingData, total_time: text})
-                }
-              />
-            </View>
-            <Text style={styles.sliderValue}>
-              {editingData.total_time?.toString()}
-              {editingData.total_time ? (
-                <Text style={styles.subtext}> min</Text>
-              ) : null}
-            </Text>
-          </View>
+          <Text style={styles.sectionTitle}>Total Time</Text>
+          <TextInput
+            style={styles.lineText}
+            value={editingData.total_time}
+            placeholder="Time to cook"
+            onChangeText={text =>
+              onChangeEditingData({...editingData, total_time: text})
+            }
+          />
         </View>
       );
     }
@@ -147,9 +131,8 @@ export default function DetailsScreen({route, navigation}: any) {
         <View>
           <Text style={styles.sectionTitle}>Servings</Text>
           <TextInput
-            style={styles.subtext}
+            style={styles.lineText}
             value={editingData.yields}
-            multiline={true}
             placeholder="Yields"
             onChangeText={text =>
               onChangeEditingData({...editingData, yields: text})
@@ -164,7 +147,7 @@ export default function DetailsScreen({route, navigation}: any) {
     if (viewMode === 'view') {
       return ingredients.map((ingredient: any, index: any) => {
         return (
-          <View style={styles.itemContainer} key={index}>
+          <View style={styles.lineContainer} key={index}>
             <Text>{ingredient}</Text>
           </View>
         );
@@ -172,11 +155,10 @@ export default function DetailsScreen({route, navigation}: any) {
     } else {
       return (
         <TextInput
-          style={styles.editText}
+          style={styles.lineText}
           value={editingData.ingredients}
           placeholder="Enter ingredients, one per line"
           onChangeText={(text: any) => {
-            console.log(text);
             onChangeEditingData({
               ...editingData,
               ingredients: text,
@@ -192,17 +174,14 @@ export default function DetailsScreen({route, navigation}: any) {
     if (viewMode === 'view') {
       return instructions.split('\\n').map((instruction: any, index: any) => {
         return (
-          <View style={styles.itemContainer} key={index}>
-            <Text style={styles.instructionCount}>{index + 1}.</Text>
-            <Text style={styles.instructionItem}>{instruction}</Text>
+          <View style={styles.lineContainer} key={index}>
+            <Text style={styles.lineNumber}>{index + 1}.</Text>
+            <Text style={styles.lineText}>{instruction}</Text>
           </View>
         );
       });
     } else {
-      const instructionsArray = instructions.split('\\n').map((item: any) => {
-        return {text: item, id: Math.random()};
-      });
-      return <InstructionsEditor instructionsArray={instructionsArray} />;
+      return <InstructionsEditor instructions={instructions} />;
     }
   };
 
@@ -240,7 +219,7 @@ export default function DetailsScreen({route, navigation}: any) {
                 style={
                   viewMode === 'view' ? styles.subheader : styles.editSubHeader
                 }>
-                {renderDuration()}
+                {renderTime()}
                 {renderYields()}
               </View>
               <Text style={styles.sectionTitle}>Ingredients</Text>
@@ -281,7 +260,7 @@ const styles = StyleSheet.create({
     color: '#666',
     overflow: 'hidden',
   },
-  duration: {
+  time: {
     color: '#666',
     overflow: 'hidden',
     paddingRight: 5,
@@ -303,57 +282,33 @@ const styles = StyleSheet.create({
   ingredientsContainer: {
     flex: 1,
   },
-  itemContainer: {
+  lineContainer: {
     flex: 1,
     flexDirection: 'row',
     paddingVertical: 5,
   },
-  sectionTitle: {
-    fontSize: 16,
-    marginBottom: 10,
-    marginTop: 25,
-    color: '#666',
-  },
-  instructionItem: {
-    lineHeight: 30,
-    flex: 1,
-  },
-  instructionCount: {
+  lineNumber: {
     lineHeight: 30,
     marginRight: 10,
+    color: '#666',
+  },
+  lineText: {
+    lineHeight: 30,
+    flex: 1,
+    alignSelf: 'flex-start',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    marginTop: 25,
     color: '#666',
   },
   instructionsContainer: {
     flex: 1,
     paddingBottom: 25,
   },
-  slider: {
-    flex: 1,
-  },
-  sliderValue: {
-    textAlign: 'center',
-    marginTop: 10,
-    marginLeft: 10,
-    width: 55,
-  },
-  durationContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    width: '100%',
-  },
   editSubHeader: {
+    flex: 1,
     flexDirection: 'column',
     width: '100%',
-  },
-  editText: {
-    alignSelf: 'flex-start',
-    lineHeight: 30,
-  },
-  lineContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  lineNumber: {
-    marginRight: 4,
   },
 });
