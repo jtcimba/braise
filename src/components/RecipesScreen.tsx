@@ -24,9 +24,7 @@ const Item = ({item, navigation}: any) => (
     <View style={styles.itemBody}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.subtext}>{item.author}</Text>
-      <Text style={styles.time}>
-        {item.total_time ? item.total_time + ' min' : ''}
-      </Text>
+      <Text style={styles.time}>{item.total_time}</Text>
     </View>
   </TouchableOpacity>
 );

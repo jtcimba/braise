@@ -1,81 +1,105 @@
-import React, {useEffect, useRef, useState} from 'react';
-import InstructionItem from './InstructionItem';
-import {View} from 'react-native';
+import React, {useRef, useState, useEffect} from 'react';
+import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 
-const InstructionsEditor = ({
-  instructionsArray,
-}: {
-  instructionsArray: any[];
+interface InstructionsEditorProps {
+  instructions: string;
+}
+
+const InstructionsEditor: React.FC<InstructionsEditorProps> = ({
+  instructions,
 }) => {
-  const [instructions, setInstructions] = useState(instructionsArray);
-  const [cursorPosition, setCursorPosition] = useState<{
-    index: any;
-    selection: any;
-  }>({
-    index: null,
-    selection: null,
-  });
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
-  const editItem = (
-    type: string,
-    i: number,
-    curText?: string,
-    newText?: string,
-  ) => {
-    const newInstructions = [...instructions];
-    if (type === 'newline') {
-      newInstructions[i] = {text: curText, id: Math.random()};
-      newInstructions.splice(i + 1, 0, {text: newText, id: Math.random()});
-      setCursorPosition({index: i + 1, selection: 0});
-    } else if (type === 'backspace') {
-      const prevLength = newInstructions[i - 1].text.length;
-      newInstructions[i - 1].text = instructions[i - 1].text + curText;
-      newInstructions.splice(i, 1);
-      setCursorPosition({
-        index: i - 1,
-        selection: prevLength,
-      });
-    }
-    setInstructions(newInstructions);
-  };
+  const [text, setText] = useState(instructions.replace(/\\n/g, '\n'));
+  const scrollViewRef = useRef<ScrollView>(null);
+  const inputRefs = useRef<Array<TextInput | null>>([]);
+  const latestNonBackspaceKeyPressMsRef = useRef<number | null>(null);
 
   useEffect(() => {
-    inputRefs.current = inputRefs.current.slice(0, instructions.length);
+    setText(instructions.replace(/\\n/g, '\n'));
   }, [instructions]);
 
-  useEffect(() => {
-    if (
-      cursorPosition.index !== null &&
-      cursorPosition.selection !== null &&
-      inputRefs.current[cursorPosition.index]
-    ) {
-      // @ts-ignore
-      inputRefs.current[cursorPosition.index]?.focus();
-      // @ts-ignore
-      inputRefs.current[cursorPosition.index]?.setSelection(
-        cursorPosition.selection,
-        cursorPosition.selection,
-      );
-      setCursorPosition({index: null, selection: null});
+  const handleLineChange = (newLine: string, index: number) => {
+    const lines = text.split('\n');
+
+    if (newLine.includes('\n')) {
+      const newLines = newLine.split('\n');
+      lines[index] = newLines[0];
+      lines.splice(index + 1, 0, newLines[1]);
+      const newText = lines.join('\n');
+      setText(newText);
+      inputRefs.current[index + 1]?.focus();
+      inputRefs.current[index + 1]?.setSelection(0, 0);
+      return;
     }
-  }, [cursorPosition]);
+
+    lines[index] = newLine;
+    setText(lines.join('\n'));
+  };
+
+  const handleKeyPress = (e: any, index: number) => {
+    const lines = text.split('\n');
+    const currentLine = lines[index];
+
+    if (
+      e.nativeEvent.key === 'Backspace' &&
+      index > 0 &&
+      (!latestNonBackspaceKeyPressMsRef.current ||
+        Date.now() - latestNonBackspaceKeyPressMsRef.current > 80) &&
+      currentLine === ''
+    ) {
+      e.preventDefault();
+      const previousLine = lines[index - 1];
+      const prevLength = previousLine.length;
+      const newLine = previousLine + currentLine;
+      lines[index - 1] = newLine;
+      lines.splice(index, 1);
+      const newText = lines.join('\n');
+      setText(newText);
+      setTimeout(() => {
+        inputRefs.current[index - 1]?.focus();
+        inputRefs.current[index - 1]?.setSelection(prevLength, prevLength);
+      }, 0);
+    } else {
+      latestNonBackspaceKeyPressMsRef.current = Date.now();
+    }
+  };
 
   return (
     <View>
-      {instructions.map((value, index) => (
-        <InstructionItem
-          key={value.id}
-          innerRef={(ref: any) => (inputRefs.current[index] = ref)}
-          instruction={value.text}
-          i={index}
-          onSubmit={(type, i, curText, newText) =>
-            editItem(type, i, curText, newText)
-          }
-        />
-      ))}
+      <ScrollView ref={scrollViewRef}>
+        {text.split('\n').map((line, index) => (
+          <View key={index} style={styles.lineContainer}>
+            <Text style={styles.lineNumber}>{index + 1}.</Text>
+            <TextInput
+              ref={(ref: any) => (inputRefs.current[index] = ref)}
+              style={styles.lineText}
+              value={line}
+              onChangeText={newLine => handleLineChange(newLine, index)}
+              onKeyPress={e => handleKeyPress(e, index)}
+              multiline
+            />
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  lineContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    paddingVertical: 5,
+  },
+  lineNumber: {
+    lineHeight: 30,
+    marginRight: 10,
+    color: '#666',
+    paddingTop: 5,
+  },
+  lineText: {
+    lineHeight: 30,
+    flex: 1,
+  },
+});
 
 export default InstructionsEditor;
