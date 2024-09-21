@@ -18,7 +18,6 @@ const InstructionsEditor: React.FC<InstructionsEditorProps> = ({
   }, [instructions]);
 
   const handleLineChange = (newLine: string, index: number) => {
-    console.log('line change', index);
     const lines = text.split('\n');
 
     if (newLine.includes('\n')) {
