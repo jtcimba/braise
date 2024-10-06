@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -13,24 +13,15 @@ import {TextInput} from 'react-native-gesture-handler';
 import {useAppDispatch, useAppSelector} from '../hooks';
 import {changeViewMode} from '../features/viewModeSlice';
 import InstructionsEditor from './InstructionsEditor';
+import {useEditingHandler} from '../EditingHandlerContext';
 
 export default function DetailsScreen({route, navigation}: any) {
-  const {
-    title,
-    total_time,
-    image,
-    yields,
-    host,
-    author,
-    ingredients,
-    instructions,
-  } = route.params.item;
-
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
+  const {setHandleSavePress} = useEditingHandler();
+  const [data, onChangeData] = useState({...route.params.item});
   const [editingData, onChangeEditingData] = useState({
     ...route.params.item,
-    ingredients: route.params.item.ingredients.join('\n'),
   });
   const yOffset = useRef(new Animated.Value(0)).current;
   const headerOpacity = yOffset.interpolate({
@@ -39,16 +30,46 @@ export default function DetailsScreen({route, navigation}: any) {
     extrapolate: 'clamp',
   });
 
-  useEffect(() => {
-    dispatch(changeViewMode('edit'));
-  }, [dispatch, route.params.item]);
+  const handleSavePress = useCallback(() => {
+    fetch(`${process.env.API_URL}recipes/${editingData.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...editingData,
+        ingredients: editingData.ingredients.replace(/\\n$/, ''),
+      }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to update the recipe');
+        }
+        return response.text();
+      })
+      .then(() => {
+        return fetch(`${process.env.API_URL}recipes/${editingData.id}`);
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch the updated recipe');
+        }
+        return response.json();
+      })
+      .then(updatedRecipe => {
+        onChangeData(updatedRecipe[0]);
+        onChangeEditingData(updatedRecipe[0]);
+      })
+      .catch(e => console.log('save error', e.message));
+  }, [editingData]);
 
   useEffect(() => {
-    onChangeEditingData({
-      ...route.params.item,
-      ingredients: route.params.item.ingredients.join('\n'),
-    });
-  }, [viewMode, route.params.item]);
+    setHandleSavePress(() => handleSavePress);
+  }, [setHandleSavePress, handleSavePress, editingData]);
+
+  useEffect(() => {
+    dispatch(changeViewMode('view'));
+  }, [dispatch, route.params.item]);
 
   useEffect(() => {
     function headerBackground() {
@@ -77,17 +98,27 @@ export default function DetailsScreen({route, navigation}: any) {
     dispatch(changeViewMode('edit'));
   }
 
+  const handleInstructionUpdate = useCallback(
+    (newInstructions: string) => {
+      onChangeEditingData((prevData: any) => ({
+        ...prevData,
+        instructions: newInstructions,
+      }));
+    },
+    [onChangeEditingData],
+  );
+
   function renderImage() {
     if (viewMode === 'view') {
-      return <Image style={styles.image} source={{uri: image}} />;
+      return <Image style={styles.image} source={{uri: data.image}} />;
     } else {
-      return <Image style={styles.image} source={{uri: image}} />;
+      return <Image style={styles.image} source={{uri: data.image}} />;
     }
   }
 
   function renderTitle() {
     if (viewMode === 'view') {
-      return <Text style={styles.title}>{title}</Text>;
+      return <Text style={styles.title}>{data.title}</Text>;
     } else {
       return (
         <TextInput
@@ -105,7 +136,7 @@ export default function DetailsScreen({route, navigation}: any) {
 
   function renderTime() {
     if (viewMode === 'view') {
-      return <Text style={styles.time}>{total_time}</Text>;
+      return <Text style={styles.time}>{data.total_time}</Text>;
     } else {
       return (
         <View>
@@ -125,7 +156,7 @@ export default function DetailsScreen({route, navigation}: any) {
 
   function renderYields() {
     if (viewMode === 'view') {
-      return <Text style={styles.subtext}>{yields}</Text>;
+      return <Text style={styles.subtext}>{data.yields}</Text>;
     } else {
       return (
         <View>
@@ -145,23 +176,25 @@ export default function DetailsScreen({route, navigation}: any) {
 
   function renderIngredients() {
     if (viewMode === 'view') {
-      return ingredients.map((ingredient: any, index: any) => {
-        return (
-          <View style={styles.lineContainer} key={index}>
-            <Text>{ingredient}</Text>
-          </View>
-        );
-      });
+      return data.ingredients
+        .split('\\n')
+        .map((ingredient: any, index: any) => {
+          return (
+            <View style={styles.lineContainer} key={index}>
+              <Text>{ingredient}</Text>
+            </View>
+          );
+        });
     } else {
       return (
         <TextInput
           style={styles.lineText}
-          value={editingData.ingredients}
+          value={editingData.ingredients.split('\\n').join('\n')}
           placeholder="Enter ingredients, one per line"
           onChangeText={(text: any) => {
             onChangeEditingData({
               ...editingData,
-              ingredients: text,
+              ingredients: text.split('\n').join('\\n'),
             });
           }}
           multiline
@@ -172,16 +205,23 @@ export default function DetailsScreen({route, navigation}: any) {
 
   const renderInstructions = () => {
     if (viewMode === 'view') {
-      return instructions.split('\\n').map((instruction: any, index: any) => {
-        return (
-          <View style={styles.lineContainer} key={index}>
-            <Text style={styles.lineNumber}>{index + 1}.</Text>
-            <Text style={styles.lineText}>{instruction}</Text>
-          </View>
-        );
-      });
+      return data.instructions
+        .split('\\n')
+        .map((instruction: any, index: any) => {
+          return (
+            <View style={styles.lineContainer} key={index}>
+              <Text style={styles.lineNumber}>{index + 1}.</Text>
+              <Text style={styles.lineText}>{instruction}</Text>
+            </View>
+          );
+        });
     } else {
-      return <InstructionsEditor instructions={instructions} />;
+      return (
+        <InstructionsEditor
+          instructions={data.instructions}
+          onUpdate={handleInstructionUpdate}
+        />
+      );
     }
   };
 
@@ -210,9 +250,9 @@ export default function DetailsScreen({route, navigation}: any) {
               {renderTitle()}
               <View style={styles.subheader}>
                 <View style={styles.itemBody}>
-                  <Text style={styles.subtext}>{author}</Text>
+                  <Text style={styles.subtext}>{data.author}</Text>
                   <Text style={styles.dot}>•</Text>
-                  <Text style={styles.subtext}>{host}</Text>
+                  <Text style={styles.subtext}>{data.host}</Text>
                 </View>
               </View>
               <View

@@ -3,10 +3,12 @@ import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
 
 interface InstructionsEditorProps {
   instructions: string;
+  onUpdate: (instructions: string) => void;
 }
 
 const InstructionsEditor: React.FC<InstructionsEditorProps> = ({
   instructions,
+  onUpdate,
 }) => {
   const [text, setText] = useState(instructions.replace(/\\n/g, '\n'));
   const scrollViewRef = useRef<ScrollView>(null);
@@ -16,6 +18,10 @@ const InstructionsEditor: React.FC<InstructionsEditorProps> = ({
   useEffect(() => {
     setText(instructions.replace(/\\n/g, '\n'));
   }, [instructions]);
+
+  useEffect(() => {
+    onUpdate(text.replace(/\n/g, '\\n'));
+  }, [text, onUpdate]);
 
   const handleLineChange = (newLine: string, index: number) => {
     const lines = text.split('\n');

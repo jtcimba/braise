@@ -5,17 +5,18 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAppDispatch, useAppSelector} from '../hooks';
 import {changeViewMode} from '../features/viewModeSlice';
 import {useTheme} from '@react-navigation/native';
+import {useEditingHandler} from '../EditingHandlerContext';
 
 export default function DetailsMenu() {
   const {colors} = useTheme();
   const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
+  const {handleSavePress} = useEditingHandler();
 
   const handleEditPress = () => {
     setmodalVisible(false);
     dispatch(changeViewMode('edit'));
-    console.log('Edit option pressed');
   };
 
   const handleDeletePress = () => {
@@ -23,9 +24,9 @@ export default function DetailsMenu() {
     console.log('Delete option pressed');
   };
 
-  const handleSavePress = () => {
+  const onPress = () => {
+    handleSavePress();
     dispatch(changeViewMode('view'));
-    console.log('Save option pressed');
   };
 
   const handleUndoPress = () => {
@@ -51,7 +52,7 @@ export default function DetailsMenu() {
           </View>
           <View
             style={[styles(colors).container, styles(colors).saveContainer]}>
-            <TouchableOpacity onPress={handleSavePress}>
+            <TouchableOpacity onPress={onPress}>
               <Text style={[styles(colors).text, styles(colors).save]}>
                 Save
               </Text>
