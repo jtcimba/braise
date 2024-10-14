@@ -1,7 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Text, TouchableHighlight} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  SafeAreaView,
+} from 'react-native';
 import {signOut, getCurrentUser, AuthUser} from 'aws-amplify/auth';
-import {SafeAreaView} from 'react-native-safe-area-context';
 
 export default function SettingsScreen() {
   const [email, setEmail] = useState<string | undefined>('');

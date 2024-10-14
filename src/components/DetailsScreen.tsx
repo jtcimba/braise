@@ -1,10 +1,9 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Text,
   View,
   StyleSheet,
   Image,
-  Pressable,
   Animated,
   KeyboardAvoidingView,
   Platform,
@@ -15,19 +14,13 @@ import {changeViewMode} from '../features/viewModeSlice';
 import InstructionsEditor from './InstructionsEditor';
 import {useEditingHandler} from '../EditingHandlerContext';
 
-export default function DetailsScreen({route, navigation}: any) {
+export default function DetailsScreen({route}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
   const {setHandleSavePress} = useEditingHandler();
   const [data, onChangeData] = useState({...route.params.item});
   const [editingData, onChangeEditingData] = useState({
     ...route.params.item,
-  });
-  const yOffset = useRef(new Animated.Value(0)).current;
-  const headerOpacity = yOffset.interpolate({
-    inputRange: [0, 180],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
   });
 
   const handleSavePress = useCallback(() => {
@@ -70,33 +63,6 @@ export default function DetailsScreen({route, navigation}: any) {
   useEffect(() => {
     dispatch(changeViewMode('view'));
   }, [dispatch, route.params.item]);
-
-  useEffect(() => {
-    function headerBackground() {
-      return (
-        <Animated.View
-          // eslint-disable-next-line react-native/no-inline-styles
-          style={{
-            backgroundColor: '#EBE9E5',
-            ...StyleSheet.absoluteFillObject,
-            opacity: headerOpacity,
-          }}
-        />
-      );
-    }
-
-    navigation.setOptions({
-      headerStyle: {
-        backgroundColor: headerOpacity,
-      },
-      headerBackground: () => headerBackground(),
-      headerTransparent: true,
-    });
-  }, [headerOpacity, navigation]);
-
-  function onEdit() {
-    dispatch(changeViewMode('edit'));
-  }
 
   const handleInstructionUpdate = useCallback(
     (newInstructions: string) => {
@@ -229,50 +195,31 @@ export default function DetailsScreen({route, navigation}: any) {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
-      <Animated.ScrollView
-        automaticallyAdjustKeyboardInsets={true}
-        onScroll={Animated.event(
-          [
-            {
-              nativeEvent: {
-                contentOffset: {
-                  y: yOffset,
-                },
-              },
-            },
-          ],
-          {useNativeDriver: true},
-        )}>
-        <Pressable onLongPress={onEdit}>
-          <View>
-            {renderImage()}
-            <View style={styles.bodyContainer}>
-              {renderTitle()}
-              <View style={styles.subheader}>
-                <View style={styles.itemBody}>
-                  <Text style={styles.subtext}>{data.author}</Text>
-                  <Text style={styles.dot}>•</Text>
-                  <Text style={styles.subtext}>{data.host}</Text>
-                </View>
-              </View>
-              <View
-                style={
-                  viewMode === 'view' ? styles.subheader : styles.editSubHeader
-                }>
-                {renderTime()}
-                {renderYields()}
-              </View>
-              <Text style={styles.sectionTitle}>Ingredients</Text>
-              <View style={styles.ingredientsContainer}>
-                {renderIngredients()}
-              </View>
-              <Text style={styles.sectionTitle}>Instructions</Text>
-              <View style={styles.instructionsContainer}>
-                {renderInstructions()}
-              </View>
+      <Animated.ScrollView automaticallyAdjustKeyboardInsets={true}>
+        {renderImage()}
+        <View style={styles.bodyContainer}>
+          {renderTitle()}
+          <View style={styles.subheader}>
+            <View style={styles.itemBody}>
+              <Text style={styles.subtext}>{data.author}</Text>
+              <Text style={styles.dot}>•</Text>
+              <Text style={styles.subtext}>{data.host}</Text>
             </View>
           </View>
-        </Pressable>
+          <View
+            style={
+              viewMode === 'view' ? styles.subheader : styles.editSubHeader
+            }>
+            {renderTime()}
+            {renderYields()}
+          </View>
+          <Text style={styles.sectionTitle}>Ingredients</Text>
+          <View style={styles.ingredientsContainer}>{renderIngredients()}</View>
+          <Text style={styles.sectionTitle}>Instructions</Text>
+          <View style={styles.instructionsContainer}>
+            {renderInstructions()}
+          </View>
+        </View>
       </Animated.ScrollView>
     </KeyboardAvoidingView>
   );
