@@ -29,9 +29,9 @@ export default function DetailsMenu() {
     dispatch(changeViewMode('view'));
   };
 
-  const handleUndoPress = () => {
+  const handleCancelPress = () => {
     dispatch(changeViewMode('view'));
-    console.log('Undo option pressed');
+    console.log('Cancel option pressed');
   };
 
   return (
@@ -39,15 +39,17 @@ export default function DetailsMenu() {
       {viewMode === 'view' && (
         <View style={styles(colors).container}>
           <TouchableOpacity onPress={() => setmodalVisible(true)}>
-            <Ionicons name="ellipsis-horizontal" size={22} color="gray" />
+            <Ionicons name="ellipsis-horizontal" size={22} color="white" />
           </TouchableOpacity>
         </View>
       )}
       {viewMode === 'edit' && (
         <View style={styles(colors).editContainer}>
           <View style={styles(colors).container}>
-            <TouchableOpacity onPress={handleUndoPress}>
-              <Ionicons name="arrow-undo-outline" size={22} color="gray" />
+            <TouchableOpacity onPress={handleCancelPress}>
+              <Text style={[styles(colors).text, styles(colors).cancel]}>
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
           <View
@@ -100,7 +102,7 @@ export default function DetailsMenu() {
 const styles = (colors: any) =>
   StyleSheet.create({
     container: {
-      backgroundColor: '#EBE9E5',
+      backgroundColor: colors.opaque,
       borderRadius: 50,
       paddingTop: 2,
       paddingLeft: 1,
@@ -121,8 +123,8 @@ const styles = (colors: any) =>
       paddingBottom: 2,
       paddingRight: 5,
     },
-    undo: {
-      color: 'gray',
+    cancel: {
+      color: 'white',
     },
     save: {
       color: 'white',

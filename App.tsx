@@ -27,6 +27,7 @@ const LightTheme = {
     card: '#EBE9E5',
     text: '#323232',
     border: '#D4D4D4',
+    opaque: 'rgba(0, 0, 0, 0.3)',
   },
   fonts: {
     regular: {
