@@ -19,11 +19,13 @@ export default function DetailsScreen({route}: any) {
   const dispatch = useAppDispatch();
   const {setHandleSavePress} = useEditingHandler();
   const [data, onChangeData] = useState({...route.params.item});
+  const [isLoading, setIsLoading] = useState(false);
   const [editingData, onChangeEditingData] = useState({
     ...route.params.item,
   });
 
   const handleSavePress = useCallback(() => {
+    setIsLoading(true);
     fetch(`${process.env.API_URL}recipes/${editingData.id}`, {
       method: 'PUT',
       headers: {
@@ -52,8 +54,12 @@ export default function DetailsScreen({route}: any) {
       .then(updatedRecipe => {
         onChangeData(updatedRecipe[0]);
         onChangeEditingData(updatedRecipe[0]);
+        setIsLoading(false);
       })
-      .catch(e => console.log('save error', e.message));
+      .catch(e => {
+        console.log('save error', e.message);
+        setIsLoading(false);
+      });
   }, [editingData]);
 
   useEffect(() => {
@@ -76,7 +82,13 @@ export default function DetailsScreen({route}: any) {
 
   function renderImage() {
     if (viewMode === 'view') {
-      return <Image style={styles.image} source={{uri: data.image}} />;
+      return (
+        <Image
+          style={styles.image}
+          source={{uri: data.image}}
+          defaultSource={require('../assets/images/placeholder.png')}
+        />
+      );
     } else {
       return <Image style={styles.image} source={{uri: data.image}} />;
     }
@@ -221,6 +233,7 @@ export default function DetailsScreen({route}: any) {
           </View>
         </View>
       </Animated.ScrollView>
+      {isLoading && <View style={styles.loadingOverlay} />}
     </KeyboardAvoidingView>
   );
 }
@@ -254,7 +267,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 250,
+    height: 215,
     resizeMode: 'cover',
   },
   subheader: {
@@ -297,5 +310,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     width: '100%',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
