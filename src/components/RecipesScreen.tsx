@@ -15,18 +15,27 @@ const Item = ({item, navigation}: any) => (
   <TouchableOpacity
     style={styles.item}
     onPress={() => navigation.navigate('DetailsScreen', {item: item})}>
-    <Image
-      style={styles.image}
-      source={{
-        uri: item.image,
-      }}
-    />
+    <View>
+      <Image
+        style={styles.image}
+        source={{
+          uri: item.image,
+        }}
+        defaultSource={require('../assets/images/placeholder.png')}
+      />
+    </View>
     <View style={styles.itemBody}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.subtext}>{item.author}</Text>
       <Text style={styles.time}>{item.total_time}</Text>
     </View>
   </TouchableOpacity>
+);
+
+const NoRecipes = () => (
+  <View style={styles.noRecipes}>
+    <Text style={styles.subtext}>No recipes found</Text>
+  </View>
 );
 
 export default function RecipesScreen() {
@@ -86,6 +95,7 @@ export default function RecipesScreen() {
                 return <Item item={item} navigation={navigation} />;
               }}
               keyExtractor={item => item.canonical_url}
+              ListEmptyComponent={<NoRecipes />}
             />
           )}
         </View>
@@ -122,5 +132,11 @@ const styles = StyleSheet.create({
   subtext: {
     color: '#666',
     overflow: 'hidden',
+  },
+  noRecipes: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
