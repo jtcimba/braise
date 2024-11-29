@@ -24,7 +24,7 @@ export default function DetailsMenu() {
     console.log('Delete option pressed');
   };
 
-  const onPress = () => {
+  const onSavePress = () => {
     handleSavePress();
     dispatch(changeViewMode('view'));
   };
@@ -39,7 +39,7 @@ export default function DetailsMenu() {
       {viewMode === 'view' && (
         <View style={styles(colors).container}>
           <TouchableOpacity onPress={() => setmodalVisible(true)}>
-            <Ionicons name="ellipsis-horizontal" size={22} color="white" />
+            <Ionicons name="ellipsis-horizontal" size={18} color="white" />
           </TouchableOpacity>
         </View>
       )}
@@ -54,7 +54,7 @@ export default function DetailsMenu() {
           </View>
           <View
             style={[styles(colors).container, styles(colors).saveContainer]}>
-            <TouchableOpacity onPress={onPress}>
+            <TouchableOpacity onPress={onSavePress}>
               <Text style={[styles(colors).text, styles(colors).save]}>
                 Save
               </Text>
@@ -72,9 +72,11 @@ export default function DetailsMenu() {
           <View
             style={[styles(colors).optionsView, styles(colors).borderBottom]}>
             <Text style={styles(colors).optionsText}>Options</Text>
-            <TouchableOpacity onPress={() => setmodalVisible(false)}>
-              <Ionicons name="close-circle" size={25} color="gray" />
-            </TouchableOpacity>
+            <View style={[styles(colors).iconContainer]}>
+              <TouchableOpacity onPress={() => setmodalVisible(false)}>
+                <Ionicons name="close-outline" size={18} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
           <TouchableOpacity
             style={styles(colors).modalItem}
@@ -103,7 +105,7 @@ const styles = (colors: any) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.opaque,
-      borderRadius: 50,
+      borderRadius: 48,
       paddingTop: 2,
       paddingLeft: 1,
       paddingBottom: 2,
@@ -179,5 +181,10 @@ const styles = (colors: any) =>
     },
     icon: {
       marginRight: 15,
+    },
+    iconContainer: {
+      backgroundColor: colors.opaque,
+      borderRadius: 48,
+      padding: 2,
     },
   });

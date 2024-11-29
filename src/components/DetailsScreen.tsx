@@ -13,6 +13,7 @@ import {useAppDispatch, useAppSelector} from '../hooks';
 import {changeViewMode} from '../features/viewModeSlice';
 import InstructionsEditor from './InstructionsEditor';
 import {useEditingHandler} from '../EditingHandlerContext';
+import {RecipeService} from '../api';
 
 export default function DetailsScreen({route}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -20,55 +21,58 @@ export default function DetailsScreen({route}: any) {
   const {setHandleSavePress} = useEditingHandler();
   const [data, onChangeData] = useState({...route.params.item});
   const [isLoading, setIsLoading] = useState(false);
-  const [editingData, onChangeEditingData] = useState({
-    ...route.params.item,
-  });
+  const [editingData, onChangeEditingData] = useState({...route.params.item});
 
-  const handleSavePress = useCallback(() => {
+  const handleSaveNewRecipe = useCallback(async () => {
     setIsLoading(true);
-    fetch(`${process.env.API_URL}recipes/${editingData.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    try {
+      const response = await RecipeService.addNewRecipe({
         ...editingData,
         ingredients: editingData.ingredients.replace(/\\n$/, ''),
-      }),
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to update the recipe');
-        }
-        return response.text();
-      })
-      .then(() => {
-        return fetch(`${process.env.API_URL}recipes/${editingData.id}`);
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch the updated recipe');
-        }
-        return response.json();
-      })
-      .then(updatedRecipe => {
-        onChangeData(updatedRecipe[0]);
-        onChangeEditingData(updatedRecipe[0]);
-        setIsLoading(false);
-      })
-      .catch(e => {
-        console.log('save error', e.message);
-        setIsLoading(false);
       });
+      const newRecipe = await RecipeService.getRecipe(response.id);
+      onChangeData(newRecipe[0]);
+      onChangeEditingData(newRecipe[0]);
+    } catch (e: any) {
+      console.log('save error', e.message);
+    } finally {
+      setIsLoading(false);
+    }
   }, [editingData]);
+
+  const handleSavePress = useCallback(async () => {
+    if (route.params.newRecipe) {
+      handleSaveNewRecipe();
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await RecipeService.updateRecipe(editingData.id, {
+        ...editingData,
+        ingredients: editingData.ingredients.replace(/\\n$/, ''),
+      });
+
+      const updatedRecipe = await RecipeService.getRecipe(editingData.id);
+      onChangeData(updatedRecipe[0]);
+      onChangeEditingData(updatedRecipe[0]);
+    } catch (e: any) {
+      console.log('save error', e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [editingData, handleSaveNewRecipe, route.params.newRecipe]);
 
   useEffect(() => {
     setHandleSavePress(() => handleSavePress);
   }, [setHandleSavePress, handleSavePress, editingData]);
 
   useEffect(() => {
+    if (route.params.newRecipe) {
+      dispatch(changeViewMode('edit'));
+      return;
+    }
     dispatch(changeViewMode('view'));
-  }, [dispatch, route.params.item]);
+  }, [dispatch, route.params.item, route.params.newRecipe]);
 
   const handleInstructionUpdate = useCallback(
     (newInstructions: string) => {
@@ -121,7 +125,7 @@ export default function DetailsScreen({route}: any) {
           <Text style={styles.sectionTitle}>Total Time</Text>
           <TextInput
             style={styles.lineText}
-            value={editingData.total_time}
+            value={editingData.total_time.toString()}
             placeholder="Time to cook"
             onChangeText={text =>
               onChangeEditingData({...editingData, total_time: text})
@@ -154,25 +158,17 @@ export default function DetailsScreen({route}: any) {
 
   function renderIngredients() {
     if (viewMode === 'view') {
-      return data.ingredients
-        .split('\\n')
-        .map((ingredient: any, index: any) => {
-          return (
-            <View style={styles.lineContainer} key={index}>
-              <Text>{ingredient}</Text>
-            </View>
-          );
-        });
+      return <Text style={styles.lineText}>{data.ingredients}</Text>;
     } else {
       return (
         <TextInput
           style={styles.lineText}
-          value={editingData.ingredients.split('\\n').join('\n')}
+          value={editingData.ingredients}
           placeholder="Enter ingredients, one per line"
           onChangeText={(text: any) => {
             onChangeEditingData({
               ...editingData,
-              ingredients: text.split('\n').join('\\n'),
+              ingredients: text,
             });
           }}
           multiline
@@ -184,7 +180,7 @@ export default function DetailsScreen({route}: any) {
   const renderInstructions = () => {
     if (viewMode === 'view') {
       return data.instructions
-        .split('\\n')
+        .split('\n')
         .map((instruction: any, index: any) => {
           return (
             <View style={styles.lineContainer} key={index}>

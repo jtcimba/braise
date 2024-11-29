@@ -14,6 +14,7 @@ import SettingsIcon from './src/components/SettingsIcon';
 import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenu from './src/components/DetailsMenu';
+import AddFromUrlScreen from './src/components/AddFromUrlScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -51,6 +52,37 @@ const LightTheme = {
 
 function AddComponent() {
   return null;
+}
+
+function AddStackNavigator() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="AddScreen"
+        component={AddScreen}
+        options={({navigation}) => ({
+          headerLeft: () => null,
+          headerRight: () => CloseIcon(navigation, 'Recipes'),
+          headerTitle: 'Add recipe',
+          presentation: 'modal',
+          headerShadowVisible: false,
+          headerRightContainerStyle: {paddingRight: 10},
+        })}
+      />
+      <Stack.Screen
+        name="AddFromUrl"
+        component={AddFromUrlScreen}
+        options={({navigation}) => ({
+          headerTitle: 'Add from URL',
+          headerLeft: () => BackIcon(navigation),
+          headerLeftContainerStyle: {paddingLeft: 10},
+          headerRight: () => CloseIcon(navigation, 'Recipes'),
+          headerShadowVisible: false,
+          headerRightContainerStyle: {paddingRight: 10},
+        })}
+      />
+    </Stack.Navigator>
+  );
 }
 
 function TabNavigator({navigation}: {navigation: any}) {
@@ -125,7 +157,7 @@ export function App(): React.JSX.Element {
             headerTransparent: true,
             headerShadowVisible: false,
             headerTitle: '',
-            headerLeft: () => BackIcon(navigation),
+            headerLeft: () => BackIcon(navigation, 'Details'),
             headerLeftContainerStyle: {paddingLeft: 10},
             headerRight: () => DetailsMenu(),
             headerRightContainerStyle: {paddingRight: 10},
@@ -133,21 +165,18 @@ export function App(): React.JSX.Element {
         />
         <Stack.Screen
           name="Add"
-          component={AddScreen}
-          options={({navigation}) => ({
-            headerLeft: () => null,
-            headerRight: () => CloseIcon(navigation),
+          component={AddStackNavigator}
+          options={{
+            headerShown: false,
             presentation: 'modal',
-            headerShadowVisible: false,
-            headerRightContainerStyle: {paddingRight: 10},
-          })}
+          }}
         />
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}
           options={({navigation}) => ({
             headerLeft: () => null,
-            headerRight: () => CloseIcon(navigation),
+            headerRight: () => CloseIcon(navigation, 'Recipes'),
             presentation: 'modal',
             headerShadowVisible: false,
             headerRightContainerStyle: {paddingRight: 10},

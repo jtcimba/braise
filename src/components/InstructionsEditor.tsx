@@ -10,17 +10,13 @@ const InstructionsEditor: React.FC<InstructionsEditorProps> = ({
   instructions,
   onUpdate,
 }) => {
-  const [text, setText] = useState(instructions.replace(/\\n/g, '\n'));
+  const [text, setText] = useState(instructions);
   const scrollViewRef = useRef<ScrollView>(null);
   const inputRefs = useRef<Array<TextInput | null>>([]);
   const latestNonBackspaceKeyPressMsRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setText(instructions.replace(/\\n/g, '\n'));
-  }, [instructions]);
-
-  useEffect(() => {
-    onUpdate(text.replace(/\n/g, '\\n'));
+    onUpdate(text);
   }, [text, onUpdate]);
 
   const handleLineChange = (newLine: string, index: number) => {

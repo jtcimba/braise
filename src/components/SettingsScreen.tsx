@@ -6,21 +6,20 @@ import {
   TouchableHighlight,
   SafeAreaView,
 } from 'react-native';
-import {signOut, getCurrentUser, AuthUser} from 'aws-amplify/auth';
+import {signOut} from 'aws-amplify/auth';
+import {AuthService} from '../api';
 
 export default function SettingsScreen() {
   const [email, setEmail] = useState<string | undefined>('');
 
   useEffect(() => {
-    getCurrentUser()
-      .then((userInfo: AuthUser | undefined) => {
-        if (userInfo?.signInDetails) {
-          setEmail(userInfo.signInDetails.loginId);
-        }
-      })
-      .catch(error => {
-        console.log('error getting user info: ', error);
-      });
+    const getUser = async () => {
+      const user = await AuthService.getUser();
+      if (user) {
+        setEmail(user.signInDetails?.loginId);
+      }
+    };
+    getUser();
   }, []);
 
   const handleSignOut = async () => {
