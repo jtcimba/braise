@@ -7,7 +7,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {RecipeService} from '../api';
 
@@ -38,21 +38,29 @@ const NoRecipes = () => (
   </View>
 );
 
-export default function RecipesScreen() {
+export default function RecipesScreen({route}: any) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const getRecipes = async () => {
-      setLoading(true);
-      const recipes = await RecipeService.getRecipes();
-      setData(recipes);
-      setLoading(false);
-    };
+  const fetchRecipes = async () => {
+    setLoading(true);
+    const recipes = await RecipeService.getRecipes();
+    setData(recipes);
+    setLoading(false);
+  };
 
-    getRecipes();
+  useEffect(() => {
+    fetchRecipes();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.refresh) {
+        fetchRecipes();
+      }
+    }, [route.params]),
+  );
 
   return (
     <View style={styles.container}>

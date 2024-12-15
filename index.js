@@ -9,8 +9,8 @@ import {name as appName} from './app.json';
 import {Amplify} from 'aws-amplify';
 import amplifyconfig from './src/amplifyconfiguration.json';
 import {Provider} from 'react-redux';
-import store from './src/store';
-import {EditingHandlerProvider} from './src/EditingHandlerContext';
+import store from './src/redux/store';
+import {EditingHandlerProvider} from './src/context/EditingHandlerContext';
 Amplify.configure(amplifyconfig);
 
 const ReduxProvider = () => (

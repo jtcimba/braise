@@ -1,10 +1,8 @@
 import {configureStore} from '@reduxjs/toolkit';
-import viewModeReducer from './features/viewModeSlice';
+import rootReducer from './rootReducer';
 
 const store = configureStore({
-  reducer: {
-    viewMode: viewModeReducer,
-  },
+  reducer: rootReducer,
 });
 
 export default store;
