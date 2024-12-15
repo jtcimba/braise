@@ -53,12 +53,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#EBE9E5',
+    paddingHorizontal: 20,
   },
   settings: {
     flex: 1,
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 20,
   },
   version: {
     color: 'gray',

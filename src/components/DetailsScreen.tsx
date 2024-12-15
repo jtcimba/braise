@@ -9,16 +9,16 @@ import {
   Platform,
 } from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
-import {useAppDispatch, useAppSelector} from '../hooks';
-import {changeViewMode} from '../features/viewModeSlice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {changeViewMode} from '../redux/slices/viewModeSlice';
 import InstructionsEditor from './InstructionsEditor';
-import {useEditingHandler} from '../EditingHandlerContext';
+import {useEditingHandler} from '../context/EditingHandlerContext';
 import {RecipeService} from '../api';
 
-export default function DetailsScreen({route}: any) {
+export default function DetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
-  const {setHandleSavePress} = useEditingHandler();
+  const {setHandleSavePress, setHandleDeletePress} = useEditingHandler();
   const [data, onChangeData] = useState({...route.params.item});
   const [isLoading, setIsLoading] = useState(false);
   const [editingData, onChangeEditingData] = useState({...route.params.item});
@@ -62,9 +62,28 @@ export default function DetailsScreen({route}: any) {
     }
   }, [editingData, handleSaveNewRecipe, route.params.newRecipe]);
 
+  const handleDeletePress = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await RecipeService.deleteRecipe(editingData.id);
+    } catch (e: any) {
+      console.log('delete error', e.message);
+    } finally {
+      setIsLoading(false);
+      navigation.navigate('Recipes', {refresh: true});
+    }
+  }, [editingData.id, navigation]);
+
   useEffect(() => {
     setHandleSavePress(() => handleSavePress);
-  }, [setHandleSavePress, handleSavePress, editingData]);
+    setHandleDeletePress(() => handleDeletePress);
+  }, [
+    setHandleSavePress,
+    handleSavePress,
+    setHandleDeletePress,
+    handleDeletePress,
+    editingData,
+  ]);
 
   useEffect(() => {
     if (route.params.newRecipe) {
@@ -125,7 +144,7 @@ export default function DetailsScreen({route}: any) {
           <Text style={styles.sectionTitle}>Total Time</Text>
           <TextInput
             style={styles.lineText}
-            value={editingData.total_time.toString()}
+            value={editingData.total_time?.toString()}
             placeholder="Time to cook"
             onChangeText={text =>
               onChangeEditingData({...editingData, total_time: text})

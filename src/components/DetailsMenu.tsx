@@ -1,27 +1,40 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, StyleSheet, View, Text} from 'react-native';
+import {TouchableOpacity, StyleSheet, View, Text, Alert} from 'react-native';
 import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useAppDispatch, useAppSelector} from '../hooks';
-import {changeViewMode} from '../features/viewModeSlice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {changeViewMode} from '../redux/slices/viewModeSlice';
 import {useTheme} from '@react-navigation/native';
-import {useEditingHandler} from '../EditingHandlerContext';
+import {useEditingHandler} from '../context/EditingHandlerContext';
 
 export default function DetailsMenu() {
   const {colors} = useTheme();
   const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
-  const {handleSavePress} = useEditingHandler();
+  const {handleSavePress, handleDeletePress} = useEditingHandler();
 
-  const handleEditPress = () => {
+  const onEditPress = () => {
     setmodalVisible(false);
     dispatch(changeViewMode('edit'));
   };
 
-  const handleDeletePress = () => {
+  const onDeletePress = () => {
     setmodalVisible(false);
-    console.log('Delete option pressed');
+    Alert.alert(
+      'Delete Recipe',
+      'Are you sure you want to delete this recipe?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: handleDeletePress,
+        },
+      ],
+    );
   };
 
   const onSavePress = () => {
@@ -29,9 +42,8 @@ export default function DetailsMenu() {
     dispatch(changeViewMode('view'));
   };
 
-  const handleCancelPress = () => {
+  const onCancelPress = () => {
     dispatch(changeViewMode('view'));
-    console.log('Cancel option pressed');
   };
 
   return (
@@ -46,7 +58,7 @@ export default function DetailsMenu() {
       {viewMode === 'edit' && (
         <View style={styles(colors).editContainer}>
           <View style={styles(colors).container}>
-            <TouchableOpacity onPress={handleCancelPress}>
+            <TouchableOpacity onPress={onCancelPress}>
               <Text style={[styles(colors).text, styles(colors).cancel]}>
                 Cancel
               </Text>
@@ -80,13 +92,13 @@ export default function DetailsMenu() {
           </View>
           <TouchableOpacity
             style={styles(colors).modalItem}
-            onPress={handleEditPress}>
+            onPress={onEditPress}>
             <Ionicons name="pencil" size={16} style={styles(colors).icon} />
             <Text style={styles(colors).editText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles(colors).modalItem]}
-            onPress={handleDeletePress}>
+            onPress={onDeletePress}>
             <Ionicons
               name="trash-outline"
               size={16}
