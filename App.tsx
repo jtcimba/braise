@@ -157,9 +157,9 @@ export function App(): React.JSX.Element {
             headerTransparent: true,
             headerShadowVisible: false,
             headerTitle: '',
-            headerLeft: () => BackIcon(navigation, 'Details'),
+            headerLeft: () => BackIcon(navigation, 'DetailsScreen'),
             headerLeftContainerStyle: {paddingLeft: 10},
-            headerRight: () => DetailsMenu(),
+            headerRight: () => DetailsMenu(navigation),
             headerRightContainerStyle: {paddingRight: 10},
           })}
         />

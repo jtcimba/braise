@@ -12,7 +12,7 @@ interface TabBarIconProps {
 const TabBarIcon: React.FC<TabBarIconProps> = ({
   name,
   color = 'gray',
-  size = 25,
+  size = 24,
   onPressFunction,
 }) => {
   const scale = useRef(new Animated.Value(1)).current;

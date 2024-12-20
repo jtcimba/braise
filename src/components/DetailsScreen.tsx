@@ -87,7 +87,7 @@ export default function DetailsScreen({route, navigation}: any) {
 
   useEffect(() => {
     if (route.params.newRecipe) {
-      dispatch(changeViewMode('edit'));
+      dispatch(changeViewMode('new'));
       return;
     }
     dispatch(changeViewMode('view'));

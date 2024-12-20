@@ -8,14 +8,22 @@ export default function BackIcon(navigation: any, component: any = null) {
   const {colors} = useTheme();
   const viewMode = useSelector((state: any) => state.viewMode.value);
 
-  if (viewMode === 'edit' && component === 'Details') {
+  if (viewMode !== 'view' && component === 'DetailsScreen') {
     return null;
   }
 
+  const onBackPress = () => {
+    if (component === 'DetailsScreen') {
+      navigation.navigate('Recipes', {refresh: true});
+      return;
+    }
+    navigation.goBack();
+  };
+
   return (
     <View style={[styles(colors).iconContainer]}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Ionicons name="chevron-back-outline" size={18} color="white" />
+      <TouchableOpacity onPress={onBackPress}>
+        <Ionicons name="chevron-back-outline" size={20} color="white" />
       </TouchableOpacity>
     </View>
   );

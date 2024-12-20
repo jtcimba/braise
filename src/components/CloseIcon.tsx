@@ -9,7 +9,7 @@ export default function CloseIcon(navigation: any, parentComponent: string) {
   return (
     <View style={[styles(colors).iconContainer]}>
       <TouchableOpacity onPress={() => navigation.navigate(parentComponent)}>
-        <Ionicons name="close-outline" size={18} color="white" />
+        <Ionicons name="close-outline" size={20} color="white" />
       </TouchableOpacity>
     </View>
   );
