@@ -15,11 +15,6 @@ export default function AddScreen() {
         <Text style={styles(colors).text}>From url</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => console.log('From image')}
-        style={styles(colors).button}>
-        <Text style={styles(colors).text}>From image</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
         onPress={() => console.log('From scratch')}
         style={styles(colors).button}>
         <Text style={styles(colors).text}>From scratch</Text>

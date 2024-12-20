@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 function SettingsIcon(navigation: any) {
   return (
     <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-      <Ionicons name="settings-outline" size={22} color="gray" />
+      <Ionicons name="settings-outline" size={24} color="gray" />
     </TouchableOpacity>
   );
 }

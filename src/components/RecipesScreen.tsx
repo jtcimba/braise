@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
@@ -42,16 +43,25 @@ export default function RecipesScreen({route}: any) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchRecipes().then(() => {
+      setRefreshing(false);
+    });
+  };
 
   const fetchRecipes = async () => {
-    setLoading(true);
     const recipes = await RecipeService.getRecipes();
     setData(recipes);
-    setLoading(false);
   };
 
   useEffect(() => {
-    fetchRecipes();
+    setLoading(true);
+    fetchRecipes().then(() => {
+      setLoading(false);
+    });
   }, []);
 
   useFocusEffect(
@@ -67,21 +77,18 @@ export default function RecipesScreen({route}: any) {
       {isLoading ? (
         <ActivityIndicator />
       ) : (
-        <View style={styles.container}>
-          {isLoading ? (
-            <ActivityIndicator />
-          ) : (
-            <FlatList
-              style={styles.container}
-              data={data}
-              renderItem={({item}) => {
-                return <Item item={item} navigation={navigation} />;
-              }}
-              keyExtractor={item => item.canonical_url}
-              ListEmptyComponent={<NoRecipes />}
-            />
-          )}
-        </View>
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          style={styles.container}
+          data={data}
+          renderItem={({item}) => {
+            return <Item item={item} navigation={navigation} />;
+          }}
+          keyExtractor={item => item.id}
+          ListEmptyComponent={!refreshing ? <NoRecipes /> : null}
+        />
       )}
     </View>
   );

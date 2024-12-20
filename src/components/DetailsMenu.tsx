@@ -7,7 +7,7 @@ import {changeViewMode} from '../redux/slices/viewModeSlice';
 import {useTheme} from '@react-navigation/native';
 import {useEditingHandler} from '../context/EditingHandlerContext';
 
-export default function DetailsMenu() {
+export default function DetailsMenu(navigation: any) {
   const {colors} = useTheme();
   const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -43,7 +43,11 @@ export default function DetailsMenu() {
   };
 
   const onCancelPress = () => {
-    dispatch(changeViewMode('view'));
+    if (viewMode === 'new') {
+      navigation.navigate('Recipes');
+    } else {
+      dispatch(changeViewMode('view'));
+    }
   };
 
   return (
@@ -51,11 +55,11 @@ export default function DetailsMenu() {
       {viewMode === 'view' && (
         <View style={styles(colors).container}>
           <TouchableOpacity onPress={() => setmodalVisible(true)}>
-            <Ionicons name="ellipsis-horizontal" size={18} color="white" />
+            <Ionicons name="ellipsis-horizontal" size={20} color="white" />
           </TouchableOpacity>
         </View>
       )}
-      {viewMode === 'edit' && (
+      {viewMode !== 'view' && (
         <View style={styles(colors).editContainer}>
           <View style={styles(colors).container}>
             <TouchableOpacity onPress={onCancelPress}>
@@ -86,14 +90,14 @@ export default function DetailsMenu() {
             <Text style={styles(colors).optionsText}>Options</Text>
             <View style={[styles(colors).iconContainer]}>
               <TouchableOpacity onPress={() => setmodalVisible(false)}>
-                <Ionicons name="close-outline" size={18} color="white" />
+                <Ionicons name="close-outline" size={20} color="white" />
               </TouchableOpacity>
             </View>
           </View>
           <TouchableOpacity
             style={styles(colors).modalItem}
             onPress={onEditPress}>
-            <Ionicons name="pencil" size={16} style={styles(colors).icon} />
+            <Ionicons name="pencil" size={18} style={styles(colors).icon} />
             <Text style={styles(colors).editText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -101,7 +105,7 @@ export default function DetailsMenu() {
             onPress={onDeletePress}>
             <Ionicons
               name="trash-outline"
-              size={16}
+              size={18}
               color="red"
               style={styles(colors).icon}
             />
