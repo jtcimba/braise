@@ -7,7 +7,7 @@ import RecipesScreen from './src/components/RecipesScreen';
 import SettingsScreen from './src/components/SettingsScreen';
 import AddScreen from './src/components/AddScreen';
 import {createStackNavigator} from '@react-navigation/stack';
-import DetailsScreen from './src/components/DetailsScreen';
+import RecipeDetailsScreen from './src/components/RecipeDetailsScreen';
 import DiscoverScreen from './src/components/DiscoverScreen';
 import TabBarIcon from './src/components/TabBarIcon';
 import SettingsIcon from './src/components/SettingsIcon';
@@ -152,12 +152,12 @@ export function App(): React.JSX.Element {
         />
         <Stack.Screen
           name="DetailsScreen"
-          component={DetailsScreen}
+          component={RecipeDetailsScreen}
           options={({navigation}) => ({
             headerTransparent: true,
             headerShadowVisible: false,
             headerTitle: '',
-            headerLeft: () => BackIcon(navigation, 'DetailsScreen'),
+            headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
             headerLeftContainerStyle: {paddingLeft: 10},
             headerRight: () => DetailsMenu(navigation),
             headerRightContainerStyle: {paddingRight: 10},

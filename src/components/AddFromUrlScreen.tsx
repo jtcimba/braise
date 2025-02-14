@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -38,20 +40,22 @@ export default function AddFromUrlScreen() {
   };
 
   return (
-    <View style={styles(colors).content}>
-      <TextInput
-        style={styles(colors).input}
-        placeholder="https://www..."
-        placeholderTextColor="gray"
-        value={url}
-        onChangeText={setUrl}
-      />
-      <TouchableOpacity
-        onPress={() => onAddRecipe()}
-        style={styles(colors).button}>
-        <Text style={styles(colors).text}>Add recipe</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles(colors).content}>
+        <TextInput
+          style={styles(colors).input}
+          placeholder="https://www..."
+          placeholderTextColor="gray"
+          value={url}
+          onChangeText={setUrl}
+        />
+        <TouchableOpacity
+          onPress={() => onAddRecipe()}
+          style={styles(colors).button}>
+          <Text style={styles(colors).text}>Add recipe</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 

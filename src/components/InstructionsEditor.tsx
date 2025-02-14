@@ -1,107 +1,145 @@
-import React, {useRef, useState, useEffect} from 'react';
-import {ScrollView, StyleSheet, Text, TextInput, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {
+  CoreBridge,
+  ListItemBridge,
+  OrderedListBridge,
+  RichText,
+  useEditorBridge,
+  useEditorContent,
+} from '@10play/tentap-editor';
+import Modal from 'react-native-modal';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {LogBox} from 'react-native';
 
-interface InstructionsEditorProps {
-  instructions: string;
-  onUpdate: (instructions: string) => void;
-}
+LogBox.ignoreLogs(["Editor isn't ready yet"]);
 
-const InstructionsEditor: React.FC<InstructionsEditorProps> = ({
+export default function InstructionsEditor({
   instructions,
-  onUpdate,
-}) => {
-  const [text, setText] = useState(instructions);
-  const scrollViewRef = useRef<ScrollView>(null);
-  const inputRefs = useRef<Array<TextInput | null>>([]);
-  const latestNonBackspaceKeyPressMsRef = useRef<number | null>(null);
+  handleInstructionsUpdate,
+  handleModalClose,
+  modalVisible,
+}: any) {
+  const convertInstructionsToHtml = (i: string) => {
+    if (!i) {
+      return '<ol><li></li></ol>';
+    }
+    let html = '<ol>';
+    i.split('\n').forEach(i => {
+      html += `<li>${i}</li>`;
+    });
+    html += '</ol>';
+    return html;
+  };
+
+  const convertInstructionsToList = (i: string) => {
+    return i
+      .replace(/<ol>/g, '')
+      .replace(/<\/ol>/g, '')
+      .replace(/<li>/g, '')
+      .replace(/<\/li>/g, '\n')
+      .replace(/<p>/g, '')
+      .replace(/<\/p>/g, '')
+      .trimEnd();
+  };
+
+  const customCodeBlockCSS = `
+    body {
+      font-family: Poppins-Regular, sans-serif;
+      font-weight: normal;
+      font-size: 0.875rem;
+      background-color: rgba(0, 0, 0, 0);
+    }
+    `;
+
+  const editor = useEditorBridge({
+    avoidIosKeyboard: true,
+    initialContent: convertInstructionsToHtml(instructions),
+    bridgeExtensions: [
+      ListItemBridge,
+      OrderedListBridge,
+      CoreBridge.configureCSS(customCodeBlockCSS),
+    ],
+  });
+
+  const content = useEditorContent(editor, {type: 'html'});
 
   useEffect(() => {
-    onUpdate(text);
-  }, [text, onUpdate]);
-
-  const handleLineChange = (newLine: string, index: number) => {
-    const lines = text.split('\n');
-
-    if (newLine.includes('\n')) {
-      const newLines = newLine.split('\n');
-      lines[index] = newLines[0];
-      lines.splice(index + 1, 0, newLines[1]);
-      const newText = lines.join('\n');
-      setText(newText);
-      inputRefs.current[index + 1]?.focus();
-      inputRefs.current[index + 1]?.setSelection(0, 0);
-      return;
-    }
-
-    lines[index] = newLine;
-    setText(lines.join('\n'));
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    const lines = text.split('\n');
-    const currentLine = lines[index];
-
-    if (
-      e.nativeEvent.key === 'Backspace' &&
-      index > 0 &&
-      (!latestNonBackspaceKeyPressMsRef.current ||
-        Date.now() - latestNonBackspaceKeyPressMsRef.current > 80) &&
-      currentLine === ''
-    ) {
-      e.preventDefault();
-      const previousLine = lines[index - 1];
-      const prevLength = previousLine.length;
-      const newLine = previousLine + currentLine;
-      lines[index - 1] = newLine;
-      lines.splice(index, 1);
-      const newText = lines.join('\n');
-      setText(newText);
-      setTimeout(() => {
-        inputRefs.current[index - 1]?.focus();
-        inputRefs.current[index - 1]?.setSelection(prevLength, prevLength);
-      }, 0);
-    } else {
-      latestNonBackspaceKeyPressMsRef.current = Date.now();
-    }
-  };
+    content && handleInstructionsUpdate(convertInstructionsToList(content));
+  }, [content, handleInstructionsUpdate]);
 
   return (
-    <View>
-      <ScrollView ref={scrollViewRef}>
-        {text.split('\n').map((line, index) => (
-          <View key={index} style={styles.lineContainer}>
-            <Text style={styles.lineNumber}>{index + 1}.</Text>
-            <TextInput
-              ref={(ref: any) => (inputRefs.current[index] = ref)}
-              style={styles.lineText}
-              value={line}
-              onChangeText={newLine => handleLineChange(newLine, index)}
-              onKeyPress={e => handleKeyPress(e, index)}
-              multiline
-            />
+    <Modal
+      isVisible={modalVisible}
+      onBackdropPress={() => handleModalClose()}
+      onSwipeComplete={() => handleModalClose()}
+      style={styles.modalOverlay}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.fullScreen}>
+        <SafeAreaView style={styles.modal}>
+          <View style={[styles.optionsView, styles.borderBottom]}>
+            <Text style={styles.optionsText}>Edit Instructions</Text>
+            <View style={[styles.iconContainer]}>
+              <TouchableOpacity onPress={() => handleModalClose()}>
+                <Ionicons name="close-outline" size={20} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
-        ))}
-      </ScrollView>
-    </View>
+          <RichText editor={editor} style={styles.editor} />
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+    </Modal>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  lineContainer: {
+  fullScreen: {
     flex: 1,
+    backgroundColor: '#EBE9E5',
+  },
+  container: {
+    flexGrow: 1,
+  },
+  editor: {
+    backgroundColor: 'transparent',
+  },
+  modalOverlay: {
+    justifyContent: 'flex-end',
+    margin: 0,
+  },
+  modal: {
+    flex: 1,
+    backgroundColor: '#EBE9E5',
+    borderRadius: 25,
+    paddingStart: 20,
+    paddingEnd: 20,
+  },
+  optionsView: {
     flexDirection: 'row',
-    paddingVertical: 5,
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  lineNumber: {
-    lineHeight: 30,
-    marginRight: 10,
-    color: '#666',
-    paddingTop: 5,
+  borderBottom: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#D4D4D4',
+    paddingBottom: 10,
   },
-  lineText: {
-    lineHeight: 30,
-    flex: 1,
+  optionsText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  iconContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 48,
+    padding: 2,
   },
 });
-
-export default InstructionsEditor;

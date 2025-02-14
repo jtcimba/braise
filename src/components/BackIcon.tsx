@@ -8,12 +8,12 @@ export default function BackIcon(navigation: any, component: any = null) {
   const {colors} = useTheme();
   const viewMode = useSelector((state: any) => state.viewMode.value);
 
-  if (viewMode !== 'view' && component === 'DetailsScreen') {
+  if (viewMode !== 'view' && component === 'RecipeDetailsScreen') {
     return null;
   }
 
   const onBackPress = () => {
-    if (component === 'DetailsScreen') {
+    if (component === 'RecipeDetailsScreen') {
       navigation.navigate('Recipes', {refresh: true});
       return;
     }
