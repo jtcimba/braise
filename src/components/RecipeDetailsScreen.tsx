@@ -16,6 +16,7 @@ import {useEditingHandler} from '../context/EditingHandlerContext';
 import {RecipeService} from '../api';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InstructionsEditor from './InstructionsEditor';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -25,6 +26,25 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const [isLoading, setIsLoading] = useState(false);
   const [editingData, onChangeEditingData] = useState({...route.params.item});
   const [modalVisible, setModalVisible] = useState(false);
+
+  const saveRecipesToLocal = async (recipes: any) => {
+    try {
+      const jsonValue = JSON.stringify(recipes);
+      await AsyncStorage.setItem('@recipes', jsonValue);
+    } catch (e) {
+      console.error('Failed to save recipes to local storage', e);
+    }
+  };
+
+  const loadRecipesFromLocal = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@recipes');
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    } catch (e) {
+      console.error('Failed to load recipes from local storage', e);
+      return [];
+    }
+  };
 
   const handleSaveNewRecipe = useCallback(async () => {
     setIsLoading(true);
@@ -36,6 +56,10 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       const newRecipe = await RecipeService.getRecipe(response.id);
       onChangeData(newRecipe[0]);
       onChangeEditingData(newRecipe[0]);
+
+      const localRecipes = await loadRecipesFromLocal();
+      localRecipes.push(newRecipe[0]);
+      saveRecipesToLocal(localRecipes);
     } catch (e: any) {
       console.log('save error', e.message);
     } finally {
@@ -58,6 +82,12 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       const updatedRecipe = await RecipeService.getRecipe(editingData.id);
       onChangeData(updatedRecipe[0]);
       onChangeEditingData(updatedRecipe[0]);
+
+      const localRecipes = await loadRecipesFromLocal();
+      const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
+        recipe.id === updatedRecipe[0].id ? updatedRecipe[0] : recipe,
+      );
+      saveRecipesToLocal(updatedRecipes);
     } catch (e: any) {
       console.log('save error', e.message);
     } finally {
@@ -69,6 +99,12 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     setIsLoading(true);
     try {
       await RecipeService.deleteRecipe(editingData.id);
+
+      const localRecipes = await loadRecipesFromLocal();
+      const updatedRecipes = localRecipes.filter(
+        (recipe: {id: any}) => recipe.id !== editingData.id,
+      );
+      saveRecipesToLocal(updatedRecipes);
     } catch (e: any) {
       console.log('delete error', e.message);
     } finally {

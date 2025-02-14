@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Text,
   View,
@@ -8,8 +8,9 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RecipeService} from '../api';
 
 const Item = ({item, navigation}: any) => (
@@ -52,25 +53,48 @@ export default function RecipesScreen({route}: any) {
     });
   };
 
-  const fetchRecipes = async () => {
-    const recipes = await RecipeService.getRecipes();
-    setData(recipes);
+  const saveRecipesToLocal = async (recipes: any) => {
+    try {
+      const jsonValue = JSON.stringify(recipes);
+      await AsyncStorage.setItem('@recipes', jsonValue);
+    } catch (e) {
+      console.error('Failed to save recipes to local storage', e);
+    }
   };
+
+  const loadRecipesFromLocal = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('@recipes');
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    } catch (e) {
+      console.error('Failed to load recipes from local storage', e);
+      return [];
+    }
+  };
+
+  const fetchRecipes = useCallback(async () => {
+    try {
+      const recipes = await RecipeService.getRecipes();
+      setData(recipes);
+      saveRecipesToLocal(recipes);
+    } catch (e) {
+      console.error('Failed to fetch recipes', e);
+    }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
-    fetchRecipes().then(() => {
-      setLoading(false);
-    });
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      if (route.params?.refresh) {
-        fetchRecipes();
+    loadRecipesFromLocal().then(localRecipes => {
+      if (localRecipes.length > 0) {
+        setData(localRecipes);
+        setLoading(false);
+      } else {
+        fetchRecipes().then(() => {
+          setLoading(false);
+        });
       }
-    }, [route.params]),
-  );
+    });
+  }, [fetchRecipes, route.params?.refresh]);
 
   return (
     <View style={styles.container}>
