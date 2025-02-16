@@ -15,7 +15,7 @@ import {RecipeService} from '../api';
 
 type RootStackParamList = {
   AddFromUrl: undefined;
-  DetailsScreen: {item: any; newRecipe: boolean};
+  RecipeDetailsScreen: {item: any; newRecipe: boolean};
 };
 
 export default function AddFromUrlScreen() {
@@ -26,7 +26,7 @@ export default function AddFromUrlScreen() {
   const onAddRecipe = () => {
     RecipeService.getRecipeFromUrl(url)
       .then(recipe => {
-        navigation.navigate('DetailsScreen', {
+        navigation.navigate('RecipeDetailsScreen', {
           item: {
             ...JSON.parse(recipe.body),
             ingredients: JSON.parse(recipe.body).ingredients.join('\n'),
