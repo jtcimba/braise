@@ -151,7 +151,7 @@ export function App(): React.JSX.Element {
           }}
         />
         <Stack.Screen
-          name="DetailsScreen"
+          name="RecipeDetailsScreen"
           component={RecipeDetailsScreen}
           options={({navigation}) => ({
             headerTransparent: true,
