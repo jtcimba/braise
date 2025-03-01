@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import {withAuthenticator} from '@aws-amplify/ui-react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
-import {NavigationContainer, DefaultTheme} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import RecipesScreen from './src/components/RecipesScreen';
 import SettingsScreen from './src/components/SettingsScreen';
 import AddScreen from './src/components/AddScreen';
@@ -15,40 +15,11 @@ import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenu from './src/components/DetailsMenu';
 import AddFromUrlScreen from './src/components/AddFromUrlScreen';
+import {ThemeProvider} from './theme/ThemeProvider';
+import {LightTheme} from './theme/theme';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
-const LightTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#D95931',
-    background: '#EBE9E5',
-    card: '#EBE9E5',
-    text: '#323232',
-    border: '#D4D4D4',
-    opaque: 'rgba(0, 0, 0, 0.3)',
-  },
-  fonts: {
-    regular: {
-      fontFamily: 'Poppins-Regular',
-      fontWeight: 'normal',
-    },
-    medium: {
-      fontFamily: 'Poppins-Medium',
-      fontWeight: 'medium',
-    },
-    light: {
-      fontFamily: 'Poppins-Light',
-      fontWeight: 'light',
-    },
-    thin: {
-      fontFamily: 'Poppins-Thin',
-      fontWeight: 'thin',
-    },
-  },
-};
 
 function AddComponent() {
   return null;
@@ -141,49 +112,51 @@ function TabNavigator({navigation}: {navigation: any}) {
 
 export function App(): React.JSX.Element {
   return (
-    <NavigationContainer theme={LightTheme}>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={TabNavigator}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="RecipeDetailsScreen"
-          component={RecipeDetailsScreen}
-          options={({navigation}) => ({
-            headerTransparent: true,
-            headerShadowVisible: false,
-            headerTitle: '',
-            headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
-            headerLeftContainerStyle: {paddingLeft: 10},
-            headerRight: () => DetailsMenu(navigation),
-            headerRightContainerStyle: {paddingRight: 10},
-          })}
-        />
-        <Stack.Screen
-          name="Add"
-          component={AddStackNavigator}
-          options={{
-            headerShown: false,
-            presentation: 'modal',
-          }}
-        />
-        <Stack.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={({navigation}) => ({
-            headerLeft: () => null,
-            headerRight: () => CloseIcon(navigation, 'Recipes'),
-            presentation: 'modal',
-            headerShadowVisible: false,
-            headerRightContainerStyle: {paddingRight: 10},
-          })}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider theme={LightTheme}>
+      <NavigationContainer theme={LightTheme}>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Home"
+            component={TabNavigator}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="RecipeDetailsScreen"
+            component={RecipeDetailsScreen}
+            options={({navigation}) => ({
+              headerTransparent: true,
+              headerShadowVisible: false,
+              headerTitle: '',
+              headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
+              headerLeftContainerStyle: {paddingLeft: 10},
+              headerRight: () => DetailsMenu(navigation),
+              headerRightContainerStyle: {paddingRight: 10},
+            })}
+          />
+          <Stack.Screen
+            name="Add"
+            component={AddStackNavigator}
+            options={{
+              headerShown: false,
+              presentation: 'modal',
+            }}
+          />
+          <Stack.Screen
+            name="Settings"
+            component={SettingsScreen}
+            options={({navigation}) => ({
+              headerLeft: () => null,
+              headerRight: () => CloseIcon(navigation, 'Recipes'),
+              presentation: 'modal',
+              headerShadowVisible: false,
+              headerRightContainerStyle: {paddingRight: 10},
+            })}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemeProvider>
   );
 }
 

@@ -4,11 +4,12 @@ import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
-import {useTheme} from '@react-navigation/native';
 import {useEditingHandler} from '../context/EditingHandlerContext';
+import {Theme} from '../../theme/types';
+import {useTheme} from '../../theme/ThemeProvider';
 
 export default function DetailsMenu(navigation: any) {
-  const {colors} = useTheme();
+  const {colors} = useTheme() as unknown as Theme;
   const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
@@ -106,8 +107,7 @@ export default function DetailsMenu(navigation: any) {
             <Ionicons
               name="trash-outline"
               size={18}
-              color="red"
-              style={styles(colors).icon}
+              style={[styles(colors).icon, styles(colors).deleteIcon]}
             />
             <Text style={styles(colors).deleteText}>Delete Recipe</Text>
           </TouchableOpacity>
@@ -171,12 +171,12 @@ const styles = (colors: any) =>
     },
     borderBottom: {
       borderBottomWidth: 1,
-      borderBottomColor: '#D4D4D4',
+      borderBottomColor: colors.border,
       paddingBottom: 10,
     },
     borderTop: {
       borderTopWidth: 1,
-      borderTopColor: '#D4D4D4',
+      borderTopColor: colors.border,
       paddingTop: 10,
     },
     modalItem: {
@@ -187,16 +187,22 @@ const styles = (colors: any) =>
     optionsText: {
       fontSize: 16,
       fontWeight: 'bold',
+      color: colors.text,
     },
     editText: {
       fontSize: 16,
+      color: colors.text,
     },
     deleteText: {
       fontSize: 16,
-      color: 'red',
+      color: colors.notification,
+    },
+    deleteIcon: {
+      color: colors.notification,
     },
     icon: {
       marginRight: 15,
+      color: colors.text,
     },
     iconContainer: {
       backgroundColor: colors.opaque,

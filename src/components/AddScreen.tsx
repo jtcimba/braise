@@ -1,12 +1,14 @@
 import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
-import {useTheme, useNavigation, ParamListBase} from '@react-navigation/native';
+import {useNavigation, ParamListBase} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Recipe} from '../models';
+import {useTheme} from '../../theme/ThemeProvider';
+import {Theme} from '../../theme/types';
 
 export default function AddScreen() {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
-  const {colors} = useTheme();
+  const {colors} = useTheme() as unknown as Theme;
   const newRecipe: Recipe = {
     id: '',
     title: '',
@@ -48,7 +50,7 @@ const styles = (colors: any) =>
       height: '100%',
     },
     button: {
-      backgroundColor: 'lightgray',
+      backgroundColor: colors.border,
       padding: 15,
       marginVertical: 10,
       borderRadius: 10,

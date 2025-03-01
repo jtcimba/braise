@@ -9,9 +9,11 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
-import {useNavigation, useTheme} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RecipeService} from '../api';
+import {useTheme} from '../../theme/ThemeProvider';
+import {Theme} from '../../theme/types';
 
 type RootStackParamList = {
   AddFromUrl: undefined;
@@ -19,7 +21,7 @@ type RootStackParamList = {
 };
 
 export default function AddFromUrlScreen() {
-  const {colors} = useTheme();
+  const {colors} = useTheme() as unknown as Theme;
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [url, setUrl] = useState('');
 
@@ -45,7 +47,7 @@ export default function AddFromUrlScreen() {
         <TextInput
           style={styles(colors).input}
           placeholder="https://www..."
-          placeholderTextColor="gray"
+          placeholderTextColor={colors.subtext}
           value={url}
           onChangeText={setUrl}
         />
@@ -85,8 +87,7 @@ const styles = (colors: any) =>
       padding: 15,
       marginVertical: 10,
       borderRadius: 10,
-      borderWidth: 1,
-      borderColor: colors.border,
+      backgroundColor: colors.border,
       width: '100%',
     },
   });

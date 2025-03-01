@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   signOutButton: {
-    backgroundColor: '#D95931',
+    backgroundColor: '#DC6C3C',
     padding: 10,
     borderRadius: 5,
     width: '100%',
