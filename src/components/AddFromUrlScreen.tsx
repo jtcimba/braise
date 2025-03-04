@@ -37,7 +37,7 @@ export default function AddFromUrlScreen() {
         });
       })
       .catch(() => {
-        Alert.alert('Oops!', 'Failed to add recipe. Please try again.');
+        Alert.alert('Error', 'Failed to add recipe. Please try again.');
       });
   };
 

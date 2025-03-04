@@ -6,6 +6,7 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {RecipeService} from '../api';
@@ -34,6 +35,7 @@ export default function RecipesScreen({route}: any) {
       Storage.saveRecipesToLocal(recipes);
     } catch (e) {
       console.error('Failed to fetch recipes', e);
+      Alert.alert('Error', 'Failed to fetch recipes.');
     }
   }, []);
 
