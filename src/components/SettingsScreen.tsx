@@ -5,6 +5,7 @@ import {
   Text,
   TouchableHighlight,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import {signOut} from 'aws-amplify/auth';
 import {AuthService} from '../api';
@@ -27,6 +28,7 @@ export default function SettingsScreen() {
       await signOut();
     } catch (error) {
       console.log('error signing out: ', error);
+      Alert.alert('Error', 'Failed to sign out.');
     }
   };
 

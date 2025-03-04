@@ -1,5 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+  Animated,
+  Alert,
+} from 'react-native';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
 import {useEditingHandler} from '../context/EditingHandlerContext';
@@ -7,6 +14,8 @@ import {RecipeService} from '../api';
 import RecipeViewer from './RecipeViewer';
 import RecipeEditor from './RecipeEditor';
 import Storage from '../storage';
+import {useTheme} from '../../theme/ThemeProvider';
+import {Theme} from '../../theme/types';
 
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -15,6 +24,47 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const [data, onChangeData] = useState({...route.params.item});
   const [isLoading, setIsLoading] = useState(false);
   const [editingData, onChangeEditingData] = useState({...route.params.item});
+  const [showSavedMessage, setShowSavedMessage] = useState(false);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const scaleAnim = useState(new Animated.Value(0.8))[0];
+  const theme = useTheme() as unknown as Theme;
+
+  const showSavedMessageTemporarily = useCallback(() => {
+    setShowSavedMessage(true);
+    Animated.parallel([
+      Animated.spring(fadeAnim, {
+        toValue: 1,
+        speed: 20,
+        bounciness: 10,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        speed: 20,
+        bounciness: 10,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.spring(fadeAnim, {
+            toValue: 0,
+            speed: 20,
+            bounciness: 10,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scaleAnim, {
+            toValue: 0.8,
+            speed: 20,
+            bounciness: 10,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setShowSavedMessage(false);
+        });
+      }, 1000);
+    });
+  }, [fadeAnim, scaleAnim]);
 
   const handleSaveNewRecipe = useCallback(async () => {
     setIsLoading(true);
@@ -30,12 +80,14 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       const localRecipes = await Storage.loadRecipesFromLocal();
       localRecipes.push(newRecipe[0]);
       Storage.saveRecipesToLocal(localRecipes);
+      showSavedMessageTemporarily();
     } catch (e: any) {
       console.log('save error', e.message);
+      Alert.alert('Error', 'Failed to save recipe');
     } finally {
       setIsLoading(false);
     }
-  }, [editingData]);
+  }, [editingData, showSavedMessageTemporarily]);
 
   const handleSavePress = useCallback(async () => {
     if (route.params.newRecipe) {
@@ -52,18 +104,26 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       const updatedRecipe = await RecipeService.getRecipe(editingData.id);
       onChangeData(updatedRecipe[0]);
       onChangeEditingData(updatedRecipe[0]);
+      console.log('updatedRecipe', updatedRecipe);
 
       const localRecipes = await Storage.loadRecipesFromLocal();
       const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
         recipe.id === updatedRecipe[0].id ? updatedRecipe[0] : recipe,
       );
       Storage.saveRecipesToLocal(updatedRecipes);
+      showSavedMessageTemporarily();
     } catch (e: any) {
       console.log('save error', e.message);
+      Alert.alert('Error', 'Failed to save recipe');
     } finally {
       setIsLoading(false);
     }
-  }, [editingData, handleSaveNewRecipe, route.params.newRecipe]);
+  }, [
+    editingData,
+    handleSaveNewRecipe,
+    route.params.newRecipe,
+    showSavedMessageTemporarily,
+  ]);
 
   const handleDeletePress = useCallback(async () => {
     setIsLoading(true);
@@ -77,6 +137,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       Storage.saveRecipesToLocal(updatedRecipes);
     } catch (e: any) {
       console.log('delete error', e.message);
+      Alert.alert('Error', 'Failed to delete recipe');
     } finally {
       setIsLoading(false);
       navigation.navigate('Recipes', {refresh: true});
@@ -116,7 +177,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={styles(theme).container}>
       {viewMode === 'view' && <RecipeViewer data={data} />}
       {viewMode !== 'view' && (
         <RecipeEditor
@@ -124,19 +185,56 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
           onChangeEditingData={handleChangeEditData}
         />
       )}
-      {isLoading && <View style={styles.loadingOverlay} />}
+      {isLoading && (
+        <View style={styles(theme).loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.subtext} />
+        </View>
+      )}
+      {showSavedMessage && (
+        <Animated.View
+          style={[
+            styles(theme).savedMessageContainer,
+            {opacity: fadeAnim, transform: [{scale: scaleAnim}]},
+          ]}>
+          <View style={styles(theme).saveMessageBackground}>
+            <Text style={styles(theme).savedMessageText}>Recipe Saved!</Text>
+          </View>
+        </Animated.View>
+      )}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+const styles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    loadingOverlay: {
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: theme.colors.opaque,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    savedMessageContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'absolute',
+      zIndex: 100,
+      width: '100%',
+      height: '100%',
+    },
+    saveMessageBackground: {
+      backgroundColor: theme.colors.opaque,
+      borderRadius: 10,
+    },
+    savedMessageText: {
+      paddingHorizontal: 20,
+      paddingVertical: 40,
+      color: 'white',
+      fontSize: 16,
+    },
+  });
