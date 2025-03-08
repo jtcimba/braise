@@ -79,7 +79,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
 
       const localRecipes = await Storage.loadRecipesFromLocal();
       localRecipes.push(newRecipe[0]);
-      Storage.saveRecipesToLocal(localRecipes);
+      await Storage.saveRecipesToLocal(localRecipes);
       showSavedMessageTemporarily();
     } catch (e: any) {
       console.log('save error', e.message);
@@ -104,13 +104,12 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       const updatedRecipe = await RecipeService.getRecipe(editingData.id);
       onChangeData(updatedRecipe[0]);
       onChangeEditingData(updatedRecipe[0]);
-      console.log('updatedRecipe', updatedRecipe);
 
       const localRecipes = await Storage.loadRecipesFromLocal();
       const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
         recipe.id === updatedRecipe[0].id ? updatedRecipe[0] : recipe,
       );
-      Storage.saveRecipesToLocal(updatedRecipes);
+      await Storage.saveRecipesToLocal(updatedRecipes);
       showSavedMessageTemporarily();
     } catch (e: any) {
       console.log('save error', e.message);
@@ -134,7 +133,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       const updatedRecipes = localRecipes.filter(
         (recipe: {id: any}) => recipe.id !== editingData.id,
       );
-      Storage.saveRecipesToLocal(updatedRecipes);
+      await Storage.saveRecipesToLocal(updatedRecipes);
     } catch (e: any) {
       console.log('delete error', e.message);
       Alert.alert('Error', 'Failed to delete recipe');

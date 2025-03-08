@@ -14,11 +14,12 @@ export default function BackIcon(navigation: any, component: any = null) {
   }
 
   const onBackPress = () => {
-    if (component === 'RecipeDetailsScreen') {
-      navigation.navigate('Recipes', {refresh: true});
+    if (component !== 'RecipeDetailsScreen') {
+      navigation.goBack();
       return;
     }
-    navigation.goBack();
+
+    navigation.navigate('Recipes', {refresh: true});
   };
 
   return (
