@@ -14,7 +14,11 @@ import ListItem from './ListItem';
 import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
 
-export default function RecipesScreen({route}: any) {
+type Route = {
+  route: {params: {refresh: boolean}};
+};
+
+export default function RecipesScreen({route}: Route) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
   const navigation = useNavigation();
@@ -32,7 +36,7 @@ export default function RecipesScreen({route}: any) {
     try {
       const recipes = await RecipeService.getRecipes();
       setData(recipes);
-      Storage.saveRecipesToLocal(recipes);
+      await Storage.saveRecipesToLocal(recipes);
     } catch (e) {
       console.error('Failed to fetch recipes', e);
       Alert.alert('Error', 'Failed to fetch recipes.');
@@ -51,7 +55,7 @@ export default function RecipesScreen({route}: any) {
         });
       }
     });
-  }, [fetchRecipes, route.params?.refresh]);
+  }, [fetchRecipes, route]);
 
   return (
     <View style={styles(theme).container}>
