@@ -4,7 +4,6 @@ import {
   Platform,
   SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -89,13 +88,12 @@ export default function InstructionsEditor({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles(theme).fullScreen}>
         <SafeAreaView style={styles(theme).modal}>
-          <View style={[styles(theme).optionsView, styles(theme).borderBottom]}>
-            <Text style={styles(theme).optionsText}>Edit Instructions</Text>
-            <View style={[styles(theme).iconContainer]}>
-              <TouchableOpacity onPress={() => handleModalClose()}>
-                <Ionicons name="close-outline" size={20} color="white" />
-              </TouchableOpacity>
-            </View>
+          <View style={[styles(theme).closeContainer]}>
+            <TouchableOpacity
+              style={styles(theme).iconContainer}
+              onPress={() => handleModalClose()}>
+              <Ionicons name="close-outline" size={20} color="white" />
+            </TouchableOpacity>
           </View>
           <RichText editor={editor} style={styles(theme).editor} />
         </SafeAreaView>
@@ -126,16 +124,8 @@ const styles = (theme: any) =>
       borderRadius: 25,
       paddingStart: 20,
       paddingEnd: 20,
-    },
-    optionsView: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    borderBottom: {
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
-      paddingBottom: 10,
+      marginTop: 20,
+      marginBottom: 20,
     },
     optionsText: {
       fontSize: 16,
@@ -145,5 +135,9 @@ const styles = (theme: any) =>
       backgroundColor: theme.colors.opaque,
       borderRadius: 48,
       padding: 2,
+    },
+    closeContainer: {
+      alignSelf: 'flex-end',
+      paddingBottom: 10,
     },
   });

@@ -1,7 +1,10 @@
 import {AuthService} from './index';
 
 class RecipeService {
-  async getRecipeFromUrl(url: string): Promise<any> {
+  async getRecipeFromUrl(
+    url: string,
+    wild_mode: boolean = false,
+  ): Promise<any> {
     try {
       const response = await fetch(`${process.env.API_URL}recipes/url`, {
         method: 'POST',
@@ -9,13 +12,15 @@ class RecipeService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          body: {
-            url: url,
-          },
+          url: url,
+          wildMode: wild_mode,
         }),
       });
 
+      console.log(response);
+
       if (!response.ok) {
+        console.log(response);
         throw new Error('Failed to scrape the recipe');
       }
 

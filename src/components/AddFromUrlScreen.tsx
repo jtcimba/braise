@@ -30,8 +30,8 @@ export default function AddFromUrlScreen() {
       .then(recipe => {
         navigation.navigate('RecipeDetailsScreen', {
           item: {
-            ...JSON.parse(recipe.body),
-            ingredients: JSON.parse(recipe.body).ingredients.join('\n'),
+            ...recipe,
+            ingredients: recipe.ingredients.join('\n'),
           },
           newRecipe: true,
         });
