@@ -71,7 +71,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     try {
       const response = await RecipeService.addNewRecipe({
         ...editingData,
-        ingredients: editingData.ingredients.replace(/\\n$/, ''),
+        ingredients: editingData.ingredients?.replace(/\\n$/, ''),
       });
       const newRecipe = await RecipeService.getRecipe(response.id);
       onChangeData(newRecipe[0]);
@@ -98,7 +98,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     try {
       await RecipeService.updateRecipe(editingData.id, {
         ...editingData,
-        ingredients: editingData.ingredients.replace(/\\n$/, ''),
+        ingredients: editingData.ingredients?.replace(/\\n$/, ''),
       });
 
       const updatedRecipe = await RecipeService.getRecipe(editingData.id);
@@ -212,11 +212,16 @@ const styles = (theme: any) =>
     },
     loadingOverlay: {
       position: 'absolute',
-      width: '100%',
-      height: '100%',
+      top: '50%',
+      left: '50%',
+      transform: [{translateX: -50}, {translateY: -50}],
+      width: 100,
+      height: 100,
+      borderRadius: 20,
       backgroundColor: theme.colors.opaque,
       justifyContent: 'center',
       alignItems: 'center',
+      zIndex: 100,
     },
     savedMessageContainer: {
       justifyContent: 'center',

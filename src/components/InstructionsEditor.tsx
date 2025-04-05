@@ -20,7 +20,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {LogBox} from 'react-native';
 import {useTheme} from '../../theme/ThemeProvider';
 
-LogBox.ignoreLogs(["Editor isn't ready yet"]);
+// Ignore specific WebView errors
+LogBox.ignoreLogs(["Editor isn't ready yet", "Can't open url: about:srcdoc"]);
 
 export default function InstructionsEditor({
   instructions,
