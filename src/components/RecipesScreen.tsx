@@ -13,6 +13,7 @@ import {RecipeService} from '../api';
 import ListItem from './ListItem';
 import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
+import SearchAndFilters from './SearchAndFilters';
 
 type Route = {
   route: {params: {refresh: boolean}};
@@ -21,6 +22,7 @@ type Route = {
 export default function RecipesScreen({route}: Route) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
@@ -36,6 +38,7 @@ export default function RecipesScreen({route}: Route) {
     try {
       const recipes = await RecipeService.getRecipes();
       setData(recipes);
+      setFilteredData(recipes);
       await Storage.saveRecipesToLocal(recipes);
     } catch (e) {
       console.error('Failed to fetch recipes', e);
@@ -48,6 +51,7 @@ export default function RecipesScreen({route}: Route) {
     Storage.loadRecipesFromLocal().then(localRecipes => {
       if (localRecipes.length > 0) {
         setData(localRecipes);
+        setFilteredData(localRecipes);
         setLoading(false);
       } else {
         fetchRecipes().then(() => {
@@ -57,8 +61,38 @@ export default function RecipesScreen({route}: Route) {
     });
   }, [fetchRecipes, route]);
 
+  const handleSearch = (query: string) => {
+    if (!query.trim()) {
+      setFilteredData(data);
+      return;
+    }
+    const searchResults = data.filter(recipe =>
+      recipe.title.toLowerCase().includes(query.toLowerCase()),
+    );
+    setFilteredData(searchResults);
+  };
+
+  const handleFiltersChange = (filters: string[]) => {
+    if (filters.length === 0) {
+      setFilteredData(data);
+      return;
+    }
+    const filteredResults = data.filter(recipe => {
+      return filters.some(filter => {
+        // Add your filter logic here based on recipe properties
+        // This is a placeholder implementation
+        return recipe.tags?.includes(filter.toLowerCase());
+      });
+    });
+    setFilteredData(filteredResults);
+  };
+
   return (
     <View style={styles(theme).container}>
+      <SearchAndFilters
+        onSearch={handleSearch}
+        onFiltersChange={handleFiltersChange}
+      />
       {isLoading ? (
         <ActivityIndicator />
       ) : (
@@ -67,7 +101,7 @@ export default function RecipesScreen({route}: Route) {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           style={styles(theme).container}
-          data={data}
+          data={filteredData}
           renderItem={({item}) => {
             return <ListItem item={item} navigation={navigation} />;
           }}

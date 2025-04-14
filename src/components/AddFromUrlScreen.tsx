@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   View,
@@ -9,12 +9,14 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RecipeService} from '../api';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import WebView from 'react-native-webview';
 
 type RootStackParamList = {
   AddFromUrl: undefined;
@@ -26,6 +28,21 @@ export default function AddFromUrlScreen() {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isValidUrl, setIsValidUrl] = useState(false);
+
+  useEffect(() => {
+    if (url.length === 0) {
+      setIsValidUrl(false);
+      return;
+    }
+    try {
+      new URL(url);
+      setIsValidUrl(true);
+    } catch {
+      setIsValidUrl(false);
+    }
+  }, [url]);
+
   const onAddRecipe = () => {
     setIsLoading(true);
     RecipeService.getRecipeFromUrl(url)
@@ -61,12 +78,46 @@ export default function AddFromUrlScreen() {
             placeholder="https://www..."
             placeholderTextColor={colors.subtext}
             value={url}
-            onChangeText={setUrl}
+            onChangeText={text => {
+              setUrl(text);
+            }}
+            autoCapitalize="none"
+            keyboardType="url"
           />
+          {!isValidUrl && (
+            <View style={styles(colors).invalidUrlContainer}>
+              <Text style={styles(colors).invalidUrlText}>
+                Enter a valid URL
+              </Text>
+            </View>
+          )}
+          {isValidUrl && (
+            <View style={styles(colors).webviewContainer}>
+              <WebView
+                source={{uri: url}}
+                style={styles(colors).webview}
+                startInLoadingState={true}
+                renderLoading={() => (
+                  <ActivityIndicator
+                    style={styles(colors).webviewLoader}
+                    color={colors.subtext}
+                  />
+                )}
+              />
+            </View>
+          )}
           <TouchableOpacity
             onPress={() => onAddRecipe()}
-            style={styles(colors).button}>
-            <Text style={styles(colors).text}>Add recipe</Text>
+            style={styles(colors).button}
+            disabled={!isValidUrl || isLoading}>
+            <Text
+              style={[
+                styles(colors).text,
+                !isValidUrl && styles(colors).disabledText,
+                isLoading && styles(colors).disabledText,
+              ]}>
+              Add recipe
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -79,12 +130,17 @@ const styles = (colors: any) =>
     container: {
       flex: 1,
       backgroundColor: colors.background,
+      borderTopLeftRadius: 25,
+      borderTopRightRadius: 25,
+      overflow: 'hidden',
     },
     content: {
       backgroundColor: colors.background,
       padding: 22,
       alignItems: 'center',
       height: '100%',
+      borderTopLeftRadius: 25,
+      borderTopRightRadius: 25,
     },
     button: {
       position: 'absolute',
@@ -100,12 +156,16 @@ const styles = (colors: any) =>
       fontSize: 16,
       textAlign: 'center',
     },
+    disabledText: {
+      opacity: 0.5,
+    },
     input: {
       padding: 15,
       marginVertical: 10,
       borderRadius: 10,
-      backgroundColor: colors.border,
+      backgroundColor: colors.backgroundText,
       width: '100%',
+      color: colors.text,
     },
     loadingOverlay: {
       position: 'absolute',
@@ -119,5 +179,34 @@ const styles = (colors: any) =>
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 100,
+    },
+    webviewContainer: {
+      width: '100%',
+      height: Dimensions.get('window').height * 0.63,
+      marginVertical: 10,
+      borderRadius: 10,
+      overflow: 'hidden',
+      backgroundColor: colors.backgroundText,
+    },
+    webview: {
+      flex: 1,
+    },
+    webviewLoader: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: [{translateX: -50}, {translateY: -50}],
+    },
+    invalidUrlContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '100%',
+      paddingHorizontal: 20,
+    },
+    invalidUrlText: {
+      color: colors.opaque,
+      fontSize: 16,
+      textAlign: 'center',
     },
   });

@@ -27,7 +27,14 @@ function AddComponent() {
 
 function AddStackNavigator() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        cardStyle: {
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+          overflow: 'hidden',
+        },
+      }}>
       <Stack.Screen
         name="AddScreen"
         component={AddScreen}
@@ -37,7 +44,12 @@ function AddStackNavigator() {
           headerTitle: 'Add recipe',
           presentation: 'modal',
           headerShadowVisible: false,
-          headerRightContainerStyle: {paddingRight: 10},
+          headerRightContainerStyle: {paddingRight: 22, paddingTop: 10},
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginTop: 10,
+          },
         })}
       />
       <Stack.Screen
@@ -46,10 +58,15 @@ function AddStackNavigator() {
         options={({navigation}) => ({
           headerTitle: 'Add from URL',
           headerLeft: () => BackIcon(navigation),
-          headerLeftContainerStyle: {paddingLeft: 10},
+          headerLeftContainerStyle: {paddingLeft: 22, paddingTop: 10},
           headerRight: () => CloseIcon(navigation, 'Recipes'),
           headerShadowVisible: false,
-          headerRightContainerStyle: {paddingRight: 10},
+          headerRightContainerStyle: {paddingRight: 22, paddingTop: 10},
+          headerTitleStyle: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginTop: 10,
+          },
         })}
       />
     </Stack.Navigator>
@@ -114,7 +131,14 @@ export function App(): React.JSX.Element {
   return (
     <ThemeProvider theme={LightTheme}>
       <NavigationContainer theme={LightTheme}>
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            cardStyle: {
+              borderTopLeftRadius: 25,
+              borderTopRightRadius: 25,
+              overflow: 'hidden',
+            },
+          }}>
           <Stack.Screen
             name="Home"
             component={TabNavigator}

@@ -43,7 +43,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
             <Text style={styles(theme).subtext}>{editingData.host}</Text>
           </View>
           <TextInput
-            style={[styles(theme).editText, styles(theme).editTitle]}
+            style={[styles(theme).editText]}
             value={editingData.title}
             multiline={true}
             placeholder="Recipe name"
@@ -135,11 +135,11 @@ const styles = (theme: any) =>
       marginBottom: 15,
       resizeMode: 'cover',
       borderRadius: 10,
-      backgroundColor: theme.colors.border,
+      backgroundColor: theme.colors.backgroundText,
     },
     editText: {
       width: '100%',
-      backgroundColor: theme.colors.border,
+      backgroundColor: theme.colors.backgroundText,
       borderRadius: 10,
       paddingTop: 10,
       paddingBottom: 10,
@@ -170,7 +170,7 @@ const styles = (theme: any) =>
       paddingHorizontal: 20,
       paddingVertical: 10,
       marginBottom: 30,
-      backgroundColor: theme.colors.border,
+      backgroundColor: theme.colors.backgroundText,
       width: '100%',
       borderRadius: 10,
       marginTop: 15,

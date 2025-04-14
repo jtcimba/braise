@@ -7,19 +7,19 @@ import {
   StyleSheet,
   Linking,
   TouchableOpacity,
-  Switch,
 } from 'react-native';
 import {WebView} from 'react-native-webview';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {LogBox} from 'react-native';
+import CustomToggle from './CustomToggle';
 
 // Ignore WebView errors
 LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
 
 export default function RecipeViewer({data}: any) {
   const theme = useTheme() as unknown as Theme;
-  const [isSimplified, setIsSimplified] = useState(false);
+  const [isWebView, setIsWebView] = useState(false);
   const [webViewError, setWebViewError] = useState(false);
 
   const handleHostPress = () => {
@@ -32,25 +32,8 @@ export default function RecipeViewer({data}: any) {
     <View style={{flex: 1}}>
       <View
         style={[
-          styles(theme).toggleContainer,
-          isSimplified && styles(theme).toggleContainerShadow,
-        ]}>
-        <Text style={styles(theme).toggleLabel}>Original</Text>
-        <Switch
-          value={isSimplified}
-          onValueChange={setIsSimplified}
-          trackColor={{
-            false: theme.colors.border,
-            true: theme.colors.primary,
-          }}
-          thumbColor={theme.colors.background}
-        />
-        <Text style={styles(theme).toggleLabel}>Simplified</Text>
-      </View>
-      <View
-        style={[
           styles(theme).contentContainer,
-          isSimplified && styles(theme).hidden,
+          !isWebView && styles(theme).hidden,
         ]}>
         {webViewError ? (
           <View style={styles(theme).errorContainer}>
@@ -99,7 +82,7 @@ export default function RecipeViewer({data}: any) {
       <View
         style={[
           styles(theme).contentContainer,
-          !isSimplified && styles(theme).hidden,
+          isWebView && styles(theme).hidden,
         ]}>
         <ScrollView automaticallyAdjustKeyboardInsets={true}>
           <Image
@@ -169,6 +152,14 @@ export default function RecipeViewer({data}: any) {
           </View>
         </ScrollView>
       </View>
+      <View style={[styles(theme).toggleContainer]}>
+        <CustomToggle
+          value={isWebView}
+          onValueChange={setIsWebView}
+          leftLabel="Braise"
+          rightLabel="Original"
+        />
+      </View>
     </View>
   );
 }
@@ -176,35 +167,11 @@ export default function RecipeViewer({data}: any) {
 const styles = (theme: any) =>
   StyleSheet.create({
     toggleContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: 6,
-      backgroundColor: theme.colors.background,
       position: 'absolute',
-      top: 59,
+      bottom: 25,
       left: '50%',
-      transform: [{translateX: -100}],
-      width: 210,
+      transform: [{translateX: -105}],
       zIndex: 1,
-      borderRadius: 25,
-    },
-    toggleContainerShadow: {
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-    },
-    toggleLabel: {
-      color: theme.colors.text,
-      marginHorizontal: 8,
-      fontSize: 12,
-      flex: 1,
-      textAlign: 'center',
     },
     image: {
       width: '100%',
@@ -254,7 +221,7 @@ const styles = (theme: any) =>
     },
     instructionsContainer: {
       flex: 1,
-      marginBottom: 25,
+      marginBottom: 65,
     },
     ingredientsContainer: {
       flex: 1,

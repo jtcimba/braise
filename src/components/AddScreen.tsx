@@ -5,6 +5,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {Recipe} from '../models';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function AddScreen() {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
@@ -26,7 +27,14 @@ export default function AddScreen() {
       <TouchableOpacity
         onPress={() => navigation.navigate('AddFromUrl')}
         style={styles(colors).button}>
-        <Text style={styles(colors).text}>From url</Text>
+        <View style={styles(colors).buttonContent}>
+          <Text style={styles(colors).text}>From URL</Text>
+          <Ionicons
+            name="chevron-forward-outline"
+            size={20}
+            color={colors.opaque}
+          />
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() =>
@@ -36,7 +44,14 @@ export default function AddScreen() {
           })
         }
         style={styles(colors).button}>
-        <Text style={styles(colors).text}>From scratch</Text>
+        <View style={styles(colors).buttonContent}>
+          <Text style={styles(colors).text}>From Scratch</Text>
+          <Ionicons
+            name="chevron-forward-outline"
+            size={20}
+            color={colors.opaque}
+          />
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -50,11 +65,16 @@ const styles = (colors: any) =>
       height: '100%',
     },
     button: {
-      backgroundColor: colors.border,
+      backgroundColor: 'white',
       padding: 15,
       marginVertical: 10,
       borderRadius: 10,
       width: '100%',
+    },
+    buttonContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
     text: {
       color: colors.text,
