@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useMemo} from 'react';
 import {
   Text,
   View,
@@ -26,6 +26,25 @@ export default function RecipesScreen({route}: Route) {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const theme = useTheme();
+
+  const categories = useMemo(() => {
+    if (!data.length) return [];
+
+    const allCategories = data
+      .map(recipe => {
+        if (typeof recipe.category === 'string') {
+          return recipe.category.split(',').map((cat: string) => cat.trim());
+        }
+        if (Array.isArray(recipe.category)) {
+          return recipe.category;
+        }
+        return [];
+      })
+      .flat()
+      .filter(Boolean);
+
+    return [...new Set(allCategories)];
+  }, [data]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -78,11 +97,18 @@ export default function RecipesScreen({route}: Route) {
       return;
     }
     const filteredResults = data.filter(recipe => {
-      return filters.some(filter => {
-        // Add your filter logic here based on recipe properties
-        // This is a placeholder implementation
-        return recipe.tags?.includes(filter.toLowerCase());
-      });
+      // Get recipe categories as an array
+      let recipeCategories: string[] = [];
+      if (typeof recipe.category === 'string') {
+        recipeCategories = recipe.category
+          .split(',')
+          .map((cat: string) => cat.trim());
+      } else if (Array.isArray(recipe.category)) {
+        recipeCategories = recipe.category;
+      }
+
+      // Check if any of the recipe categories match any of the selected filters
+      return filters.some(filter => recipeCategories.includes(filter));
     });
     setFilteredData(filteredResults);
   };
@@ -92,6 +118,7 @@ export default function RecipesScreen({route}: Route) {
       <SearchAndFilters
         onSearch={handleSearch}
         onFiltersChange={handleFiltersChange}
+        filterOptions={categories}
       />
       {isLoading ? (
         <ActivityIndicator />

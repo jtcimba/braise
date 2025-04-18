@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import InstructionsEditor from './InstructionsEditor';
+import CategoryEditor from './CategoryEditor';
 import {useTheme} from '../../theme/ThemeProvider';
 
 export default function RecipeEditor({editingData, onChangeEditingData}: any) {
@@ -27,6 +28,20 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     [onChangeEditingData],
   );
 
+  const handleCategoryUpdate = useCallback(
+    (newCategories: string[]) => {
+      onChangeEditingData((prevData: any) => ({
+        ...prevData,
+        category: newCategories.join(','),
+      }));
+    },
+    [onChangeEditingData],
+  );
+
+  const categoriesArray = editingData.category
+    ? editingData.category.split(',').filter((cat: string) => cat.trim())
+    : [];
+
   return (
     <KeyboardAwareScrollView style={styles(theme).editContainer}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -42,6 +57,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
             {editingData.host && <Text style={styles(theme).dot}>•</Text>}
             <Text style={styles(theme).subtext}>{editingData.host}</Text>
           </View>
+          <Text style={styles(theme).fieldLabel}>Recipe Name</Text>
           <TextInput
             style={[styles(theme).editText]}
             value={editingData.title}
@@ -51,6 +67,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
               onChangeEditingData({...editingData, title: text})
             }
           />
+          <Text style={styles(theme).fieldLabel}>Cooking Time</Text>
           <TextInput
             style={styles(theme).editText}
             value={editingData.total_time?.toString()}
@@ -59,6 +76,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
               onChangeEditingData({...editingData, total_time: text})
             }
           />
+          <Text style={styles(theme).fieldLabel}>Servings</Text>
           <TextInput
             style={styles(theme).editText}
             value={editingData.yields}
@@ -67,6 +85,12 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
               onChangeEditingData({...editingData, yields: text})
             }
           />
+          <Text style={styles(theme).fieldLabel}>Categories</Text>
+          <CategoryEditor
+            categories={categoriesArray}
+            onChange={handleCategoryUpdate}
+          />
+          <Text style={styles(theme).fieldLabel}>Ingredients</Text>
           <TextInput
             style={styles(theme).editText}
             value={editingData.ingredients}
@@ -80,6 +104,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
             multiline
             scrollEnabled={false}
           />
+          <Text style={styles(theme).fieldLabel}>Instructions</Text>
           <TouchableOpacity
             style={styles(theme).editInstructionContainer}
             onPress={() => setModalVisible(true)}>
@@ -128,6 +153,13 @@ const styles = (theme: any) =>
       marginHorizontal: 5,
       color: theme.colors.subtext,
     },
+    fieldLabel: {
+      fontSize: 16,
+      fontWeight: '600',
+      marginTop: 15,
+      marginBottom: 5,
+      color: theme.colors.text,
+    },
     editImage: {
       width: '100%',
       height: 235,
@@ -139,12 +171,13 @@ const styles = (theme: any) =>
     },
     editText: {
       width: '100%',
-      backgroundColor: theme.colors.backgroundText,
+      // backgroundColor: theme.colors.backgroundText,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
       borderRadius: 10,
       paddingTop: 10,
       paddingBottom: 10,
       paddingHorizontal: 15,
-      marginTop: 15,
       color: theme.colors.text,
     },
     editTitle: {
@@ -168,12 +201,12 @@ const styles = (theme: any) =>
     },
     editInstructionContainer: {
       paddingHorizontal: 20,
-      paddingVertical: 10,
-      marginBottom: 30,
-      backgroundColor: theme.colors.backgroundText,
+      paddingVertical: 5,
+      marginBottom: 35,
       width: '100%',
       borderRadius: 10,
-      marginTop: 15,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     placeholder: {
       color: theme.colors.subtext,

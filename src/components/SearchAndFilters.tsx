@@ -7,23 +7,13 @@ import FilterChip from './FilterChip';
 interface SearchAndFiltersProps {
   onSearch: (query: string) => void;
   onFiltersChange: (filters: string[]) => void;
+  filterOptions: string[];
 }
-
-const FILTER_OPTIONS = [
-  'Breakfast',
-  'Lunch',
-  'Dinner',
-  'Dessert',
-  'Vegetarian',
-  'Vegan',
-  'Gluten-Free',
-  'Quick',
-  'Healthy',
-];
 
 export default function SearchAndFilters({
   onSearch,
   onFiltersChange,
+  filterOptions,
 }: SearchAndFiltersProps) {
   const theme = useTheme() as unknown as Theme;
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +32,11 @@ export default function SearchAndFilters({
     onFiltersChange(newFilters);
   };
 
+  const capitalizeFirstLetter = (text: string) => {
+    if (!text) return '';
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
+
   return (
     <View style={styles(theme).container}>
       <TextInput
@@ -57,10 +52,10 @@ export default function SearchAndFilters({
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles(theme).filtersContainer}>
-        {FILTER_OPTIONS.map(filter => (
+        {filterOptions.map(filter => (
           <FilterChip
             key={filter}
-            label={filter}
+            label={capitalizeFirstLetter(filter)}
             selected={selectedFilters.includes(filter)}
             onPress={() => toggleFilter(filter)}
           />

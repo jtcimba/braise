@@ -6,6 +6,7 @@ export interface Theme {
     subtext: string;
     border: string;
     opaque: string;
+    backgroundText: string;
   };
   fonts: {
     regular: {

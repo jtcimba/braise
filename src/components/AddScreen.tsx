@@ -20,6 +20,7 @@ export default function AddScreen() {
     yields: '',
     ingredients: '',
     instructions: '',
+    category: [],
   };
 
   return (
@@ -28,7 +29,12 @@ export default function AddScreen() {
         onPress={() => navigation.navigate('AddFromUrl')}
         style={styles(colors).button}>
         <View style={styles(colors).buttonContent}>
+          <View>
           <Text style={styles(colors).text}>From URL</Text>
+            <Text style={styles(colors).subtext}>
+              Import a recipe from any website
+            </Text>
+          </View>
           <Ionicons
             name="chevron-forward-outline"
             size={20}
@@ -45,7 +51,10 @@ export default function AddScreen() {
         }
         style={styles(colors).button}>
         <View style={styles(colors).buttonContent}>
+          <View>
           <Text style={styles(colors).text}>From Scratch</Text>
+            <Text style={styles(colors).subtext}>Create a recipe manually</Text>
+          </View>
           <Ionicons
             name="chevron-forward-outline"
             size={20}
@@ -79,5 +88,11 @@ const styles = (colors: any) =>
     text: {
       color: colors.text,
       fontSize: 16,
+      fontWeight: '600',
+    },
+    subtext: {
+      color: colors.subtext,
+      fontSize: 14,
+      marginTop: 2,
     },
   });
