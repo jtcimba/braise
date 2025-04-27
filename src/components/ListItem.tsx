@@ -21,7 +21,9 @@ export default function Item({item, navigation}: any) {
       </View>
       <View style={styles(theme).itemBody}>
         <Text style={styles(theme).title}>{item.title}</Text>
-        <Text style={styles(theme).subtext}>{item.author}</Text>
+        {item.author && (
+          <Text style={styles(theme).subtext}>{item.author}</Text>
+        )}
         <View style={styles(theme).timeContainer}>
           {item.total_time ? (
             <>
