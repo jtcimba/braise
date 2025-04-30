@@ -314,7 +314,9 @@ export default function RecipeViewer({data}: any) {
             <Text style={styles(theme).title}>{data.title}</Text>
             <View style={styles(theme).subheader}>
               <View style={styles(theme).itemBody}>
-                <Text style={styles(theme).subtext}>{data.author}</Text>
+                {data.author && (
+                  <Text style={styles(theme).subtext}>{data.author}</Text>
+                )}
                 {data.host && data.author && (
                   <Text style={styles(theme).dot}>•</Text>
                 )}

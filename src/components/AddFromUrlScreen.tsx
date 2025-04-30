@@ -50,7 +50,6 @@ export default function AddFromUrlScreen() {
         navigation.navigate('RecipeDetailsScreen', {
           item: {
             ...recipe,
-            ingredients: recipe.ingredients?.join('\n'),
           },
           newRecipe: true,
         });

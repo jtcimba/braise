@@ -210,5 +210,6 @@ const styles = (theme: any) =>
     },
     placeholder: {
       color: theme.colors.subtext,
+      lineHeight: 30,
     },
   });
