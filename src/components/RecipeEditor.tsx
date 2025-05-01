@@ -54,7 +54,9 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
           />
           <View style={styles(theme).itemBody}>
             <Text style={styles(theme).subtext}>{editingData.author}</Text>
-            {editingData.host && <Text style={styles(theme).dot}>•</Text>}
+            {editingData.host && editingData.author && (
+              <Text style={styles(theme).dot}>•</Text>
+            )}
             <Text style={styles(theme).subtext}>{editingData.host}</Text>
           </View>
           <Text style={styles(theme).fieldLabel}>Recipe Name</Text>

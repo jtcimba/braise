@@ -82,6 +82,8 @@ export default function AddFromUrlScreen() {
             }}
             autoCapitalize="none"
             keyboardType="url"
+            returnKeyType="go"
+            onSubmitEditing={() => onAddRecipe()}
           />
           {!isValidUrl && (
             <View style={styles(colors).invalidUrlContainer}>
