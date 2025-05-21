@@ -20,7 +20,7 @@ export default function AddScreen() {
     yields: '',
     ingredients: '',
     instructions: '',
-    category: [],
+    category: '',
   };
 
   return (
@@ -30,7 +30,7 @@ export default function AddScreen() {
         style={styles(colors).button}>
         <View style={styles(colors).buttonContent}>
           <View>
-          <Text style={styles(colors).text}>From URL</Text>
+            <Text style={styles(colors).text}>From URL</Text>
             <Text style={styles(colors).subtext}>
               Import a recipe from any website
             </Text>
@@ -52,7 +52,7 @@ export default function AddScreen() {
         style={styles(colors).button}>
         <View style={styles(colors).buttonContent}>
           <View>
-          <Text style={styles(colors).text}>From Scratch</Text>
+            <Text style={styles(colors).text}>From Scratch</Text>
             <Text style={styles(colors).subtext}>Create a recipe manually</Text>
           </View>
           <Ionicons

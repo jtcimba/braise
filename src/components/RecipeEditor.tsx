@@ -39,7 +39,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
   );
 
   const categoriesArray = editingData.category
-    ? editingData.category.split(',').filter((cat: string) => cat.trim())
+    ? editingData.category?.split(',').filter((cat: string) => cat.trim())
     : [];
 
   return (
