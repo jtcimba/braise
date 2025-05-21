@@ -27,17 +27,9 @@ class RecipeService {
         const errorText = await response.text();
         console.error('Failed to scrape recipe. Status:', response.status);
         console.error('Error response:', errorText);
-        
-        // Handle specific error cases
-        if (errorText.includes('Connection timed out')) {
-          throw new Error('The recipe website is taking too long to respond. Please try again in a few moments.');
-        } else if (errorText.includes('Max retries exceeded')) {
-          throw new Error('Unable to access the recipe website. The site might be blocking automated access.');
-        } else {
-          throw new Error(
-            `Failed to scrape recipe: ${response.status} ${errorText}`,
-          );
-        }
+        throw new Error(
+          `Failed to scrape recipe: ${response.status} ${errorText}`,
+        );
       }
 
       return await response.json();
