@@ -1,14 +1,13 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
-  ScrollView,
   Text,
   View,
   Image,
   StyleSheet,
   Linking,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
-import {WebView} from 'react-native-webview';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {LogBox} from 'react-native';
@@ -17,7 +16,6 @@ import CustomToggle from './CustomToggle';
 // Ignore WebView errors
 LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
 
-// Common measurement units
 const MEASUREMENT_UNITS = [
   // Volume
   'cup',
@@ -129,7 +127,20 @@ const MEASUREMENT_UNITS = [
 export default function RecipeViewer({data}: any) {
   const theme = useTheme() as unknown as Theme;
   const [isWebView, setIsWebView] = useState(false);
-  const [webViewError, setWebViewError] = useState(false);
+  const [tab, setTab] = useState('ingredients');
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const imageScale = scrollY.interpolate({
+    inputRange: [-350, 0],
+    outputRange: [1.5, 1],
+    extrapolate: 'clamp',
+  });
+
+  const imageTranslateY = scrollY.interpolate({
+    inputRange: [-300, 0, 300],
+    outputRange: [-100, 0, 100],
+    extrapolate: 'clamp',
+  });
 
   const handleHostPress = () => {
     if (data.canonical_url) {
@@ -137,7 +148,6 @@ export default function RecipeViewer({data}: any) {
     }
   };
 
-  // Function to convert Unicode fractions to decimal
   const convertUnicodeFraction = (fraction: string): string => {
     const unicodeFractions: {[key: string]: string} = {
       '½': '1/2',
@@ -160,7 +170,6 @@ export default function RecipeViewer({data}: any) {
     return unicodeFractions[fraction] || fraction;
   };
 
-  // Function to convert long-form units to abbreviations
   const convertToAbbreviation = (unit: string): string => {
     const unitMap = {
       // Volume
@@ -220,24 +229,19 @@ export default function RecipeViewer({data}: any) {
       return {quantity: '', unit: '', text: ingredient};
     }
 
-    // Remove the quantity from the ingredient string
     const remainingText = ingredient
       .substring(quantityMatch?.[0]?.length || 0)
       .trim();
 
-    // Check if the next word is a unit
     const words = remainingText.split(/\s+/);
     let unit = '';
     let text = remainingText;
 
     if (words.length > 0) {
-      // Check for single word units
       if (MEASUREMENT_UNITS.includes(words[0].toLowerCase())) {
         unit = convertToAbbreviation(words[0]);
         text = words.slice(1).join(' ');
-      }
-      // Check for two-word units (like "fluid ounce")
-      else if (
+      } else if (
         words.length > 1 &&
         MEASUREMENT_UNITS.includes(`${words[0]} ${words[1]}`.toLowerCase())
       ) {
@@ -250,149 +254,140 @@ export default function RecipeViewer({data}: any) {
   };
 
   return (
-    <View style={{flex: 1}}>
-      <View
-        style={[
-          styles(theme).contentContainer,
-          !isWebView && styles(theme).hidden,
-        ]}>
-        {webViewError ? (
-          <View style={styles(theme).errorContainer}>
-            <Text style={styles(theme).errorText}>
-              Unable to load the recipe. Please try again later.
-            </Text>
-            <TouchableOpacity
-              style={styles(theme).retryButton}
-              onPress={() => setWebViewError(false)}>
-              <Text style={styles(theme).retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <WebView
-            source={{uri: data.canonical_url}}
-            style={styles(theme).webview}
-            startInLoadingState={true}
-            javaScriptEnabled={true}
-            domStorageEnabled={true}
-            mediaPlaybackRequiresUserAction={true}
-            allowsInlineMediaPlayback={false}
-            allowsFullscreenVideo={false}
-            allowsPictureInPictureMediaPlayback={false}
-            onError={syntheticEvent => {
-              const {nativeEvent} = syntheticEvent;
-              console.warn('WebView error: ', nativeEvent);
-              setWebViewError(true);
-            }}
-            onHttpError={syntheticEvent => {
-              const {nativeEvent} = syntheticEvent;
-              console.warn('WebView HTTP error: ', nativeEvent);
-              setWebViewError(true);
-            }}
-            onShouldStartLoadWithRequest={request => {
-              if (
-                request.url.includes('video') ||
-                request.url.includes('player')
-              ) {
-                return false;
-              }
-              return true;
-            }}
-          />
+    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
+      <Animated.ScrollView
+        contentContainerStyle={{paddingBottom: 40, paddingTop: 0}}
+        showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={true}
+        bounces={true}
+        contentInsetAdjustmentBehavior="never"
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollY}}}],
+          {useNativeDriver: true},
         )}
-      </View>
-      <View
-        style={[
-          styles(theme).contentContainer,
-          isWebView && styles(theme).hidden,
-        ]}>
-        <ScrollView automaticallyAdjustKeyboardInsets={true}>
+        scrollEventThrottle={16}>
+        <Animated.View
+          style={[
+            {transform: [{scale: imageScale}, {translateY: imageTranslateY}]},
+            {overflow: 'hidden', marginTop: -50},
+          ]}>
           <Image
             style={styles(theme).image}
             source={{uri: data.image ? data.image : null}}
           />
-          <View style={styles(theme).bodyContainer}>
-            <Text style={styles(theme).title}>{data.title}</Text>
-            <View style={styles(theme).subheader}>
-              <View style={styles(theme).itemBody}>
-                {data.author && (
-                  <Text style={styles(theme).subtext}>{data.author}</Text>
-                )}
-                {data.host && data.author && (
-                  <Text style={styles(theme).dot}>•</Text>
-                )}
-                {data.host && (
-                  <TouchableOpacity onPress={handleHostPress}>
-                    <Text style={[styles(theme).subtext, styles(theme).host]}>
-                      {data.host}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+        </Animated.View>
+        <View style={styles(theme).bodyContainer}>
+          <View style={styles(theme).headerRow}>
+            <View style={{flex: 1}}>
+              <Text style={styles(theme).title}>{data.title}</Text>
+              {data.author && (
+                <Text style={styles(theme).subtext}>{data.author}</Text>
+              )}
+              {data.host && (
+                <TouchableOpacity onPress={handleHostPress}>
+                  <Text style={[styles(theme).subtext, styles(theme).host]}>
+                    {data.host}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
-            <View style={styles(theme).subheader}>
-              <Text
-                style={[
-                  styles(theme).time,
-                  data.total_time ? styles(theme).paddingRight : null,
-                ]}>
-                {data.total_time}
-              </Text>
-              <Text style={styles(theme).subtext}>{data.yields}</Text>
+            <View style={styles(theme).metaBadgeCol}>
+              {data.yields && (
+                <View style={styles(theme).metaBadgeRect}>
+                  <Text style={styles(theme).metaBadgeValue}>
+                    {data.yields}
+                  </Text>
+                  <Text style={styles(theme).metaBadgeLabel}>servings</Text>
+                </View>
+              )}
+              {data.total_time && (
+                <View style={styles(theme).metaBadgeRect}>
+                  <Text style={styles(theme).metaBadgeValue}>
+                    {data.total_time}
+                  </Text>
+                  <Text style={styles(theme).metaBadgeLabel}>min</Text>
+                </View>
+              )}
             </View>
-            {data.ingredients && (
-              <>
-                <Text style={styles(theme).sectionTitle}>Ingredients</Text>
-                <View style={styles(theme).ingredientsContainer}>
-                  {data.ingredients
-                    .split('\n')
-                    .map((ingredient: string, index: number) => {
-                      const {quantity, unit, text} =
-                        parseIngredient(ingredient);
-
-                      return (
-                        <View style={styles(theme).ingredientLine} key={index}>
-                          <View style={styles(theme).quantityContainer}>
-                            {quantity ? (
-                              <Text style={styles(theme).quantity}>
-                                {quantity} {unit}
-                              </Text>
-                            ) : (
-                              <View style={styles(theme).emptyQuantity} />
-                            )}
-                          </View>
-                          <Text style={styles(theme).ingredientText}>
-                            {text}
-                          </Text>
-                        </View>
-                      );
-                    })}
-                </View>
-              </>
-            )}
-            {data.instructions && (
-              <>
-                <Text style={styles(theme).sectionTitle}>Instructions</Text>
-                <View style={styles(theme).instructionsContainer}>
-                  {data.instructions
-                    .split('\n')
-                    .map((instruction: any, index: any) => {
-                      return (
-                        <View style={styles(theme).lineContainer} key={index}>
-                          <Text style={styles(theme).lineNumber}>
-                            {index + 1}.
-                          </Text>
-                          <Text style={styles(theme).lineText}>
-                            {instruction}
-                          </Text>
-                        </View>
-                      );
-                    })}
-                </View>
-              </>
-            )}
           </View>
-        </ScrollView>
-      </View>
+          {data.about && (
+            <Text style={styles(theme).aboutText}>{data.about}</Text>
+          )}
+          {data.category && (
+            <View style={styles(theme).tagsRow}>
+              {data.category.split(',').map((cat: string, idx: number) => {
+                const label = cat.trim();
+                const capitalized =
+                  label.charAt(0).toUpperCase() + label.slice(1);
+                return (
+                  <View style={styles(theme).tagPill} key={idx}>
+                    <Text style={styles(theme).tagPillText}>{capitalized}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
+          <View style={styles(theme).tabBarContainer}>
+            <CustomToggle
+              value={tab === 'directions'}
+              onValueChange={v => setTab(v ? 'directions' : 'ingredients')}
+              leftLabel="Ingredients"
+              rightLabel="Directions"
+            />
+          </View>
+          {tab === 'ingredients' && data.ingredients && (
+            <View style={styles(theme).ingredientsContainer}>
+              {data.ingredients
+                .split('\n')
+                .map((ingredient: string, index: number, arr: string[]) => {
+                  const {quantity, unit, text} = parseIngredient(ingredient);
+                  return (
+                    <View
+                      style={[
+                        styles(theme).ingredientLine,
+                        index !== arr.length - 1 &&
+                          styles(theme).ingredientDivider,
+                      ]}
+                      key={index}>
+                      <View style={styles(theme).quantityContainer}>
+                        {quantity ? (
+                          <Text style={styles(theme).quantity}>
+                            {quantity} {unit}
+                          </Text>
+                        ) : (
+                          <View style={styles(theme).emptyQuantity} />
+                        )}
+                      </View>
+                      <Text style={styles(theme).ingredientTextBold}>
+                        {text}
+                      </Text>
+                    </View>
+                  );
+                })}
+            </View>
+          )}
+          {tab === 'directions' && data.instructions && (
+            <>
+              <View style={styles(theme).instructionsContainer}>
+                {data.instructions
+                  .split('\n')
+                  .map((instruction: any, index: any) => {
+                    return (
+                      <View style={styles(theme).lineContainer} key={index}>
+                        <Text style={styles(theme).lineNumber}>
+                          {index + 1}.
+                        </Text>
+                        <Text style={styles(theme).lineText}>
+                          {instruction}
+                        </Text>
+                      </View>
+                    );
+                  })}
+              </View>
+            </>
+          )}
+        </View>
+      </Animated.ScrollView>
       <View style={[styles(theme).toggleContainer]}>
         <CustomToggle
           value={isWebView}
@@ -409,14 +404,14 @@ const styles = (theme: any) =>
   StyleSheet.create({
     toggleContainer: {
       position: 'absolute',
-      bottom: 25,
+      top: 68,
       left: '50%',
       transform: [{translateX: -105}],
       zIndex: 1,
     },
     image: {
       width: '100%',
-      height: 350,
+      height: 475,
       resizeMode: 'cover',
       backgroundColor: theme.colors.border,
     },
@@ -424,29 +419,62 @@ const styles = (theme: any) =>
       flex: 1,
       paddingHorizontal: 20,
       marginBottom: 65,
+      borderTopLeftRadius: 35,
+      borderTopRightRadius: 35,
+      marginTop: -75,
+      paddingTop: 18,
+      backgroundColor: theme.colors.background,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      marginBottom: 12,
+    },
+    metaBadgeCol: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginLeft: 5,
+    },
+    metaBadgeRect: {
+      width: 64,
+      height: 60,
+      borderRadius: 20,
+      backgroundColor: theme.colors.backgroundText,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 0,
+      paddingHorizontal: 4,
+    },
+    metaBadgeValue: {
+      color: theme.colors.text,
+      fontSize: 20,
+      fontWeight: '700',
+      textAlign: 'center',
+      marginBottom: -2,
+    },
+    metaBadgeLabel: {
+      color: theme.colors.text,
+      fontSize: 12,
+      fontWeight: '400',
+      textAlign: 'center',
+      opacity: 0.7,
+      marginTop: -2,
+      flexWrap: 'wrap',
+      width: '100%',
     },
     title: {
       fontSize: 20,
-      marginTop: 10,
+      fontWeight: '700',
+      marginBottom: 4,
       width: '100%',
       color: theme.colors.text,
     },
-    subheader: {
-      flexDirection: 'row',
-      alignContent: 'center',
-      marginTop: 5,
-      width: '100%',
-    },
-    dot: {
-      marginHorizontal: 5,
-    },
-    itemBody: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
     subtext: {
-      fontSize: 16,
+      fontSize: 15,
+      fontWeight: '500',
       color: theme.colors.subtext,
+      marginBottom: 2,
     },
     host: {
       textDecorationLine: 'underline',
@@ -458,20 +486,28 @@ const styles = (theme: any) =>
     },
     sectionTitle: {
       fontSize: 16,
+      fontWeight: '600',
       marginTop: 25,
       marginBottom: 10,
       color: theme.colors.subtext,
     },
     instructionsContainer: {
       flex: 1,
+      marginTop: 8,
     },
     ingredientsContainer: {
       flex: 1,
+      marginBottom: 10,
     },
     ingredientLine: {
       flexDirection: 'row',
-      paddingVertical: 5,
-      alignItems: 'flex-start',
+      alignItems: 'center',
+      paddingVertical: 7,
+      backgroundColor: 'transparent',
+    },
+    ingredientDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: '#ECECEC',
     },
     quantityContainer: {
       width: 70,
@@ -479,35 +515,40 @@ const styles = (theme: any) =>
       paddingRight: 10,
     },
     quantity: {
-      fontWeight: 'bold',
-      color: theme.colors.text,
       textAlign: 'right',
-      lineHeight: 24,
+      fontSize: 16,
+      color: theme.colors.subtext,
     },
     emptyQuantity: {
       width: 1,
       height: 24,
     },
-    ingredientText: {
+    ingredientTextBold: {
       flex: 1,
       color: theme.colors.text,
       lineHeight: 24,
+      fontSize: 16,
+      textAlign: 'left',
+      marginLeft: 0,
     },
     lineContainer: {
       flex: 1,
       flexDirection: 'row',
-      paddingVertical: 5,
+      paddingVertical: 7,
     },
     lineNumber: {
       lineHeight: 24,
       marginRight: 10,
       color: theme.colors.subtext,
+      fontSize: 16,
     },
     lineText: {
       lineHeight: 24,
       flex: 1,
       alignSelf: 'flex-start',
       color: theme.colors.text,
+      fontSize: 16,
+      fontWeight: '400',
     },
     paddingRight: {
       paddingRight: 5,
@@ -543,5 +584,34 @@ const styles = (theme: any) =>
       color: theme.colors.background,
       fontSize: 16,
       fontWeight: 'bold',
+    },
+    tagsRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 5,
+      marginBottom: 8,
+      marginTop: 4,
+    },
+    tagPill: {
+      backgroundColor: '#F3F3F3',
+      borderRadius: 18,
+      paddingHorizontal: 18,
+      paddingVertical: 5,
+      marginBottom: 2,
+    },
+    tagPillText: {
+      color: theme.colors.text,
+      fontSize: 15,
+    },
+    tabBarContainer: {
+      marginTop: 10,
+      marginBottom: 15,
+      width: '100%',
+    },
+    aboutText: {
+      fontSize: 15,
+      color: theme.colors.subtext,
+      marginBottom: 8,
+      lineHeight: 22,
     },
   });

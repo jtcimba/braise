@@ -50,10 +50,10 @@ const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: theme.colors.border,
+      backgroundColor: theme.colors.backgroundText,
       borderRadius: 25,
-      padding: 4,
-      width: 210,
+      width: '100%',
+      minWidth: 210,
     },
     option: {
       flex: 1,
@@ -64,14 +64,14 @@ const styles = (theme: Theme) =>
       justifyContent: 'center',
     },
     selectedOption: {
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors.primary,
     },
     optionText: {
       fontSize: 14,
       color: theme.colors.text,
     },
     selectedText: {
-      color: theme.colors.text,
-      fontWeight: '600',
+      color: theme.colors.background,
+      // fontWeight: '600',
     },
   });

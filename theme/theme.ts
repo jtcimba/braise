@@ -4,14 +4,14 @@ export const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#13411A',
-    background: '#F2F0EC',
-    card: '#F2F0EC',
-    text: '#323232',
+    primary: '#1B4D0E',
+    background: '#FFFFFF',
+    card: '#FFFFFF',
+    text: '#000000',
     subtext: '#7B7B76',
     border: '#D4D4D4',
     opaque: 'rgba(0, 0, 0, 0.15)',
-    backgroundText: '#E8E8E3',
+    backgroundText: '#F3F3F3',
   },
   fonts: {
     regular: {

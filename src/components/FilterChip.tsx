@@ -34,7 +34,7 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 16,
-      backgroundColor: theme.colors.border,
+      backgroundColor: theme.colors.backgroundText,
       marginRight: 6,
       marginBottom: 6,
     },
