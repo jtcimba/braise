@@ -17,6 +17,7 @@ export default function AddScreen() {
     host: '',
     image: '',
     total_time: '',
+    total_time_unit: '',
     yields: '',
     ingredients: '',
     instructions: '',

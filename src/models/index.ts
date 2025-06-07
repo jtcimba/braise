@@ -5,6 +5,7 @@ export interface Recipe {
   host: string;
   image: string;
   total_time: string;
+  total_time_unit: string;
   yields: string;
   ingredients: string;
   instructions: string;

@@ -12,6 +12,7 @@ import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {LogBox} from 'react-native';
 import CustomToggle from './CustomToggle';
+import {WebView} from 'react-native-webview';
 
 // Ignore WebView errors
 LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
@@ -254,140 +255,168 @@ export default function RecipeViewer({data}: any) {
   };
 
   return (
-    <View style={{flex: 1, backgroundColor: theme.colors.background}}>
-      <Animated.ScrollView
-        contentContainerStyle={{paddingBottom: 40, paddingTop: 0}}
-        showsVerticalScrollIndicator={false}
-        automaticallyAdjustKeyboardInsets={true}
-        bounces={true}
-        contentInsetAdjustmentBehavior="never"
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {y: scrollY}}}],
-          {useNativeDriver: true},
-        )}
-        scrollEventThrottle={16}>
-        <Animated.View
-          style={[
-            {transform: [{scale: imageScale}, {translateY: imageTranslateY}]},
-            {overflow: 'hidden', marginTop: -50},
-          ]}>
-          <Image
-            style={styles(theme).image}
-            source={{uri: data.image ? data.image : null}}
-          />
-        </Animated.View>
-        <View style={styles(theme).bodyContainer}>
-          <View style={styles(theme).headerRow}>
-            <View style={{flex: 1}}>
-              <Text style={styles(theme).title}>{data.title}</Text>
-              {data.author && (
-                <Text style={styles(theme).subtext}>{data.author}</Text>
-              )}
-              {data.host && (
-                <TouchableOpacity onPress={handleHostPress}>
-                  <Text style={[styles(theme).subtext, styles(theme).host]}>
-                    {data.host}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={styles(theme).metaBadgeCol}>
-              {data.yields && (
+    <View style={styles(theme).container}>
+      {isWebView ? (
+        <WebView
+          source={{uri: data.canonical_url}}
+          style={styles(theme).webview}
+        />
+      ) : (
+        <Animated.ScrollView
+          contentContainerStyle={styles(theme).scrollContent}
+          showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={true}
+          bounces={true}
+          contentInsetAdjustmentBehavior="never"
+          onScroll={Animated.event(
+            [{nativeEvent: {contentOffset: {y: scrollY}}}],
+            {useNativeDriver: true},
+          )}
+          scrollEventThrottle={16}>
+          <Animated.View
+            style={[
+              {transform: [{scale: imageScale}, {translateY: imageTranslateY}]},
+              styles(theme).imageContainer,
+            ]}>
+            <Image
+              style={styles(theme).image}
+              source={{uri: data.image ? data.image : null}}
+            />
+          </Animated.View>
+          <View style={styles(theme).bodyContainer}>
+            <View style={styles(theme).headerRow}>
+              <View style={styles(theme).flex}>
+                <Text style={styles(theme).title}>{data.title}</Text>
+                {data.author && (
+                  <Text style={styles(theme).subtext}>{data.author}</Text>
+                )}
+                {data.host && (
+                  <TouchableOpacity onPress={handleHostPress}>
+                    <Text style={[styles(theme).subtext, styles(theme).host]}>
+                      {data.host}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View style={styles(theme).metaBadgeCol}>
                 <View style={styles(theme).metaBadgeRect}>
                   <Text style={styles(theme).metaBadgeValue}>
-                    {data.yields}
+                    {data.yields || '-'}
                   </Text>
                   <Text style={styles(theme).metaBadgeLabel}>servings</Text>
                 </View>
-              )}
-              {data.total_time && (
                 <View style={styles(theme).metaBadgeRect}>
                   <Text style={styles(theme).metaBadgeValue}>
-                    {data.total_time}
+                    {data.total_time || '-'}
                   </Text>
-                  <Text style={styles(theme).metaBadgeLabel}>min</Text>
+                  <Text style={styles(theme).metaBadgeLabel}>
+                    {data.total_time_unit || 'min'}
+                  </Text>
                 </View>
-              )}
+              </View>
             </View>
-          </View>
-          {data.about && (
-            <Text style={styles(theme).aboutText}>{data.about}</Text>
-          )}
-          {data.category && (
-            <View style={styles(theme).tagsRow}>
-              {data.category.split(',').map((cat: string, idx: number) => {
-                const label = cat.trim();
-                const capitalized =
-                  label.charAt(0).toUpperCase() + label.slice(1);
-                return (
-                  <View style={styles(theme).tagPill} key={idx}>
-                    <Text style={styles(theme).tagPillText}>{capitalized}</Text>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-          <View style={styles(theme).tabBarContainer}>
-            <CustomToggle
-              value={tab === 'directions'}
-              onValueChange={v => setTab(v ? 'directions' : 'ingredients')}
-              leftLabel="Ingredients"
-              rightLabel="Directions"
-            />
-          </View>
-          {tab === 'ingredients' && data.ingredients && (
-            <View style={styles(theme).ingredientsContainer}>
-              {data.ingredients
-                .split('\n')
-                .map((ingredient: string, index: number, arr: string[]) => {
-                  const {quantity, unit, text} = parseIngredient(ingredient);
+            {data.about && (
+              <Text style={styles(theme).aboutText}>{data.about}</Text>
+            )}
+            {data.category && (
+              <View style={styles(theme).tagsRow}>
+                {data.category.split(',').map((cat: string, idx: number) => {
+                  const label = cat.trim();
+                  const capitalized =
+                    label.charAt(0).toUpperCase() + label.slice(1);
                   return (
-                    <View
-                      style={[
-                        styles(theme).ingredientLine,
-                        index !== arr.length - 1 &&
-                          styles(theme).ingredientDivider,
-                      ]}
-                      key={index}>
-                      <View style={styles(theme).quantityContainer}>
-                        {quantity ? (
-                          <Text style={styles(theme).quantity}>
-                            {quantity} {unit}
-                          </Text>
-                        ) : (
-                          <View style={styles(theme).emptyQuantity} />
-                        )}
-                      </View>
-                      <Text style={styles(theme).ingredientTextBold}>
-                        {text}
+                    <View style={styles(theme).tagPill} key={idx}>
+                      <Text style={styles(theme).tagPillText}>
+                        {capitalized}
                       </Text>
                     </View>
                   );
                 })}
-            </View>
-          )}
-          {tab === 'directions' && data.instructions && (
-            <>
-              <View style={styles(theme).instructionsContainer}>
-                {data.instructions
-                  .split('\n')
-                  .map((instruction: any, index: any) => {
-                    return (
-                      <View style={styles(theme).lineContainer} key={index}>
-                        <Text style={styles(theme).lineNumber}>
-                          {index + 1}.
-                        </Text>
-                        <Text style={styles(theme).lineText}>
-                          {instruction}
-                        </Text>
-                      </View>
-                    );
-                  })}
               </View>
-            </>
-          )}
-        </View>
-      </Animated.ScrollView>
+            )}
+            <View style={styles(theme).tabBarContainer}>
+              <CustomToggle
+                value={tab === 'directions'}
+                onValueChange={v => setTab(v ? 'directions' : 'ingredients')}
+                leftLabel="Ingredients"
+                rightLabel="Directions"
+              />
+            </View>
+            {tab === 'ingredients' && (
+              <View style={styles(theme).ingredientsContainer}>
+                {data.ingredients ? (
+                  data.ingredients
+                    .split('\n')
+                    .map((ingredient: string, index: number, arr: string[]) => {
+                      const {quantity, unit, text} =
+                        parseIngredient(ingredient);
+                      return (
+                        <View
+                          style={[
+                            styles(theme).ingredientLine,
+                            index !== arr.length - 1 &&
+                              styles(theme).ingredientDivider,
+                          ]}
+                          key={index}>
+                          <View style={styles(theme).quantityContainer}>
+                            {quantity ? (
+                              <Text style={styles(theme).quantity}>
+                                {quantity} {unit}
+                              </Text>
+                            ) : (
+                              <View style={styles(theme).emptyQuantity} />
+                            )}
+                          </View>
+                          <Text style={styles(theme).ingredientTextBold}>
+                            {text}
+                          </Text>
+                        </View>
+                      );
+                    })
+                ) : (
+                  <View style={styles(theme).emptyStateContainer}>
+                    <Text style={styles(theme).emptyStateText}>
+                      Looks like this recipe is missing ingredients. Edit the
+                      recipe to add info or view the original source by tapping
+                      'Original' above.
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+            {tab === 'directions' && (
+              <>
+                <View style={styles(theme).instructionsContainer}>
+                  {data.instructions ? (
+                    data.instructions
+                      .split('\n')
+                      .map((instruction: any, index: any) => {
+                        return (
+                          <View style={styles(theme).lineContainer} key={index}>
+                            <Text style={styles(theme).lineNumber}>
+                              {index + 1}.
+                            </Text>
+                            <Text style={styles(theme).lineText}>
+                              {instruction}
+                            </Text>
+                          </View>
+                        );
+                      })
+                  ) : (
+                    <View style={styles(theme).emptyStateContainer}>
+                      <Text style={styles(theme).emptyStateText}>
+                        Looks like this recipe is missing directions. Edit the
+                        recipe to add info or view the original source by
+                        tapping 'Original' above.
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </>
+            )}
+          </View>
+        </Animated.ScrollView>
+      )}
       <View style={[styles(theme).toggleContainer]}>
         <CustomToggle
           value={isWebView}
@@ -402,12 +431,20 @@ export default function RecipeViewer({data}: any) {
 
 const styles = (theme: any) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
     toggleContainer: {
       position: 'absolute',
       top: 68,
       left: '50%',
       transform: [{translateX: -105}],
       zIndex: 1,
+    },
+    imageContainer: {
+      overflow: 'hidden',
+      marginTop: -50,
     },
     image: {
       width: '100%',
@@ -418,7 +455,7 @@ const styles = (theme: any) =>
     bodyContainer: {
       flex: 1,
       paddingHorizontal: 20,
-      marginBottom: 65,
+      marginBottom: 35,
       borderTopLeftRadius: 35,
       borderTopRightRadius: 35,
       marginTop: -75,
@@ -613,5 +650,26 @@ const styles = (theme: any) =>
       color: theme.colors.subtext,
       marginBottom: 8,
       lineHeight: 22,
+    },
+    emptyStateContainer: {
+      padding: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      // backgroundColor: theme.colors.backgroundText,
+      borderRadius: 12,
+      marginTop: 10,
+    },
+    emptyStateText: {
+      color: theme.colors.subtext,
+      fontSize: 16,
+      textAlign: 'center',
+      lineHeight: 24,
+    },
+    flex: {
+      flex: 1,
+    },
+    scrollContent: {
+      paddingBottom: 40,
+      paddingTop: 0,
     },
   });

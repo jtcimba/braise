@@ -78,6 +78,14 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
               onChangeEditingData({...editingData, total_time: text})
             }
           />
+          <TextInput
+            style={styles(theme).editText}
+            value={editingData.total_time_unit}
+            placeholder="Time unit"
+            onChangeText={text =>
+              onChangeEditingData({...editingData, total_time_unit: text})
+            }
+          />
           <Text style={styles(theme).fieldLabel}>Servings</Text>
           <TextInput
             style={styles(theme).editText}

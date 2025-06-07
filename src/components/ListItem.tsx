@@ -33,7 +33,9 @@ export default function Item({item, navigation}: any) {
                 color={theme.colors.subtext}
                 style={styles(theme).icon}
               />
-              <Text style={styles(theme).time}>{item.total_time}</Text>
+              <Text style={styles(theme).time}>
+                {item.total_time} {item.total_time_unit}
+              </Text>
             </>
           ) : null}
         </View>
