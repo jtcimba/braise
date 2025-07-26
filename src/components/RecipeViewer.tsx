@@ -287,16 +287,18 @@ export default function RecipeViewer({data}: any) {
             <View style={styles(theme).headerRow}>
               <View style={styles(theme).flex}>
                 <Text style={styles(theme).title}>{data.title}</Text>
-                {data.author && (
-                  <Text style={styles(theme).subtext}>{data.author}</Text>
-                )}
-                {data.host && (
-                  <TouchableOpacity onPress={handleHostPress}>
-                    <Text style={[styles(theme).subtext, styles(theme).host]}>
-                      {data.host}
-                    </Text>
-                  </TouchableOpacity>
-                )}
+                <View style={styles(theme).authorRow}>
+                  {data.author && (
+                    <Text style={styles(theme).subtext}>{data.author}</Text>
+                  )}
+                  {data.host && (
+                    <TouchableOpacity onPress={handleHostPress}>
+                      <Text style={[styles(theme).subtext, styles(theme).host]}>
+                        {data.host}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
               <View style={styles(theme).metaBadgeCol}>
                 <View style={styles(theme).metaBadgeRect}>
@@ -315,9 +317,6 @@ export default function RecipeViewer({data}: any) {
                 </View>
               </View>
             </View>
-            {data.about && (
-              <Text style={styles(theme).aboutText}>{data.about}</Text>
-            )}
             {data.category && (
               <View style={styles(theme).tagsRow}>
                 {data.category.split(',').map((cat: string, idx: number) => {
@@ -325,14 +324,20 @@ export default function RecipeViewer({data}: any) {
                   const capitalized =
                     label.charAt(0).toUpperCase() + label.slice(1);
                   return (
-                    <View style={styles(theme).tagPill} key={idx}>
+                    <View key={idx}>
                       <Text style={styles(theme).tagPillText}>
                         {capitalized}
+                        {idx < data.category.split(',').length - 1
+                          ? '  •  '
+                          : ''}
                       </Text>
                     </View>
                   );
                 })}
               </View>
+            )}
+            {data.about && (
+              <Text style={styles(theme).aboutText}>{data.about}</Text>
             )}
             <View style={styles(theme).tabBarContainer}>
               <CustomToggle
@@ -340,6 +345,9 @@ export default function RecipeViewer({data}: any) {
                 onValueChange={v => setTab(v ? 'directions' : 'ingredients')}
                 leftLabel="Ingredients"
                 rightLabel="Directions"
+                textStyle="header"
+                color="secondary"
+                type="tab"
               />
             </View>
             {tab === 'ingredients' && (
@@ -376,9 +384,8 @@ export default function RecipeViewer({data}: any) {
                 ) : (
                   <View style={styles(theme).emptyStateContainer}>
                     <Text style={styles(theme).emptyStateText}>
-                      Looks like this recipe is missing ingredients. Edit the
-                      recipe to add info or view the original source by tapping
-                      'Original' above.
+                      No ingredients found. Add them in edit mode or view the
+                      original recipe.
                     </Text>
                   </View>
                 )}
@@ -405,9 +412,8 @@ export default function RecipeViewer({data}: any) {
                   ) : (
                     <View style={styles(theme).emptyStateContainer}>
                       <Text style={styles(theme).emptyStateText}>
-                        Looks like this recipe is missing directions. Edit the
-                        recipe to add info or view the original source by
-                        tapping 'Original' above.
+                        No directions found. Add them in edit mode or view the
+                        original recipe.
                       </Text>
                     </View>
                   )}
@@ -419,6 +425,8 @@ export default function RecipeViewer({data}: any) {
       )}
       <View style={[styles(theme).toggleContainer]}>
         <CustomToggle
+          type="pill"
+          color="secondary"
           value={isWebView}
           onValueChange={setIsWebView}
           leftLabel="Braise"
@@ -455,17 +463,18 @@ const styles = (theme: any) =>
     bodyContainer: {
       flex: 1,
       paddingHorizontal: 20,
-      marginBottom: 35,
       borderTopLeftRadius: 35,
       borderTopRightRadius: 35,
       marginTop: -75,
       paddingTop: 18,
       backgroundColor: theme.colors.background,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      minHeight: '100%',
     },
     headerRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-      marginBottom: 12,
     },
     metaBadgeCol: {
       flexDirection: 'row',
@@ -476,24 +485,21 @@ const styles = (theme: any) =>
     metaBadgeRect: {
       width: 64,
       height: 60,
-      borderRadius: 20,
-      backgroundColor: theme.colors.backgroundText,
+      borderRadius: 13,
+      backgroundColor: theme.colors.badgeBackground,
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: 0,
       paddingHorizontal: 4,
     },
     metaBadgeValue: {
+      ...theme.typography.bodyLarge,
       color: theme.colors.text,
-      fontSize: 20,
-      fontWeight: '700',
       textAlign: 'center',
       marginBottom: -2,
     },
     metaBadgeLabel: {
+      ...theme.typography.caption,
       color: theme.colors.text,
-      fontSize: 12,
-      fontWeight: '400',
       textAlign: 'center',
       opacity: 0.7,
       marginTop: -2,
@@ -501,59 +507,56 @@ const styles = (theme: any) =>
       width: '100%',
     },
     title: {
-      fontSize: 20,
-      fontWeight: '700',
-      marginBottom: 4,
+      ...theme.typography.h1,
+      marginBottom: 5,
       width: '100%',
       color: theme.colors.text,
     },
     subtext: {
-      fontSize: 15,
-      fontWeight: '500',
+      ...theme.typography.bodyMedium,
       color: theme.colors.subtext,
-      marginBottom: 2,
     },
     host: {
+      ...theme.typography.bodyMedium,
       textDecorationLine: 'underline',
     },
     time: {
-      fontSize: 16,
+      ...theme.typography.bodyMedium,
       color: theme.colors.subtext,
       overflow: 'hidden',
     },
     sectionTitle: {
-      fontSize: 16,
-      fontWeight: '600',
+      ...theme.typography.h3,
       marginTop: 25,
       marginBottom: 10,
       color: theme.colors.subtext,
     },
     instructionsContainer: {
-      flex: 1,
-      marginTop: 8,
+      paddingHorizontal: 20,
+      paddingVertical: 5,
     },
     ingredientsContainer: {
-      flex: 1,
-      marginBottom: 10,
+      paddingHorizontal: 15,
+      paddingVertical: 5,
     },
     ingredientLine: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: 7,
+      paddingVertical: 10,
       backgroundColor: 'transparent',
     },
     ingredientDivider: {
       borderBottomWidth: 1,
-      borderBottomColor: '#ECECEC',
+      borderBottomColor: theme.colors.border,
     },
     quantityContainer: {
-      width: 70,
+      width: 80,
       alignItems: 'flex-end',
-      paddingRight: 10,
+      paddingRight: 15,
     },
     quantity: {
+      ...theme.typography.bodyMedium,
       textAlign: 'right',
-      fontSize: 16,
       color: theme.colors.subtext,
     },
     emptyQuantity: {
@@ -561,31 +564,27 @@ const styles = (theme: any) =>
       height: 24,
     },
     ingredientTextBold: {
+      ...theme.typography.bodyMedium,
       flex: 1,
       color: theme.colors.text,
-      lineHeight: 24,
-      fontSize: 16,
       textAlign: 'left',
       marginLeft: 0,
     },
     lineContainer: {
       flex: 1,
       flexDirection: 'row',
-      paddingVertical: 7,
+      paddingVertical: 10,
     },
     lineNumber: {
-      lineHeight: 24,
+      ...theme.typography.bodyMedium,
       marginRight: 10,
       color: theme.colors.subtext,
-      fontSize: 16,
     },
     lineText: {
-      lineHeight: 24,
+      ...theme.typography.bodyMedium,
       flex: 1,
       alignSelf: 'flex-start',
       color: theme.colors.text,
-      fontSize: 16,
-      fontWeight: '400',
     },
     paddingRight: {
       paddingRight: 5,
@@ -625,45 +624,31 @@ const styles = (theme: any) =>
     tagsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 5,
-      marginBottom: 8,
-      marginTop: 4,
-    },
-    tagPill: {
-      backgroundColor: '#F3F3F3',
-      borderRadius: 18,
-      paddingHorizontal: 18,
-      paddingVertical: 5,
-      marginBottom: 2,
     },
     tagPillText: {
-      color: theme.colors.text,
-      fontSize: 15,
+      color: theme.colors.primary,
+      ...theme.typography.bodyMedium,
     },
     tabBarContainer: {
-      marginTop: 10,
-      marginBottom: 15,
+      marginVertical: 10,
       width: '100%',
     },
     aboutText: {
-      fontSize: 15,
-      color: theme.colors.subtext,
-      marginBottom: 8,
-      lineHeight: 22,
+      ...theme.typography.bodyMedium,
+      color: theme.colors.text,
+      marginBottom: 5,
     },
     emptyStateContainer: {
       padding: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      // backgroundColor: theme.colors.backgroundText,
       borderRadius: 12,
       marginTop: 10,
     },
     emptyStateText: {
+      ...theme.typography.bodyMedium,
       color: theme.colors.subtext,
-      fontSize: 16,
       textAlign: 'center',
-      lineHeight: 24,
     },
     flex: {
       flex: 1,
@@ -671,5 +656,13 @@ const styles = (theme: any) =>
     scrollContent: {
       paddingBottom: 40,
       paddingTop: 0,
+    },
+    horizontalLine: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.opaque,
+      marginBottom: 10,
+    },
+    authorRow: {
+      marginBottom: 10,
     },
   });

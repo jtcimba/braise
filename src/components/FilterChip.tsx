@@ -34,16 +34,15 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 16,
-      backgroundColor: theme.colors.backgroundText,
+      backgroundColor: theme.colors.badgeBackground,
       marginRight: 6,
-      marginBottom: 6,
     },
     selectedChip: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.text,
     },
     label: {
+      ...theme.typography.bodySmall,
       color: theme.colors.text,
-      fontSize: 13,
     },
     selectedLabel: {
       color: theme.colors.background,

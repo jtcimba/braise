@@ -49,7 +49,7 @@ export default function AddFromUrlScreen() {
       .then(recipe => {
         navigation.navigate('RecipeDetailsScreen', {
           item: {
-            ...recipe,
+            ...recipe.data,
           },
           newRecipe: true,
         });

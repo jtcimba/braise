@@ -1,17 +1,14 @@
 import {AuthService} from './index';
 
 class RecipeService {
-  async getRecipeFromUrl(
-    url: string,
-    wild_mode: boolean = false,
-  ): Promise<any> {
+  async getRecipeFromUrl(url: string): Promise<any> {
     try {
       const idToken = await AuthService.getIdToken();
       if (!idToken) {
         throw new Error('Failed to get ID token');
       }
 
-      const response = await fetch(`${process.env.API_URL}recipes/url`, {
+      const response = await fetch(`${process.env.API_URL}recipes/import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -19,7 +16,6 @@ class RecipeService {
         },
         body: JSON.stringify({
           url: url,
-          wildMode: wild_mode,
         }),
       });
 

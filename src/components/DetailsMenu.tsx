@@ -62,7 +62,8 @@ export default function DetailsMenu(navigation: any) {
       )}
       {viewMode !== 'view' && (
         <View style={styles(colors).editContainer}>
-          <View style={styles(colors).container}>
+          <View
+            style={[styles(colors).container, styles(colors).buttonContainer]}>
             <TouchableOpacity onPress={onCancelPress}>
               <Text style={[styles(colors).text, styles(colors).cancel]}>
                 Cancel
@@ -127,10 +128,14 @@ const styles = (colors: any) =>
       paddingBottom: 2,
       paddingRight: 3,
     },
+    buttonContainer: {
+      minWidth: 70,
+    },
     saveContainer: {
       marginLeft: 10,
       backgroundColor: colors.primary,
       color: 'white',
+      minWidth: 70,
     },
     editContainer: {
       flexDirection: 'row',
@@ -139,7 +144,8 @@ const styles = (colors: any) =>
       paddingTop: 2,
       paddingLeft: 7,
       paddingBottom: 2,
-      paddingRight: 5,
+      paddingRight: 7,
+      textAlign: 'center',
     },
     cancel: {
       color: 'white',

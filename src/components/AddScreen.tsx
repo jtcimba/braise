@@ -1,15 +1,14 @@
 import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import {useNavigation, ParamListBase} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Recipe} from '../models';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function AddScreen() {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
-  const {colors} = useTheme() as unknown as Theme;
+  const theme = useTheme() as unknown as Theme;
   const newRecipe: Recipe = {
     id: '',
     title: '',
@@ -25,22 +24,19 @@ export default function AddScreen() {
   };
 
   return (
-    <View style={styles(colors).content}>
+    <View style={styles(theme).content}>
+      <View style={styles(theme).imageContainer}>
+        <Image
+          source={require('../assets/bowl.png')}
+          style={styles(theme).bowlImage}
+          resizeMode="contain"
+        />
+      </View>
       <TouchableOpacity
         onPress={() => navigation.navigate('AddFromUrl')}
-        style={styles(colors).button}>
-        <View style={styles(colors).buttonContent}>
-          <View>
-            <Text style={styles(colors).text}>From URL</Text>
-            <Text style={styles(colors).subtext}>
-              Import a recipe from any website
-            </Text>
-          </View>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={20}
-            color={colors.opaque}
-          />
+        style={styles(theme).button}>
+        <View style={styles(theme).buttonContent}>
+          <Text style={styles(theme).text}>From URL</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -50,36 +46,43 @@ export default function AddScreen() {
             newRecipe: true,
           })
         }
-        style={styles(colors).button}>
-        <View style={styles(colors).buttonContent}>
-          <View>
-            <Text style={styles(colors).text}>From Scratch</Text>
-            <Text style={styles(colors).subtext}>Create a recipe manually</Text>
-          </View>
-          <Ionicons
-            name="chevron-forward-outline"
-            size={20}
-            color={colors.opaque}
-          />
+        style={styles(theme).button}>
+        <View style={styles(theme).buttonContent}>
+          <Text style={styles(theme).text}>From Scratch</Text>
         </View>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = (colors: any) =>
+const styles = (theme: any) =>
   StyleSheet.create({
     content: {
       padding: 22,
       alignItems: 'center',
       height: '100%',
+      backgroundColor: theme.colors.text,
+      flex: 1,
+      justifyContent: 'space-between',
+    },
+    imageContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 30,
+    },
+    bowlImage: {
+      width: 400,
+      height: 400,
     },
     button: {
-      backgroundColor: 'white',
-      padding: 15,
+      backgroundColor: theme.colors.primary,
+      padding: 10,
       marginVertical: 10,
-      borderRadius: 10,
+      borderRadius: 30,
       width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     buttonContent: {
       flexDirection: 'row',
@@ -87,13 +90,14 @@ const styles = (colors: any) =>
       alignItems: 'center',
     },
     text: {
-      color: colors.text,
-      fontSize: 16,
-      fontWeight: '600',
+      color: theme.colors.card,
+      backgroundColor: theme.colors.primary,
+      ...theme.typography.h2,
     },
     subtext: {
-      color: colors.subtext,
+      color: theme.colors.subtext,
       fontSize: 14,
       marginTop: 2,
+      ...theme.typography.bodySmall,
     },
   });

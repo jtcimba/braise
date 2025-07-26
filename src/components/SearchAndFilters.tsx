@@ -73,14 +73,18 @@ const styles = (theme: Theme) =>
     },
     searchInput: {
       height: 36,
-      backgroundColor: theme.colors.background,
-      borderRadius: 18,
+      backgroundColor: theme.colors.textBox,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 13,
       paddingHorizontal: 12,
-      marginBottom: 8,
       color: theme.colors.text,
+      textAlignVertical: 'center',
+      includeFontPadding: false,
+      ...theme.typography.bodySmall,
+      marginBottom: 10,
     },
     filtersContainer: {
       flexDirection: 'row',
-      marginBottom: 4,
     },
   });

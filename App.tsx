@@ -17,6 +17,8 @@ import DetailsMenu from './src/components/DetailsMenu';
 import AddFromUrlScreen from './src/components/AddFromUrlScreen';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
+import {useTheme} from './theme/ThemeProvider';
+import {Theme} from './theme/types';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,6 +28,7 @@ function AddComponent() {
 }
 
 function AddStackNavigator() {
+  const theme = useTheme() as unknown as Theme;
   return (
     <Stack.Navigator
       screenOptions={{
@@ -46,9 +49,11 @@ function AddStackNavigator() {
           headerShadowVisible: false,
           headerRightContainerStyle: {paddingRight: 22, paddingTop: 10},
           headerTitleStyle: {
-            fontSize: 18,
-            fontWeight: 'bold',
-            marginTop: 10,
+            ...theme?.typography.h1,
+            color: theme.colors.card,
+          },
+          headerStyle: {
+            backgroundColor: theme.colors.text,
           },
         })}
       />
@@ -74,6 +79,8 @@ function AddStackNavigator() {
 }
 
 function TabNavigator({navigation}: {navigation: any}) {
+  const theme = useTheme() as unknown as Theme;
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -100,6 +107,10 @@ function TabNavigator({navigation}: {navigation: any}) {
           headerRight: () => SettingsIcon(navigation),
           headerRightContainerStyle: {paddingRight: 10},
           headerShadowVisible: false,
+          headerTitleStyle: {
+            ...theme?.typography.h1,
+            color: theme.colors.text,
+          },
         }}
       />
       <Tab.Screen
@@ -114,7 +125,7 @@ function TabNavigator({navigation}: {navigation: any}) {
         })}
       />
       <Tab.Screen
-        name="Discover"
+        name="Grocery Lists"
         component={DiscoverScreen}
         options={{
           headerTitleAlign: 'left',
@@ -171,11 +182,19 @@ export function App(): React.JSX.Element {
             name="Settings"
             component={SettingsScreen}
             options={({navigation}) => ({
+              headerTitle: 'Settings',
               headerLeft: () => null,
               headerRight: () => CloseIcon(navigation, 'Recipes'),
               presentation: 'modal',
               headerShadowVisible: false,
               headerRightContainerStyle: {paddingRight: 10},
+              headerTitleStyle: {
+                fontFamily: 'Lora-Bold',
+                fontSize: 18,
+                fontWeight: 'bold',
+                lineHeight: 26,
+                color: '#323232',
+              },
             })}
           />
         </Stack.Navigator>

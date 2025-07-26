@@ -4,6 +4,7 @@ import {
   Platform,
   SafeAreaView,
   StyleSheet,
+  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -29,7 +30,7 @@ export default function InstructionsEditor({
   handleModalClose,
   modalVisible,
 }: any) {
-  const theme = useTheme();
+  const theme = useTheme() as unknown as any;
 
   const convertInstructionsToHtml = (i: string) => {
     if (!i) {
@@ -54,13 +55,14 @@ export default function InstructionsEditor({
       .trimEnd();
   };
 
-  const customCodeBlockCSS = `
-    body {
-      font-family: Poppins-Regular, sans-serif;
-      font-weight: normal;
-      font-size: 0.875rem;
-      background-color: rgba(0, 0, 0, 0);
-    }
+  const customCodeBlockCSS = `      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 1rem;
+        background-color: #FDFDFD;
+        color: #2D2D2D;
+        line-height: 1.5;
+      }
     `;
 
   const editor = useEditorBridge({
@@ -84,16 +86,21 @@ export default function InstructionsEditor({
       isVisible={modalVisible}
       onBackdropPress={() => handleModalClose()}
       onSwipeComplete={() => handleModalClose()}
-      style={styles(theme).modalOverlay}>
+      style={styles(theme).modalContainer}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles(theme).fullScreen}>
-        <SafeAreaView style={styles(theme).modal}>
-          <View style={[styles(theme).closeContainer]}>
+        style={styles(theme).keyboardAvoidingView}>
+        <SafeAreaView style={styles(theme).safeAreaView}>
+          <View style={styles(theme).headerContainer}>
+            <Text style={styles(theme).headerText}>Edit Directions</Text>
             <TouchableOpacity
               style={styles(theme).iconContainer}
               onPress={() => handleModalClose()}>
-              <Ionicons name="close-outline" size={20} color="white" />
+              <Ionicons
+                name="close-outline"
+                size={20}
+                color={theme.colors.text}
+              />
             </TouchableOpacity>
           </View>
           <RichText editor={editor} style={styles(theme).editor} />
@@ -105,40 +112,42 @@ export default function InstructionsEditor({
 
 const styles = (theme: any) =>
   StyleSheet.create({
-    fullScreen: {
+    keyboardAvoidingView: {
       flex: 1,
       backgroundColor: theme.colors.background,
-    },
-    container: {
-      flexGrow: 1,
     },
     editor: {
       backgroundColor: 'transparent',
     },
-    modalOverlay: {
-      justifyContent: 'flex-end',
+    modalContainer: {
       margin: 0,
     },
-    modal: {
+    safeAreaView: {
       flex: 1,
       backgroundColor: theme.colors.background,
-      borderRadius: 25,
-      paddingStart: 20,
-      paddingEnd: 20,
       marginTop: 20,
-      marginBottom: 20,
+      marginHorizontal: 30,
     },
     optionsText: {
       fontSize: 16,
       fontWeight: 'bold',
     },
     iconContainer: {
-      backgroundColor: theme.colors.opaque,
+      backgroundColor: theme.colors.badgeBackground,
       borderRadius: 48,
       padding: 2,
     },
     closeContainer: {
       alignSelf: 'flex-end',
       paddingBottom: 10,
+    },
+    headerContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    headerText: {
+      color: theme.colors.text,
+      ...theme.typography.h2,
     },
   });

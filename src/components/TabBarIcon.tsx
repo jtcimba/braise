@@ -19,7 +19,7 @@ const TabBarIcon: React.FC<TabBarIconProps> = ({
 
   const icons: {[key: string]: string} = {
     Recipes: 'file-tray-full-outline',
-    Discover: 'compass-outline',
+    'Grocery Lists': 'cart-outline',
     Add: 'add-circle-outline',
   };
 

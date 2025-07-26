@@ -30,7 +30,7 @@ export default function Item({item, navigation}: any) {
               <Ionicons
                 name="time-outline"
                 size={16}
-                color={theme.colors.subtext}
+                color={theme.colors.primary}
                 style={styles(theme).icon}
               />
               <Text style={styles(theme).time}>
@@ -56,8 +56,7 @@ const styles = (theme: any) =>
       flex: 1,
     },
     title: {
-      fontSize: 14,
-      fontFamily: theme.fonts.medium.fontFamily,
+      ...theme.typography.h3,
       color: theme.colors.text,
     },
     timeContainer: {
@@ -65,17 +64,20 @@ const styles = (theme: any) =>
       alignItems: 'center',
     },
     time: {
-      color: theme.colors.subtext,
+      color: theme.colors.primary,
+      ...theme.typography.bodySmall,
     },
     image: {
       width: 75,
       height: 75,
       marginRight: 10,
       backgroundColor: theme.colors.border,
+      borderRadius: 13,
     },
     subtext: {
-      color: theme.colors.subtext,
       overflow: 'hidden',
+      ...theme.typography.bodySmall,
+      color: theme.colors.subtext,
     },
     icon: {
       marginRight: 3,

@@ -72,7 +72,7 @@ export default function CategoryEditor({
           <TextInput
             ref={inputRef}
             style={styles(theme).input}
-            placeholder="Add a category..."
+            placeholder="Add a tag..."
             placeholderTextColor={theme.colors.subtext}
             value={newCategory}
             onChangeText={setNewCategory}
@@ -88,41 +88,36 @@ export default function CategoryEditor({
 
 const styles = (theme: Theme) =>
   StyleSheet.create({
-    label: {
-      fontSize: 16,
-      fontWeight: '600',
-      marginTop: 15,
-      marginBottom: 5,
-      color: theme.colors.text,
-    },
     chipsContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       alignItems: 'center',
+      marginTop: 5,
     },
     chip: {
-      height: 30,
+      height: 26,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: theme.colors.backgroundText,
+      justifyContent: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors.border,
       borderRadius: 15,
-      paddingVertical: 4,
-      paddingHorizontal: 8,
-      marginRight: 8,
-      marginBottom: 8,
+      paddingVertical: 5,
+      paddingHorizontal: 10,
+      marginRight: 10,
     },
     chipText: {
       color: theme.colors.text,
-      fontSize: 14,
+      ...theme.typography.bodySmall,
+      lineHeight: 15,
+      textAlignVertical: 'center',
+      includeFontPadding: false,
     },
     removeButton: {
       marginLeft: 4,
-      width: 20,
-      height: 20,
-      borderRadius: 10,
+      width: 16,
+      height: 16,
       backgroundColor: theme.colors.background,
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     removeButtonText: {
       color: theme.colors.text,
@@ -132,13 +127,12 @@ const styles = (theme: Theme) =>
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: 30,
-      marginBottom: 8,
+      height: 26,
+      marginBottom: 5,
     },
     input: {
-      height: 30,
-      backgroundColor: theme.colors.background,
-      borderRadius: 15,
+      ...theme.typography.bodyMedium,
+      height: 26,
       color: theme.colors.text,
       minWidth: 150,
     },

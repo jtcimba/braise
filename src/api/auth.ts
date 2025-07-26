@@ -39,6 +39,8 @@ class AuthService {
       if (!idToken) {
         throw new Error('Failed to get ID token');
       }
+      console.log('AWS ID:', awsId);
+      console.log('IDD Token:', idToken);
 
       const apiUrl = `${process.env.API_URL}users?awsid=${awsId}`;
       const response = await fetch(apiUrl, {
