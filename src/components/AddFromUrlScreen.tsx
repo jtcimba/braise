@@ -24,7 +24,7 @@ type RootStackParamList = {
 };
 
 export default function AddFromUrlScreen() {
-  const {colors} = useTheme() as unknown as Theme;
+  const theme = useTheme() as unknown as Theme;
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -65,17 +65,39 @@ export default function AddFromUrlScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles(colors).container}>
+      <View style={styles(theme).container}>
         {isLoading && (
-          <View style={styles(colors).loadingOverlay}>
-            <ActivityIndicator size="large" color={colors.subtext} />
+          <View style={styles(theme).loadingOverlay}>
+            <ActivityIndicator size="large" color={theme.colors.subtext} />
           </View>
         )}
-        <View style={styles(colors).content}>
+        <View style={styles(theme).content}>
+          {!isValidUrl && (
+            <View style={styles(theme).invalidUrlContainer}>
+              <Text style={styles(theme).invalidUrlText}>
+                Enter a valid URL
+              </Text>
+            </View>
+          )}
+          {isValidUrl && (
+            <View style={styles(theme).webviewContainer}>
+              <WebView
+                source={{uri: url}}
+                style={styles(theme).webview}
+                startInLoadingState={true}
+                renderLoading={() => (
+                  <ActivityIndicator
+                    style={styles(theme).webviewLoader}
+                    color={theme.colors.subtext}
+                  />
+                )}
+              />
+            </View>
+          )}
           <TextInput
-            style={styles(colors).input}
+            style={styles(theme).input}
             placeholder="https://www..."
-            placeholderTextColor={colors.subtext}
+            placeholderTextColor={theme.colors.subtext}
             value={url}
             onChangeText={text => {
               setUrl(text);
@@ -85,37 +107,15 @@ export default function AddFromUrlScreen() {
             returnKeyType="go"
             onSubmitEditing={() => onAddRecipe()}
           />
-          {!isValidUrl && (
-            <View style={styles(colors).invalidUrlContainer}>
-              <Text style={styles(colors).invalidUrlText}>
-                Enter a valid URL
-              </Text>
-            </View>
-          )}
-          {isValidUrl && (
-            <View style={styles(colors).webviewContainer}>
-              <WebView
-                source={{uri: url}}
-                style={styles(colors).webview}
-                startInLoadingState={true}
-                renderLoading={() => (
-                  <ActivityIndicator
-                    style={styles(colors).webviewLoader}
-                    color={colors.subtext}
-                  />
-                )}
-              />
-            </View>
-          )}
           <TouchableOpacity
             onPress={() => onAddRecipe()}
-            style={styles(colors).button}
+            style={styles(theme).button}
             disabled={!isValidUrl || isLoading}>
             <Text
               style={[
-                styles(colors).text,
-                !isValidUrl && styles(colors).disabledText,
-                isLoading && styles(colors).disabledText,
+                styles(theme).text,
+                !isValidUrl && styles(theme).disabledText,
+                isLoading && styles(theme).disabledText,
               ]}>
               Add recipe
             </Text>
@@ -126,48 +126,48 @@ export default function AddFromUrlScreen() {
   );
 }
 
-const styles = (colors: any) =>
+const styles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,
-      borderTopLeftRadius: 25,
-      borderTopRightRadius: 25,
+      backgroundColor: theme.colors.secondary,
       overflow: 'hidden',
     },
     content: {
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.secondary,
       padding: 22,
       alignItems: 'center',
       height: '100%',
-      borderTopLeftRadius: 25,
-      borderTopRightRadius: 25,
+      flex: 1,
+      justifyContent: 'space-between',
     },
     button: {
-      position: 'absolute',
-      bottom: 15,
-      backgroundColor: colors.primary,
-      padding: 15,
+      backgroundColor: theme.colors.text,
+      padding: 10,
       marginVertical: 10,
-      borderRadius: 10,
+      borderRadius: 30,
       width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     text: {
-      color: 'white',
-      fontSize: 16,
+      color: theme.colors.card,
+      ...(theme.typography?.h2 || {fontSize: 16, fontWeight: 'bold'}),
       textAlign: 'center',
     },
     disabledText: {
       opacity: 0.5,
     },
     input: {
-      padding: 15,
-      marginVertical: 10,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: colors.border,
+      ...theme.typography.bodySmall,
+      padding: 10,
+      marginVertical: 5,
+      borderRadius: 13,
+      borderWidth: 2,
+      borderColor: theme.colors.card,
       width: '100%',
-      color: colors.text,
+      color: theme.colors.text,
+      backgroundColor: theme.colors.card,
     },
     loadingOverlay: {
       position: 'absolute',
@@ -177,7 +177,7 @@ const styles = (colors: any) =>
       width: 100,
       height: 100,
       borderRadius: 20,
-      backgroundColor: colors.opaque,
+      backgroundColor: theme.colors.opaque,
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 100,
@@ -188,7 +188,7 @@ const styles = (colors: any) =>
       marginVertical: 10,
       borderRadius: 10,
       overflow: 'hidden',
-      backgroundColor: colors.backgroundText,
+      backgroundColor: theme.colors.backgroundText,
     },
     webview: {
       flex: 1,
@@ -207,8 +207,9 @@ const styles = (colors: any) =>
       paddingHorizontal: 20,
     },
     invalidUrlText: {
-      color: colors.opaque,
-      fontSize: 16,
+      color: theme.colors.card,
+      fontSize: 14,
       textAlign: 'center',
+      ...(theme.typography?.bodySmall || {fontSize: 12}),
     },
   });

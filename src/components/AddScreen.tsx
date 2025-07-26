@@ -33,22 +33,22 @@ export default function AddScreen() {
         />
       </View>
       <TouchableOpacity
-        onPress={() => navigation.navigate('AddFromUrl')}
-        style={styles(theme).button}>
-        <View style={styles(theme).buttonContent}>
-          <Text style={styles(theme).text}>From URL</Text>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
         onPress={() =>
           navigation.navigate('RecipeDetailsScreen', {
             item: newRecipe,
             newRecipe: true,
           })
         }
-        style={styles(theme).button}>
+        style={styles(theme).secondaryButton}>
         <View style={styles(theme).buttonContent}>
           <Text style={styles(theme).text}>From Scratch</Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('AddFromUrl')}
+        style={styles(theme).button}>
+        <View style={styles(theme).buttonContent}>
+          <Text style={styles(theme).text}>From URL</Text>
         </View>
       </TouchableOpacity>
     </View>
@@ -61,7 +61,7 @@ const styles = (theme: any) =>
       padding: 22,
       alignItems: 'center',
       height: '100%',
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.secondary,
       flex: 1,
       justifyContent: 'space-between',
     },
@@ -69,14 +69,14 @@ const styles = (theme: any) =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: 30,
+      marginRight: 5,
     },
     bowlImage: {
       width: 400,
       height: 400,
     },
     button: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors.text,
       padding: 10,
       marginVertical: 10,
       borderRadius: 30,
@@ -91,7 +91,6 @@ const styles = (theme: any) =>
     },
     text: {
       color: theme.colors.card,
-      backgroundColor: theme.colors.primary,
       ...theme.typography.h2,
     },
     subtext: {
@@ -99,5 +98,15 @@ const styles = (theme: any) =>
       fontSize: 14,
       marginTop: 2,
       ...theme.typography.bodySmall,
+    },
+    secondaryButton: {
+      borderWidth: 2,
+      borderColor: theme.colors.card,
+      padding: 10,
+      marginVertical: 10,
+      borderRadius: 30,
+      width: '100%',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   });

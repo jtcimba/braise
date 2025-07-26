@@ -30,14 +30,7 @@ function AddComponent() {
 function AddStackNavigator() {
   const theme = useTheme() as unknown as Theme;
   return (
-    <Stack.Navigator
-      screenOptions={{
-        cardStyle: {
-          borderTopLeftRadius: 25,
-          borderTopRightRadius: 25,
-          overflow: 'hidden',
-        },
-      }}>
+    <Stack.Navigator>
       <Stack.Screen
         name="AddScreen"
         component={AddScreen}
@@ -53,7 +46,7 @@ function AddStackNavigator() {
             color: theme.colors.card,
           },
           headerStyle: {
-            backgroundColor: theme.colors.text,
+            backgroundColor: theme.colors.secondary,
           },
         })}
       />
@@ -68,9 +61,11 @@ function AddStackNavigator() {
           headerShadowVisible: false,
           headerRightContainerStyle: {paddingRight: 22, paddingTop: 10},
           headerTitleStyle: {
-            fontSize: 18,
-            fontWeight: 'bold',
-            marginTop: 10,
+            ...theme.typography.h1,
+            color: theme.colors.card,
+          },
+          headerStyle: {
+            backgroundColor: theme.colors.secondary,
           },
         })}
       />
