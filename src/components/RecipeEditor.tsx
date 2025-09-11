@@ -242,13 +242,11 @@ const styles = (theme: Theme) =>
     bodyContainer: {
       flex: 1,
       paddingHorizontal: 20,
-      borderTopLeftRadius: 35,
-      borderTopRightRadius: 35,
+      borderTopLeftRadius: 30,
+      borderTopRightRadius: 30,
       marginTop: -75,
       paddingTop: 18,
       backgroundColor: theme.colors.background,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
       minHeight: '100%',
     },
     headerRow: {

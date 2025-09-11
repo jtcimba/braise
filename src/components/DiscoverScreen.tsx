@@ -4,7 +4,7 @@ import {View, Text, StyleSheet} from 'react-native';
 export default function DiscoverScreen() {
   return (
     <View style={styles.container}>
-      <Text>Comming Soon!</Text>
+      <Text>Coming Soon!</Text>
     </View>
   );
 }

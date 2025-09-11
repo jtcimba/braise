@@ -31,6 +31,7 @@ export default function ServingsPickerModal({
 
   const servingsOptions = [
     '-',
+    '0.5',
     ...Array.from({length: 20}, (_, i) => (i + 1).toString()),
   ];
 

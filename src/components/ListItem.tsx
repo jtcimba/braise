@@ -64,7 +64,7 @@ const styles = (theme: any) =>
       alignItems: 'center',
     },
     time: {
-      color: theme.colors.primary,
+      color: theme.colors.subtext,
       ...theme.typography.bodySmall,
     },
     image: {
