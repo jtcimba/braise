@@ -265,7 +265,7 @@ const styles = (theme: Theme) =>
       backgroundColor: 'transparent',
     },
     subtextInput: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.text,
       marginBottom: 5,
       backgroundColor: 'transparent',
@@ -286,13 +286,13 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 4,
     },
     metaBadgeValue: {
-      ...theme.typography.bodyLarge,
+      ...theme.typography.b1,
       color: theme.colors.text,
       textAlign: 'center',
       marginBottom: -2,
     },
     metaBadgeLabel: {
-      ...theme.typography.caption,
+      ...theme.typography.b1,
       color: theme.colors.text,
       textAlign: 'center',
       opacity: 0.7,
@@ -315,7 +315,7 @@ const styles = (theme: Theme) =>
       marginBottom: 20,
     },
     ingredientsInput: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.text,
       borderWidth: 1,
       borderColor: theme.colors.border,
@@ -325,7 +325,7 @@ const styles = (theme: Theme) =>
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.text,
       marginTop: 5,
       marginBottom: 10,
@@ -347,17 +347,17 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
     },
     lineNumber: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       marginRight: 10,
       color: theme.colors.subtext,
     },
     editInstructions: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       flex: 1,
       color: theme.colors.text,
     },
     placeholder: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.subtext,
     },
     authorRow: {

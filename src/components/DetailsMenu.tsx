@@ -63,7 +63,7 @@ export default function DetailsMenu(navigation: any) {
       {viewMode !== 'view' && (
         <View style={styles(colors).editContainer}>
           <View
-            style={[styles(colors).container, styles(colors).buttonContainer]}>
+            style={[styles(colors).container, styles(colors).b1Container]}>
             <TouchableOpacity onPress={onCancelPress}>
               <Text style={[styles(colors).text, styles(colors).cancel]}>
                 Cancel

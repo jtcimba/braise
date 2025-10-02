@@ -46,7 +46,7 @@ export default function CustomToggle({
             styles(theme).optionText,
             textStyle === 'header'
               ? theme.typography.h3
-              : (isPill && theme.typography.bodyMedium) ||
+              : (isPill && theme.typography.b1) ||
                 (isTab && theme.typography.h3),
             isPill &&
               !value &&
@@ -75,7 +75,7 @@ export default function CustomToggle({
             styles(theme).optionText,
             textStyle === 'header'
               ? theme.typography.h3
-              : (isPill && theme.typography.bodyMedium) ||
+              : (isPill && theme.typography.b1) ||
                 (isTab && theme.typography.h3),
             isPill &&
               value &&

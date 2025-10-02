@@ -108,7 +108,7 @@ const styles = (theme: Theme) =>
     },
     chipText: {
       color: theme.colors.text,
-      ...theme.typography.bodySmall,
+      ...theme.typography.b2,
       lineHeight: 15,
       textAlignVertical: 'center',
       includeFontPadding: false,
@@ -131,7 +131,7 @@ const styles = (theme: Theme) =>
       marginBottom: 5,
     },
     input: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       height: 26,
       color: theme.colors.text,
       minWidth: 150,

@@ -109,7 +109,7 @@ export default function AddFromUrlScreen() {
           />
           <TouchableOpacity
             onPress={() => onAddRecipe()}
-            style={styles(theme).button}
+            style={styles(theme).b1}
             disabled={!isValidUrl || isLoading}>
             <Text
               style={[
@@ -159,7 +159,7 @@ const styles = (theme: any) =>
       opacity: 0.5,
     },
     input: {
-      ...theme.typography.bodySmall,
+      ...theme.typography.b2,
       padding: 10,
       marginVertical: 5,
       borderRadius: 13,
@@ -210,6 +210,6 @@ const styles = (theme: any) =>
       color: theme.colors.card,
       fontSize: 14,
       textAlign: 'center',
-      ...(theme.typography?.bodySmall || {fontSize: 12}),
+      ...(theme.typography?.b2 || {fontSize: 12}),
     },
   });

@@ -65,7 +65,7 @@ const styles = (theme: any) =>
     },
     time: {
       color: theme.colors.subtext,
-      ...theme.typography.bodySmall,
+      ...theme.typography.b2,
     },
     image: {
       width: 75,
@@ -76,7 +76,7 @@ const styles = (theme: any) =>
     },
     subtext: {
       overflow: 'hidden',
-      ...theme.typography.bodySmall,
+      ...theme.typography.b2,
       color: theme.colors.subtext,
     },
     icon: {

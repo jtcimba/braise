@@ -81,7 +81,7 @@ const styles = (theme: Theme) =>
       color: theme.colors.text,
       textAlignVertical: 'center',
       includeFontPadding: false,
-      ...theme.typography.bodySmall,
+      ...theme.typography.b2,
       marginBottom: 10,
     },
     filtersContainer: {

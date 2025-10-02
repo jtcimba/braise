@@ -105,7 +105,7 @@ export default function TotalTimePickerModal({
                 </View>
               </View>
 
-              <View style={styles(theme).buttonContainer}>
+              <View style={styles(theme).b1Container}>
                 <TouchableOpacity
                   style={styles(theme).cancelButton}
                   onPress={onClose}>
@@ -176,7 +176,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     cancelButtonText: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.subtext,
     },
     confirmButton: {
@@ -188,7 +188,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     confirmButtonText: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.background,
       fontWeight: '500',
     },

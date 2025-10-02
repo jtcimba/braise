@@ -40,14 +40,14 @@ export default function AddScreen() {
           })
         }
         style={styles(theme).secondaryButton}>
-        <View style={styles(theme).buttonContent}>
+        <View style={styles(theme).b1Content}>
           <Text style={styles(theme).text}>From Scratch</Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => navigation.navigate('AddFromUrl')}
-        style={styles(theme).button}>
-        <View style={styles(theme).buttonContent}>
+        style={styles(theme).b1}>
+        <View style={styles(theme).b1Content}>
           <Text style={styles(theme).text}>From URL</Text>
         </View>
       </TouchableOpacity>
@@ -97,7 +97,7 @@ const styles = (theme: any) =>
       color: theme.colors.subtext,
       fontSize: 14,
       marginTop: 2,
-      ...theme.typography.bodySmall,
+      ...theme.typography.b2,
     },
     secondaryButton: {
       borderWidth: 2,

@@ -307,13 +307,13 @@ const styles = (theme: any) =>
       paddingHorizontal: 4,
     },
     metaBadgeValue: {
-      ...theme.typography.bodyLarge,
+      ...theme.typography.b1,
       color: theme.colors.text,
       textAlign: 'center',
       marginBottom: -2,
     },
     metaBadgeLabel: {
-      ...theme.typography.caption,
+      ...theme.typography.b1,
       color: theme.colors.text,
       textAlign: 'center',
       opacity: 0.7,
@@ -328,15 +328,15 @@ const styles = (theme: any) =>
       color: theme.colors.text,
     },
     subtext: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.subtext,
     },
     host: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       textDecorationLine: 'underline',
     },
     time: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.subtext,
       overflow: 'hidden',
     },
@@ -370,7 +370,7 @@ const styles = (theme: any) =>
       paddingRight: 15,
     },
     quantity: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       textAlign: 'right',
       color: theme.colors.subtext,
     },
@@ -379,7 +379,7 @@ const styles = (theme: any) =>
       height: 24,
     },
     ingredientTextBold: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       flex: 1,
       color: theme.colors.text,
       textAlign: 'left',
@@ -391,12 +391,12 @@ const styles = (theme: any) =>
       paddingVertical: 10,
     },
     lineNumber: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       marginRight: 10,
       color: theme.colors.subtext,
     },
     lineText: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       flex: 1,
       alignSelf: 'flex-start',
       color: theme.colors.text,
@@ -442,14 +442,14 @@ const styles = (theme: any) =>
     },
     tagPillText: {
       color: theme.colors.primary,
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
     },
     tabBarContainer: {
       marginVertical: 10,
       width: '100%',
     },
     aboutText: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.text,
       marginBottom: 5,
     },
@@ -461,7 +461,7 @@ const styles = (theme: any) =>
       marginTop: 10,
     },
     emptyStateText: {
-      ...theme.typography.bodyMedium,
+      ...theme.typography.b1,
       color: theme.colors.subtext,
       textAlign: 'center',
     },
