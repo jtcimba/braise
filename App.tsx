@@ -184,11 +184,10 @@ export function App(): React.JSX.Element {
               headerShadowVisible: false,
               headerRightContainerStyle: {paddingRight: 10},
               headerTitleStyle: {
-                fontFamily: 'Lora-Bold',
-                fontSize: 18,
+                fontFamily: 'Satoshi Variable',
+                fontSize: 16,
                 fontWeight: 'bold',
-                lineHeight: 26,
-                color: '#323232',
+                color: '#2d2d2d',
               },
             })}
           />

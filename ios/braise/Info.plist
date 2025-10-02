@@ -50,15 +50,8 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
-		<string>Lora-Light.ttf</string>
-		<string>Lora-Bold.ttf</string>
-		<string>Lora-Medium.ttf</string>
-		<string>Lora-Regular.ttf</string>
-		<string>Lora-SemiBold.ttf</string>
-		<string>MerriweatherSans-Bold.ttf</string>
-		<string>MerriweatherSans-Light.ttf</string>
-		<string>MerriweatherSans-Medium.ttf</string>
-		<string>MerriweatherSans-Regular.ttf</string>
+		<string>Erode-Variable.ttf</string>
+		<string>Satoshi-Variable.ttf</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

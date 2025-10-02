@@ -10,28 +10,8 @@ export interface TypographyStyles {
   h6: TextStyle;
 
   // Body text styles using Merriweather Sans
-  bodyLarge: TextStyle;
-  bodyMedium: TextStyle;
-  bodySmall: TextStyle;
-  bodyXSmall: TextStyle;
-
-  // Special text styles
-  caption: TextStyle;
-  label: TextStyle;
-  button: TextStyle;
-  link: TextStyle;
-
-  // Additional Merriweather Sans styles
-  merriweatherH1: TextStyle;
-  merriweatherH2: TextStyle;
-  merriweatherBody: TextStyle;
-  merriweatherBodyBold: TextStyle;
-
-  // Additional Lora styles
-  loraH1: TextStyle;
-  loraH2: TextStyle;
-  loraBody: TextStyle;
-  loraBodyBold: TextStyle;
+  b1: TextStyle;
+  b2: TextStyle;
 }
 
 // Type for the theme object

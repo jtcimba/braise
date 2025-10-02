@@ -21,7 +21,7 @@ export default function FilterChip({
       style={[styles(theme).chip, selected && styles(theme).selectedChip]}
       onPress={onPress}>
       <Text
-        style={[styles(theme).b1, selected && styles(theme).selectedLabel]}>
+        style={[styles(theme).label, selected && styles(theme).selectedLabel]}>
         {label}
       </Text>
     </TouchableOpacity>
@@ -31,17 +31,17 @@ export default function FilterChip({
 const styles = (theme: Theme) =>
   StyleSheet.create({
     chip: {
-      paddingHorizontal: 12,
+      paddingHorizontal: 15,
       paddingVertical: 6,
       borderRadius: 16,
       backgroundColor: theme.colors.badgeBackground,
       marginRight: 6,
     },
     selectedChip: {
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
     },
     label: {
-      ...theme.typography.b2,
+      ...theme.typography.h5,
       color: theme.colors.text,
     },
     selectedLabel: {

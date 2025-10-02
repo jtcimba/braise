@@ -2,40 +2,12 @@
   "migIndex": 1,
   "data": [
     {
-      "path": "src/assets/fonts/Lora-Bold.ttf",
-      "sha1": "e24126e8c27fdd834acb1ccf27054aeeb90ef492"
+      "path": "src/assets/fonts/Erode-Variable.ttf",
+      "sha1": "0f6119af0c1faa5d96daafafbe1d0cd7eed874f1"
     },
     {
-      "path": "src/assets/fonts/Lora-Light.ttf",
-      "sha1": "8b86687d0b850f8ae7ddfb4eba787a4a32b48765"
-    },
-    {
-      "path": "src/assets/fonts/Lora-Medium.ttf",
-      "sha1": "1eb9610f2d31ed20319568b516e8328de69c5b2a"
-    },
-    {
-      "path": "src/assets/fonts/Lora-Regular.ttf",
-      "sha1": "2f0de70df8ae30d4e64fffcb8850fc9b111365c3"
-    },
-    {
-      "path": "src/assets/fonts/Lora-SemiBold.ttf",
-      "sha1": "7850da50ade64e68ce01cd318716b0b2927a8b9b"
-    },
-    {
-      "path": "src/assets/fonts/MerriweatherSans-Bold.ttf",
-      "sha1": "b69073b6a9cdb2e6b46491ba01826d178cfb9153"
-    },
-    {
-      "path": "src/assets/fonts/MerriweatherSans-Light.ttf",
-      "sha1": "03582f94c0bb94cd087869ae1a5023b24e748c43"
-    },
-    {
-      "path": "src/assets/fonts/MerriweatherSans-Medium.ttf",
-      "sha1": "b0f1c6c636ba39e8350571a5f5bc64b5d522439b"
-    },
-    {
-      "path": "src/assets/fonts/MerriweatherSans-Regular.ttf",
-      "sha1": "3d080364c3c4fa22a59ccc7a6ca99400db6853d8"
+      "path": "src/assets/fonts/Satoshi-Variable.ttf",
+      "sha1": "d49872a745842f389bc9d24b73d0a3090fce50b1"
     }
   ]
 }

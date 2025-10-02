@@ -56,7 +56,7 @@ const styles = (theme: any) =>
       flex: 1,
     },
     title: {
-      ...theme.typography.h3,
+      ...theme.typography.h5,
       color: theme.colors.text,
     },
     timeContainer: {

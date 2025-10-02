@@ -12,18 +12,11 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1464B23E35C14C9493FB10DD /* MerriweatherSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB9F2F61E465402E9AD097C2 /* MerriweatherSans-Medium.ttf */; };
 		23F9559B2BEEE2CD00A94A19 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 23F955882BEEE2CD00A94A19 /* Ionicons.ttf */; };
-		2BC7915EEBF34D1AAF2D7EA1 /* Lora-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 17D8C471FE6849D390201197 /* Lora-Bold.ttf */; };
-		5348AA86F18B4DE881B17822 /* MerriweatherSans-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 86A1A92D004D48E2BA717AD7 /* MerriweatherSans-Light.ttf */; };
-		552DB474ACB740ABB1509A7A /* Lora-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F1DACB392994A62B882DBA9 /* Lora-Medium.ttf */; };
-		55703DE16BAB4A55AFCF74BB /* Lora-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4BD32D95471446D4A2B76B2C /* Lora-Light.ttf */; };
-		68D85DB9482548C591EC7AD6 /* MerriweatherSans-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 423BA6F91E27405896E86FA3 /* MerriweatherSans-Regular.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-braise-braiseTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-braise-braiseTests.a */; };
-		798A7D4548BA42F6B9A124EC /* MerriweatherSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 196873E492D14FC59760D266 /* MerriweatherSans-Bold.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		8CD77E6B1E5F4E65B652A1F9 /* Lora-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 92A2D2A532224B9C8CD44308 /* Lora-Regular.ttf */; };
-		B8B0B61DE3CE4A9E83E2C510 /* Lora-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A58A1980B87642FEB30342B9 /* Lora-SemiBold.ttf */; };
+		C09BDB8B46044C87B8EBCB5C /* Satoshi-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8856D8F716456482EA8776 /* Satoshi-Variable.ttf */; };
+		F30EFE660593420D99AE1313 /* Erode-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A9BCD14426040BA91BB802B /* Erode-Variable.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,27 +53,20 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = braise/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = braise/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = braise/main.m; sourceTree = "<group>"; };
-		17D8C471FE6849D390201197 /* Lora-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Lora-Bold.ttf"; path = "../src/assets/fonts/Lora-Bold.ttf"; sourceTree = "<group>"; };
-		196873E492D14FC59760D266 /* MerriweatherSans-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "MerriweatherSans-Bold.ttf"; path = "../src/assets/fonts/MerriweatherSans-Bold.ttf"; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-braise-braiseTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-braise-braiseTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		23A880ED2E04329C00D15E39 /* braise2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = braise2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		23A880F92E04329E00D15E39 /* braise2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = braise2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		23A881032E04329E00D15E39 /* braise2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = braise2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		23F955882BEEE2CD00A94A19 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = braise/Fonts/Ionicons.ttf; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-braise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise.debug.xcconfig"; path = "Target Support Files/Pods-braise/Pods-braise.debug.xcconfig"; sourceTree = "<group>"; };
-		423BA6F91E27405896E86FA3 /* MerriweatherSans-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "MerriweatherSans-Regular.ttf"; path = "../src/assets/fonts/MerriweatherSans-Regular.ttf"; sourceTree = "<group>"; };
-		4BD32D95471446D4A2B76B2C /* Lora-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lora-Light.ttf"; path = "../src/assets/fonts/Lora-Light.ttf"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-braise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise.release.xcconfig"; path = "Target Support Files/Pods-braise/Pods-braise.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-braise-braiseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise-braiseTests.debug.xcconfig"; path = "Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-braise.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-braise.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5F1DACB392994A62B882DBA9 /* Lora-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Lora-Medium.ttf"; path = "../src/assets/fonts/Lora-Medium.ttf"; sourceTree = "<group>"; };
+		6A9BCD14426040BA91BB802B /* Erode-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Erode-Variable.ttf"; path = "../src/assets/fonts/Erode-Variable.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = braise/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		86A1A92D004D48E2BA717AD7 /* MerriweatherSans-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "MerriweatherSans-Light.ttf"; path = "../src/assets/fonts/MerriweatherSans-Light.ttf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-braise-braiseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise-braiseTests.release.xcconfig"; path = "Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests.release.xcconfig"; sourceTree = "<group>"; };
-		92A2D2A532224B9C8CD44308 /* Lora-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Lora-Regular.ttf"; path = "../src/assets/fonts/Lora-Regular.ttf"; sourceTree = "<group>"; };
-		A58A1980B87642FEB30342B9 /* Lora-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Lora-SemiBold.ttf"; path = "../src/assets/fonts/Lora-SemiBold.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FB9F2F61E465402E9AD097C2 /* MerriweatherSans-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "MerriweatherSans-Medium.ttf"; path = "../src/assets/fonts/MerriweatherSans-Medium.ttf"; sourceTree = "<group>"; };
+		FF8856D8F716456482EA8776 /* Satoshi-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = "Satoshi-Variable.ttf"; path = "../src/assets/fonts/Satoshi-Variable.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,15 +197,8 @@
 		9651252CF9884FC6BFBFE597 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				4BD32D95471446D4A2B76B2C /* Lora-Light.ttf */,
-				17D8C471FE6849D390201197 /* Lora-Bold.ttf */,
-				5F1DACB392994A62B882DBA9 /* Lora-Medium.ttf */,
-				92A2D2A532224B9C8CD44308 /* Lora-Regular.ttf */,
-				A58A1980B87642FEB30342B9 /* Lora-SemiBold.ttf */,
-				196873E492D14FC59760D266 /* MerriweatherSans-Bold.ttf */,
-				86A1A92D004D48E2BA717AD7 /* MerriweatherSans-Light.ttf */,
-				FB9F2F61E465402E9AD097C2 /* MerriweatherSans-Medium.ttf */,
-				423BA6F91E27405896E86FA3 /* MerriweatherSans-Regular.ttf */,
+				6A9BCD14426040BA91BB802B /* Erode-Variable.ttf */,
+				FF8856D8F716456482EA8776 /* Satoshi-Variable.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -399,15 +378,8 @@
 				23F9559B2BEEE2CD00A94A19 /* Ionicons.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				55703DE16BAB4A55AFCF74BB /* Lora-Light.ttf in Resources */,
-				2BC7915EEBF34D1AAF2D7EA1 /* Lora-Bold.ttf in Resources */,
-				552DB474ACB740ABB1509A7A /* Lora-Medium.ttf in Resources */,
-				8CD77E6B1E5F4E65B652A1F9 /* Lora-Regular.ttf in Resources */,
-				B8B0B61DE3CE4A9E83E2C510 /* Lora-SemiBold.ttf in Resources */,
-				798A7D4548BA42F6B9A124EC /* MerriweatherSans-Bold.ttf in Resources */,
-				5348AA86F18B4DE881B17822 /* MerriweatherSans-Light.ttf in Resources */,
-				1464B23E35C14C9493FB10DD /* MerriweatherSans-Medium.ttf in Resources */,
-				68D85DB9482548C591EC7AD6 /* MerriweatherSans-Regular.ttf in Resources */,
+				F30EFE660593420D99AE1313 /* Erode-Variable.ttf in Resources */,
+				C09BDB8B46044C87B8EBCB5C /* Satoshi-Variable.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

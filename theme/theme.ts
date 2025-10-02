@@ -3,39 +3,39 @@ import {TextStyle} from 'react-native';
 
 export const typography = {
   h1: {
-    fontFamily: 'Satoshi-Variable',
+    fontFamily: 'Satoshi Variable',
     fontSize: 20,
     fontWeight: 'bold',
   } as TextStyle,
   h2: {
-    fontFamily: 'Satoshi-Variable',
+    fontFamily: 'Satoshi Variable',
     fontSize: 16,
     fontWeight: 'bold',
   } as TextStyle,
   h3: {
-    fontFamily: 'Satoshi-Variable',
+    fontFamily: 'Satoshi Variable',
     fontWeight: 'medium',
     fontSize: 16,
   } as TextStyle,
   h4: {
-    fontFamily: 'Satoshi-Variable',
+    fontFamily: 'Satoshi Variable',
     fontWeight: 'bold',
     fontSize: 14,
   } as TextStyle,
   h5: {
-    fontFamily: 'Satoshi-Variable',
+    fontFamily: 'Satoshi Variable',
     fontWeight: 'medium',
     fontSize: 14,
   } as TextStyle,
   b1: {
-    fontFamily: 'Erode-Variable',
+    fontFamily: 'Erode Variable',
     fontWeight: 'medium',
     fontSize: 16,
   } as TextStyle,
   b2: {
-    fontFamily: 'Erode-Variable',
+    fontFamily: 'Erode Variable',
     fontWeight: 'medium',
-    fontSize: 14,
+    fontSize: 15,
   } as TextStyle,
 };
 

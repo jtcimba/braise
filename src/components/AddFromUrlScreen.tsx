@@ -109,7 +109,7 @@ export default function AddFromUrlScreen() {
           />
           <TouchableOpacity
             onPress={() => onAddRecipe()}
-            style={styles(theme).b1}
+            style={styles(theme).button}
             disabled={!isValidUrl || isLoading}>
             <Text
               style={[
