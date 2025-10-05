@@ -96,7 +96,6 @@ const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: theme.colors.opaqueCard,
       borderRadius: 25,
       width: '100%',
       minWidth: 210,

@@ -133,7 +133,7 @@ const styles = (theme: any) =>
       fontWeight: 'bold',
     },
     iconContainer: {
-      backgroundColor: theme.colors.badgeBackground,
+      backgroundColor: theme.colors.border,
       borderRadius: 48,
       padding: 2,
     },

@@ -188,7 +188,7 @@ const styles = (theme: any) =>
       marginVertical: 10,
       borderRadius: 10,
       overflow: 'hidden',
-      backgroundColor: theme.colors.backgroundText,
+      backgroundColor: theme.colors.border,
     },
     webview: {
       flex: 1,

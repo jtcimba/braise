@@ -100,7 +100,7 @@ function TabNavigator({navigation}: {navigation: any}) {
         options={{
           headerTitleAlign: 'left',
           headerRight: () => SettingsIcon(navigation),
-          headerRightContainerStyle: {paddingRight: 10},
+          headerRightContainerStyle: {paddingRight: 15},
           headerShadowVisible: false,
           headerTitleStyle: {
             ...theme?.typography.h1,

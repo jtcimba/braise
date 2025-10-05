@@ -280,7 +280,7 @@ const styles = (theme: Theme) =>
       width: 64,
       height: 60,
       borderRadius: 13,
-      backgroundColor: theme.colors.badgeBackground,
+      backgroundColor: theme.colors.border,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 4,

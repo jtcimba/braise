@@ -42,7 +42,7 @@ export default function SearchAndFilters({
       <TextInput
         style={styles(theme).searchInput}
         placeholder="Search recipes..."
-        placeholderTextColor={theme.colors.subtext}
+        placeholderTextColor={theme.colors.text}
         value={searchQuery}
         onChangeText={handleSearch}
         returnKeyType="search"
@@ -68,23 +68,25 @@ export default function SearchAndFilters({
 const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      padding: 8,
-      backgroundColor: theme.colors.background,
+      paddingBottom: 10,
     },
     searchInput: {
+      marginHorizontal: 15,
       height: 36,
-      backgroundColor: theme.colors.textBox,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      borderRadius: 13,
+      borderRadius: 7,
       paddingHorizontal: 12,
       color: theme.colors.text,
       textAlignVertical: 'center',
       includeFontPadding: false,
-      ...theme.typography.b2,
+      ...theme.typography.h5,
       marginBottom: 10,
     },
     filtersContainer: {
       flexDirection: 'row',
+      paddingStart: 15,
+      marginEnd: 25,
+      overflow: 'visible',
     },
   });

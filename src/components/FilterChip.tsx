@@ -32,9 +32,9 @@ const styles = (theme: Theme) =>
   StyleSheet.create({
     chip: {
       paddingHorizontal: 15,
-      paddingVertical: 6,
-      borderRadius: 16,
-      backgroundColor: theme.colors.badgeBackground,
+      paddingVertical: 4,
+      borderRadius: 15,
+      backgroundColor: theme.colors.border,
       marginRight: 6,
     },
     selectedChip: {
