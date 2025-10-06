@@ -56,14 +56,14 @@ export default function DetailsMenu(navigation: any) {
       {viewMode === 'view' && (
         <View style={styles(colors).container}>
           <TouchableOpacity onPress={() => setmodalVisible(true)}>
-            <Ionicons name="ellipsis-horizontal" size={20} color="white" />
+            <Ionicons name="ellipsis-horizontal" size={25} color="#2D2D2D" />
           </TouchableOpacity>
         </View>
       )}
       {viewMode !== 'view' && (
         <View style={styles(colors).editContainer}>
           <View
-            style={[styles(colors).container, styles(colors).b1Container]}>
+            style={[styles(colors).container, styles(colors).buttonContainer]}>
             <TouchableOpacity onPress={onCancelPress}>
               <Text style={[styles(colors).text, styles(colors).cancel]}>
                 Cancel
@@ -92,7 +92,7 @@ export default function DetailsMenu(navigation: any) {
             <Text style={styles(colors).optionsText}>Options</Text>
             <View style={[styles(colors).iconContainer]}>
               <TouchableOpacity onPress={() => setmodalVisible(false)}>
-                <Ionicons name="close-outline" size={20} color="white" />
+                <Ionicons name="close-outline" size={25} color="#2D2D2D" />
               </TouchableOpacity>
             </View>
           </View>
@@ -121,7 +121,6 @@ export default function DetailsMenu(navigation: any) {
 const styles = (colors: any) =>
   StyleSheet.create({
     container: {
-      backgroundColor: colors.opaque,
       borderRadius: 48,
       paddingTop: 2,
       paddingLeft: 1,
@@ -130,6 +129,7 @@ const styles = (colors: any) =>
     },
     buttonContainer: {
       minWidth: 70,
+      backgroundColor: colors.border,
     },
     saveContainer: {
       marginLeft: 10,
@@ -148,10 +148,10 @@ const styles = (colors: any) =>
       textAlign: 'center',
     },
     cancel: {
-      color: 'white',
+      color: colors.text,
     },
     save: {
-      color: 'white',
+      color: colors.background,
     },
     modalOverlay: {
       justifyContent: 'flex-end',
@@ -211,7 +211,6 @@ const styles = (colors: any) =>
       color: colors.text,
     },
     iconContainer: {
-      backgroundColor: colors.opaque,
       borderRadius: 48,
       padding: 2,
     },

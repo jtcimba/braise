@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import InstructionsEditor from './InstructionsEditor';
 import CategoryEditor from './CategoryEditor';
 import CustomToggle from './CustomToggle';
@@ -76,93 +77,92 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
       style={styles(theme).container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView
-        contentContainerStyle={styles(theme).scrollContent}
+        style={styles(theme).contentContainer}
         showsVerticalScrollIndicator={false}
-        bounces={true}>
+        contentContainerStyle={styles(theme).scrollContentContainer}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            <View style={styles(theme).imageContainer}>
-              <Image
-                style={styles(theme).image}
-                source={{
-                  uri: editingData.image ? editingData.image : null,
-                }}
-              />
-            </View>
-            <View style={styles(theme).bodyContainer}>
-              <View style={styles(theme).headerRow}>
-                <View style={styles(theme).flex}>
-                  <TextInput
-                    style={styles(theme).titleInput}
-                    value={editingData.title}
-                    placeholder="Recipe name"
-                    placeholderTextColor={theme.colors.subtext}
-                    onChangeText={text =>
-                      onChangeEditingData({...editingData, title: text})
-                    }
-                    multiline
-                  />
-                  <TextInput
-                    style={styles(theme).subtextInput}
-                    value={editingData.author}
-                    placeholder="Author"
-                    placeholderTextColor={theme.colors.subtext}
-                    onChangeText={text =>
-                      onChangeEditingData({...editingData, author: text})
-                    }
-                  />
-                  <TextInput
-                    style={styles(theme).subtextInput}
-                    value={editingData.host}
-                    placeholder="Source website"
-                    placeholderTextColor={theme.colors.subtext}
-                    onChangeText={text =>
-                      onChangeEditingData({...editingData, host: text})
-                    }
-                  />
-                </View>
-                <View style={styles(theme).metaBadgeCol}>
-                  <TouchableOpacity
-                    style={styles(theme).metaBadgeRect}
-                    onPress={() => setServingsModalVisible(true)}>
-                    <Text style={styles(theme).metaBadgeValue}>
-                      {editingData.yields || '-'}
-                    </Text>
-                    <Text style={styles(theme).metaBadgeLabel}>servings</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles(theme).metaBadgeRect}
-                    onPress={() => setTotalTimeModalVisible(true)}>
-                    <Text style={styles(theme).metaBadgeValue}>
-                      {editingData.total_time || '-'}
-                    </Text>
-                    <Text style={styles(theme).metaBadgeLabel}>
-                      {editingData.total_time_unit || '-'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <CategoryEditor
-                categories={categoriesArray}
-                onChange={handleCategoryUpdate}
+            <View style={styles(theme).headerContainer}>
+              <TextInput
+                style={styles(theme).titleInput}
+                value={editingData.title}
+                placeholder="Recipe name"
+                placeholderTextColor={theme.colors.subtext}
+                onChangeText={text =>
+                  onChangeEditingData({...editingData, title: text})
+                }
+                multiline
               />
               <TextInput
-                style={styles(theme).aboutInput}
-                value={editingData.about}
-                placeholder="Add a description or notes about this recipe..."
+                style={styles(theme).authorInput}
+                value={editingData.author}
+                placeholder="Author"
                 placeholderTextColor={theme.colors.subtext}
-                onChangeText={(text: any) => {
-                  onChangeEditingData({
-                    ...editingData,
-                    about: text,
-                  });
-                }}
-                multiline
-                scrollEnabled={false}
+                onChangeText={text =>
+                  onChangeEditingData({...editingData, author: text})
+                }
               />
+            </View>
+            <Image
+              style={styles(theme).image}
+              source={{
+                uri: editingData.image ? editingData.image : null,
+              }}
+            />
+            <View style={styles(theme).bodyContainer}>
+              <View style={styles(theme).detailsContainer}>
+                <View style={styles(theme).detailsRow}>
+                  <TouchableOpacity
+                    style={styles(theme).detailsTimeContainer}
+                    onPress={() => setTotalTimeModalVisible(true)}>
+                    <Ionicons
+                      name="time-outline"
+                      size={20}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={styles(theme).detailsText}>
+                      {editingData.total_time
+                        ? editingData.total_time +
+                          ' ' +
+                          (editingData.total_time_unit || 'min')
+                        : '-'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles(theme).detailsTimeContainer}
+                    onPress={() => setServingsModalVisible(true)}>
+                    <Ionicons
+                      name="speedometer-outline"
+                      size={20}
+                      color={theme.colors.primary}
+                      style={styles(theme).detailsIcon}
+                    />
+                    <Text style={styles(theme).detailsText}>
+                      {editingData.yields || '-'} servings
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <CategoryEditor
+                  categories={categoriesArray}
+                  onChange={handleCategoryUpdate}
+                />
+                <TextInput
+                  style={styles(theme).aboutInput}
+                  value={editingData.about}
+                  placeholder="Add a description or notes about this recipe..."
+                  placeholderTextColor={theme.colors.subtext}
+                  onChangeText={(text: any) => {
+                    onChangeEditingData({
+                      ...editingData,
+                      about: text,
+                    });
+                  }}
+                  multiline
+                  scrollEnabled={false}
+                />
+              </View>
               <View style={styles(theme).tabBarContainer}>
                 <CustomToggle
-                  type="tab"
                   value={false}
                   onValueChange={v => {
                     if (v) {
@@ -171,9 +171,9 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   }}
                   leftLabel="Ingredients"
                   rightLabel="Directions"
+                  textStyle="header"
                 />
               </View>
-
               <View style={styles(theme).ingredientsContainer}>
                 <TextInput
                   style={styles(theme).ingredientsInput}
@@ -226,35 +226,55 @@ const styles = (theme: Theme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     },
-    scrollContent: {
-      flexGrow: 1,
+    contentContainer: {
+      flex: 1,
+      marginTop: 105,
     },
-    imageContainer: {
-      overflow: 'hidden',
-      marginTop: -50,
+    scrollContentContainer: {
+      paddingBottom: 40,
+    },
+    headerContainer: {
+      marginBottom: 10,
+      paddingHorizontal: 25,
+      paddingTop: 5,
     },
     image: {
       width: '100%',
-      height: 475,
+      height: 325,
       resizeMode: 'cover',
       backgroundColor: theme.colors.border,
     },
     bodyContainer: {
       flex: 1,
       paddingHorizontal: 20,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
-      marginTop: -75,
       paddingTop: 18,
       backgroundColor: theme.colors.background,
       minHeight: '100%',
     },
-    headerRow: {
+    detailsContainer: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 7,
+      padding: 15,
+      marginBottom: 10,
+    },
+    detailsRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
+      alignContent: 'center',
     },
-    flex: {
-      flex: 1,
+    detailsTimeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: 15,
+    },
+    detailsText: {
+      ...theme.typography.h5,
+      color: theme.colors.text,
+      marginLeft: 5,
+    },
+    detailsIcon: {
+      marginRight: 3,
     },
     titleInput: {
       ...theme.typography.h1,
@@ -264,41 +284,11 @@ const styles = (theme: Theme) =>
       padding: 0,
       backgroundColor: 'transparent',
     },
-    subtextInput: {
+    authorInput: {
       ...theme.typography.b1,
-      color: theme.colors.text,
+      color: theme.colors.primary,
       marginBottom: 5,
       backgroundColor: 'transparent',
-    },
-    metaBadgeCol: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginLeft: 5,
-    },
-    metaBadgeRect: {
-      width: 64,
-      height: 60,
-      borderRadius: 13,
-      backgroundColor: theme.colors.border,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 4,
-    },
-    metaBadgeValue: {
-      ...theme.typography.b1,
-      color: theme.colors.text,
-      textAlign: 'center',
-      marginBottom: -2,
-    },
-    metaBadgeLabel: {
-      ...theme.typography.b1,
-      color: theme.colors.text,
-      textAlign: 'center',
-      opacity: 0.7,
-      marginTop: -2,
-      flexWrap: 'wrap',
-      width: '100%',
     },
     sectionTitle: {
       ...theme.typography.h3,
@@ -325,10 +315,9 @@ const styles = (theme: Theme) =>
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.b1,
+      ...theme.typography.b2,
       color: theme.colors.text,
       marginTop: 5,
-      marginBottom: 10,
     },
     instructionsContainer: {
       flex: 1,

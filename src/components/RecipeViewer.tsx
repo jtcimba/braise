@@ -1,12 +1,11 @@
-import React, {useState, useRef} from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   View,
   Image,
   StyleSheet,
-  Linking,
   TouchableOpacity,
-  Animated,
+  ScrollView,
 } from 'react-native';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
@@ -15,6 +14,7 @@ import CustomToggle from './CustomToggle';
 import {WebView} from 'react-native-webview';
 import ServingsPickerModal from './ServingsPickerModal';
 import {parseIngredient, scaleIngredients} from '../services';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Ignore WebView errors
 LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
@@ -28,25 +28,6 @@ export default function RecipeViewer({data}: any) {
   const [scaledIngredients, setScaledIngredients] = useState(
     data.ingredients || '',
   );
-  const scrollY = useRef(new Animated.Value(0)).current;
-
-  const imageScale = scrollY.interpolate({
-    inputRange: [-350, 0],
-    outputRange: [1.5, 1],
-    extrapolate: 'clamp',
-  });
-
-  const imageTranslateY = scrollY.interpolate({
-    inputRange: [-300, 0, 300],
-    outputRange: [-100, 0, 100],
-    extrapolate: 'clamp',
-  });
-
-  const handleHostPress = () => {
-    if (data.canonical_url) {
-      Linking.openURL(data.canonical_url);
-    }
-  };
 
   const handleServingsConfirm = (newServings: string) => {
     const originalServings =
@@ -69,86 +50,72 @@ export default function RecipeViewer({data}: any) {
           style={styles(theme).webview}
         />
       ) : (
-        <Animated.ScrollView
-          contentContainerStyle={styles(theme).scrollContent}
+        <ScrollView
+          style={styles(theme).contentContainer}
           showsVerticalScrollIndicator={false}
-          automaticallyAdjustKeyboardInsets={true}
-          bounces={true}
-          contentInsetAdjustmentBehavior="never"
-          onScroll={Animated.event(
-            [{nativeEvent: {contentOffset: {y: scrollY}}}],
-            {useNativeDriver: true},
-          )}
-          scrollEventThrottle={16}>
-          <Animated.View
-            style={[
-              {transform: [{scale: imageScale}, {translateY: imageTranslateY}]},
-              styles(theme).imageContainer,
-            ]}>
-            <Image
-              style={styles(theme).image}
-              source={{uri: data.image ? data.image : null}}
-            />
-          </Animated.View>
+          contentContainerStyle={styles(theme).scrollContentContainer}>
+          <View style={styles(theme).headerContainer}>
+            <Text style={styles(theme).title}>{data.title}</Text>
+            {data.author && (
+              <Text style={styles(theme).author}>{data.author}</Text>
+            )}
+          </View>
+          <Image
+            style={styles(theme).image}
+            source={{uri: data.image ? data.image : null}}
+          />
           <View style={styles(theme).bodyContainer}>
-            <View style={styles(theme).headerRow}>
-              <View style={styles(theme).flex}>
-                <Text style={styles(theme).title}>{data.title}</Text>
-                <View style={styles(theme).authorRow}>
-                  {data.author && (
-                    <Text style={styles(theme).subtext}>{data.author}</Text>
-                  )}
-                  {data.host && (
-                    <TouchableOpacity onPress={handleHostPress}>
-                      <Text style={[styles(theme).subtext, styles(theme).host]}>
-                        {data.host}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+            <View style={styles(theme).detailsContainer}>
+              <View style={styles(theme).detailsRow}>
+                <View style={styles(theme).detailsTimeContainer}>
+                  <Ionicons
+                    name="time-outline"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={styles(theme).detailsText}>
+                    {data.total_time
+                      ? data.total_time + ' ' + (data.total_time_unit || 'min')
+                      : '-'}
+                  </Text>
                 </View>
-              </View>
-              <View style={styles(theme).metaBadgeCol}>
                 <TouchableOpacity
-                  style={styles(theme).metaBadgeRect}
-                  onPress={() => setShowServingsModal(true)}
-                  activeOpacity={0.7}>
-                  <Text style={styles(theme).metaBadgeValue}>
-                    {currentServings}
+                  style={styles(theme).detailsTimeContainer}
+                  onPress={() => setShowServingsModal(true)}>
+                  <Ionicons
+                    name="speedometer-outline"
+                    size={20}
+                    color={theme.colors.primary}
+                    style={styles(theme).detailsIcon}
+                  />
+                  <Text style={styles(theme).detailsText}>
+                    {currentServings} servings
                   </Text>
-                  <Text style={styles(theme).metaBadgeLabel}>servings</Text>
                 </TouchableOpacity>
-                <View style={styles(theme).metaBadgeRect}>
-                  <Text style={styles(theme).metaBadgeValue}>
-                    {data.total_time || '-'}
-                  </Text>
-                  <Text style={styles(theme).metaBadgeLabel}>
-                    {data.total_time_unit || 'min'}
-                  </Text>
+              </View>
+              {data.category && (
+                <View style={styles(theme).tagsRow}>
+                  {data.category.split(',').map((cat: string, idx: number) => {
+                    const label = cat.trim();
+                    const capitalized =
+                      label.charAt(0).toUpperCase() + label.slice(1);
+                    return (
+                      <View key={idx}>
+                        <Text style={styles(theme).tagPillText}>
+                          {capitalized}
+                          {idx < data.category.split(',').length - 1
+                            ? '  •  '
+                            : ''}
+                        </Text>
+                      </View>
+                    );
+                  })}
                 </View>
-              </View>
+              )}
+              {data.about && (
+                <Text style={styles(theme).aboutText}>{data.about}</Text>
+              )}
             </View>
-            {data.category && (
-              <View style={styles(theme).tagsRow}>
-                {data.category.split(',').map((cat: string, idx: number) => {
-                  const label = cat.trim();
-                  const capitalized =
-                    label.charAt(0).toUpperCase() + label.slice(1);
-                  return (
-                    <View key={idx}>
-                      <Text style={styles(theme).tagPillText}>
-                        {capitalized}
-                        {idx < data.category.split(',').length - 1
-                          ? '  •  '
-                          : ''}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            )}
-            {data.about && (
-              <Text style={styles(theme).aboutText}>{data.about}</Text>
-            )}
             <View style={styles(theme).tabBarContainer}>
               <CustomToggle
                 value={tab === 'directions'}
@@ -156,8 +123,6 @@ export default function RecipeViewer({data}: any) {
                 leftLabel="Ingredients"
                 rightLabel="Directions"
                 textStyle="header"
-                color="secondary"
-                type="tab"
               />
             </View>
             {tab === 'ingredients' && (
@@ -231,19 +196,17 @@ export default function RecipeViewer({data}: any) {
               </>
             )}
           </View>
-        </Animated.ScrollView>
+        </ScrollView>
       )}
       <View style={[styles(theme).toggleContainer]}>
         <CustomToggle
-          type="pill"
-          color="secondary"
           value={isWebView}
           onValueChange={setIsWebView}
           leftLabel="Braise"
           rightLabel="Original"
+          textStyle="body"
         />
       </View>
-
       <ServingsPickerModal
         visible={showServingsModal}
         onClose={() => setShowServingsModal(false)}
@@ -262,74 +225,42 @@ const styles = (theme: any) =>
     },
     toggleContainer: {
       position: 'absolute',
-      top: 68,
+      top: 65,
       left: '50%',
       transform: [{translateX: -105}],
       zIndex: 1,
+      minWidth: 210,
     },
     imageContainer: {
-      overflow: 'hidden',
-      marginTop: -50,
+      width: '100%',
+      height: 325,
     },
     image: {
       width: '100%',
-      height: 475,
+      height: 325,
       resizeMode: 'cover',
       backgroundColor: theme.colors.border,
     },
     bodyContainer: {
       flex: 1,
       paddingHorizontal: 20,
-      borderTopLeftRadius: 30,
-      borderTopRightRadius: 30,
-      marginTop: -75,
       paddingTop: 18,
       backgroundColor: theme.colors.background,
       minHeight: '100%',
+      marginTop: -75,
     },
-    headerRow: {
+    detailsRow: {
       flexDirection: 'row',
       alignItems: 'flex-start',
-    },
-    metaBadgeCol: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginLeft: 5,
-    },
-    metaBadgeRect: {
-      width: 64,
-      height: 60,
-      borderRadius: 13,
-      backgroundColor: theme.colors.border,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 4,
-    },
-    metaBadgeValue: {
-      ...theme.typography.b1,
-      color: theme.colors.text,
-      textAlign: 'center',
-      marginBottom: -2,
-    },
-    metaBadgeLabel: {
-      ...theme.typography.b1,
-      color: theme.colors.text,
-      textAlign: 'center',
-      opacity: 0.7,
-      marginTop: -2,
-      flexWrap: 'wrap',
-      width: '100%',
+      alignContent: 'center',
     },
     title: {
       ...theme.typography.h1,
-      marginBottom: 5,
-      width: '100%',
       color: theme.colors.text,
     },
-    subtext: {
+    author: {
       ...theme.typography.b1,
-      color: theme.colors.subtext,
+      color: theme.colors.primary,
     },
     host: {
       ...theme.typography.b1,
@@ -370,9 +301,9 @@ const styles = (theme: any) =>
       paddingRight: 15,
     },
     quantity: {
-      ...theme.typography.b1,
+      ...theme.typography.h4,
       textAlign: 'right',
-      color: theme.colors.subtext,
+      color: theme.colors.primary,
     },
     emptyQuantity: {
       width: 1,
@@ -391,9 +322,10 @@ const styles = (theme: any) =>
       paddingVertical: 10,
     },
     lineNumber: {
-      ...theme.typography.b1,
+      ...theme.typography.h4,
       marginRight: 10,
-      color: theme.colors.subtext,
+      color: theme.colors.primary,
+      marginTop: 2,
     },
     lineText: {
       ...theme.typography.b1,
@@ -410,6 +342,10 @@ const styles = (theme: any) =>
     },
     contentContainer: {
       flex: 1,
+      marginTop: 105,
+    },
+    scrollContentContainer: {
+      paddingBottom: 40,
     },
     hidden: {
       display: 'none',
@@ -439,19 +375,20 @@ const styles = (theme: any) =>
     tagsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
+      marginTop: 8,
     },
     tagPillText: {
-      color: theme.colors.primary,
-      ...theme.typography.b1,
+      color: theme.colors.text,
+      ...theme.typography.h4,
     },
     tabBarContainer: {
       marginVertical: 10,
       width: '100%',
     },
     aboutText: {
-      ...theme.typography.b1,
+      ...theme.typography.b2,
       color: theme.colors.text,
-      marginBottom: 5,
+      marginVertical: 5,
     },
     emptyStateContainer: {
       padding: 20,
@@ -461,16 +398,12 @@ const styles = (theme: any) =>
       marginTop: 10,
     },
     emptyStateText: {
-      ...theme.typography.b1,
+      ...theme.typography.b2,
       color: theme.colors.subtext,
       textAlign: 'center',
     },
     flex: {
       flex: 1,
-    },
-    scrollContent: {
-      paddingBottom: 40,
-      paddingTop: 0,
     },
     horizontalLine: {
       borderBottomWidth: 1,
@@ -479,5 +412,29 @@ const styles = (theme: any) =>
     },
     authorRow: {
       marginBottom: 10,
+    },
+    headerContainer: {
+      marginBottom: 10,
+      paddingHorizontal: 25,
+      paddingTop: 5,
+    },
+    detailsContainer: {
+      borderWidth: 1,
+      borderColor: theme.colors.border,
+      borderRadius: 7,
+      padding: 15,
+    },
+    detailsText: {
+      ...theme.typography.h5,
+      color: theme.colors.text,
+      marginLeft: 5,
+    },
+    detailsIcon: {
+      marginRight: 3,
+    },
+    detailsTimeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: 15,
     },
   });

@@ -59,7 +59,7 @@ export default function InstructionsEditor({
       body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
         font-size: 1rem;
-        background-color: #FDFDFD;
+        background-color: #F6F6F4;
         color: #2D2D2D;
         line-height: 1.5;
       }
@@ -133,7 +133,6 @@ const styles = (theme: any) =>
       fontWeight: 'bold',
     },
     iconContainer: {
-      backgroundColor: theme.colors.border,
       borderRadius: 48,
       padding: 2,
     },

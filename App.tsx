@@ -137,14 +137,7 @@ export function App(): React.JSX.Element {
   return (
     <ThemeProvider theme={LightTheme}>
       <NavigationContainer theme={LightTheme}>
-        <Stack.Navigator
-          screenOptions={{
-            cardStyle: {
-              borderTopLeftRadius: 25,
-              borderTopRightRadius: 25,
-              overflow: 'hidden',
-            },
-          }}>
+        <Stack.Navigator>
           <Stack.Screen
             name="Home"
             component={TabNavigator}
@@ -160,9 +153,9 @@ export function App(): React.JSX.Element {
               headerShadowVisible: false,
               headerTitle: '',
               headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
-              headerLeftContainerStyle: {paddingLeft: 10},
+              headerLeftContainerStyle: {paddingLeft: 15, marginBottom: 10},
               headerRight: () => DetailsMenu(navigation),
-              headerRightContainerStyle: {paddingRight: 10},
+              headerRightContainerStyle: {paddingRight: 15, marginBottom: 10},
             })}
           />
           <Stack.Screen

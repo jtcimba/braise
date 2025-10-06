@@ -24,11 +24,6 @@ export default function Item({item, navigation}: any) {
           {item.author && (
             <Text style={styles(theme).author}>{item.author}</Text>
           )}
-          {item.total_time && (
-            <Text style={styles(theme).time}>
-              {item.total_time} {item.total_time_unit}
-            </Text>
-          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -52,10 +47,6 @@ const styles = (theme: any) =>
       ...theme.typography.h3,
       color: theme.colors.text,
     },
-    time: {
-      ...theme.typography.b2,
-      color: theme.colors.primary,
-    },
     image: {
       width: 70,
       height: 70,
@@ -65,8 +56,8 @@ const styles = (theme: any) =>
     },
     author: {
       overflow: 'hidden',
-      ...theme.typography.b2,
-      color: theme.colors.text,
+      ...theme.typography.h5,
+      color: theme.colors.primary,
     },
     subtextContainer: {
       flexDirection: 'row',

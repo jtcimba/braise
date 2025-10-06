@@ -92,7 +92,7 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
       alignItems: 'center',
-      marginTop: 5,
+      marginTop: 8,
     },
     chip: {
       height: 26,
@@ -102,13 +102,13 @@ const styles = (theme: Theme) =>
       borderWidth: 1,
       borderColor: theme.colors.border,
       borderRadius: 15,
-      paddingVertical: 5,
+      paddingVertical: 6,
       paddingHorizontal: 10,
       marginRight: 10,
     },
     chipText: {
       color: theme.colors.text,
-      ...theme.typography.b2,
+      ...theme.typography.h5,
       lineHeight: 15,
       textAlignVertical: 'center',
       includeFontPadding: false,
@@ -131,7 +131,7 @@ const styles = (theme: Theme) =>
       marginBottom: 5,
     },
     input: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       height: 26,
       color: theme.colors.text,
       minWidth: 150,

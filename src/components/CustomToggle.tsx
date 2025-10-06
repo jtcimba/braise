@@ -8,8 +8,6 @@ interface CustomToggleProps {
   onValueChange: (value: boolean) => void;
   leftLabel: string;
   rightLabel: string;
-  type?: 'pill' | 'tab';
-  color?: 'primary' | 'secondary';
   textStyle?: 'body' | 'header';
 }
 
@@ -18,134 +16,66 @@ export default function CustomToggle({
   onValueChange,
   leftLabel,
   rightLabel,
-  type = 'pill',
-  color = 'primary',
   textStyle = 'body',
 }: CustomToggleProps) {
   const theme = useTheme() as unknown as Theme;
 
-  const isPill = type === 'pill';
-  const isTab = type === 'tab';
+  const getOptionStyle = (isSelected: boolean) => [
+    styles(theme).option,
+    isSelected && styles(theme, textStyle).selectedOption,
+  ];
+
+  const getTextStyle = (isSelected: boolean) => [
+    styles(theme).baseText,
+    textStyle === 'header' ? theme.typography.h3 : theme.typography.h5,
+    isSelected
+      ? styles(theme, textStyle).selectedText
+      : styles(theme, textStyle).unselectedText,
+  ];
 
   return (
-    <View
-      style={[styles(theme).container, isTab && styles(theme).tabContainer]}>
+    <View style={styles(theme).container}>
       <TouchableOpacity
-        style={[
-          styles(theme).option,
-          isPill &&
-            !value &&
-            (color === 'secondary'
-              ? styles(theme).selectedSecondaryOption
-              : styles(theme).selectedPillOption),
-          isTab && !value && styles(theme).selectedTabOption,
-        ]}
+        style={getOptionStyle(!value)}
         onPress={() => onValueChange(false)}>
-        <Text
-          style={[
-            styles(theme).optionText,
-            textStyle === 'header'
-              ? theme.typography.h3
-              : (isPill && theme.typography.b1) ||
-                (isTab && theme.typography.h3),
-            isPill &&
-              !value &&
-              (color === 'secondary'
-                ? styles(theme).selectedSecondaryText
-                : styles(theme).selectedPillText),
-            isTab && !value && styles(theme).selectedTabText,
-            isTab && value && styles(theme).unselectedTabText,
-          ]}>
-          {leftLabel}
-        </Text>
+        <Text style={getTextStyle(!value)}>{leftLabel}</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[
-          styles(theme).option,
-          isPill &&
-            value &&
-            (color === 'secondary'
-              ? styles(theme).selectedSecondaryOption
-              : styles(theme).selectedPillOption),
-          isTab && value && styles(theme).selectedTabOption,
-        ]}
+        style={getOptionStyle(value)}
         onPress={() => onValueChange(true)}>
-        <Text
-          style={[
-            styles(theme).optionText,
-            textStyle === 'header'
-              ? theme.typography.h3
-              : (isPill && theme.typography.b1) ||
-                (isTab && theme.typography.h3),
-            isPill &&
-              value &&
-              (color === 'secondary'
-                ? styles(theme).selectedSecondaryText
-                : styles(theme).selectedPillText),
-            isTab && value && styles(theme).selectedTabText,
-            isTab && !value && styles(theme).unselectedTabText,
-          ]}>
-          {rightLabel}
-        </Text>
+        <Text style={getTextStyle(value)}>{rightLabel}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = (theme: Theme) =>
+const styles = (theme: Theme, textStyle?: string) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
-      borderRadius: 25,
-      width: '100%',
-      minWidth: 210,
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-    },
-    tabContainer: {
-      backgroundColor: 'transparent',
-      borderWidth: 0,
-      borderRadius: 0,
-      minWidth: 'auto',
     },
     option: {
       flex: 1,
-      paddingBottom: 1,
-      paddingHorizontal: 16,
-      borderRadius: 21,
+      paddingHorizontal: textStyle === 'body' ? 12 : 16,
+      paddingVertical: textStyle === 'body' ? 0 : 5,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    selectedPillOption: {
-      backgroundColor: theme.colors.primary,
-      margin: 2,
+    selectedOption: {
+      borderBottomWidth: 1,
+      borderBottomColor:
+        textStyle === 'body' ? theme.colors.text : theme.colors.primary,
+      paddingBottom: textStyle === 'body' ? 4 : 6,
     },
-    selectedTabOption: {
-      backgroundColor: 'transparent',
-      borderRadius: 0,
-      borderBottomWidth: 2,
-      borderBottomColor: theme.colors.text,
-    },
-    optionText: {
+    baseText: {
       color: theme.colors.text,
     },
-    selectedPillText: {
-      color: theme.colors.background,
-    },
-    selectedTabText: {
+    selectedText: {
       color: theme.colors.text,
-      ...theme.typography.h2,
+      ...theme.typography.h4,
     },
-    unselectedTabText: {
-      paddingBottom: 3,
+    unselectedText: {
       color: theme.colors.subtext,
-      ...theme.typography.h2,
-    },
-    selectedSecondaryOption: {
-      backgroundColor: theme.colors.opaque,
-      margin: 2,
-    },
-    selectedSecondaryText: {
-      color: theme.colors.background,
+      paddingBottom: textStyle === 'body' ? 1 : 3,
     },
   });

@@ -151,7 +151,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     cancelButtonText: {
-      ...theme.typography.b1,
+      ...theme.typography.h4,
       color: theme.colors.subtext,
     },
     confirmButton: {
@@ -163,7 +163,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     confirmButtonText: {
-      ...theme.typography.b1,
+      ...theme.typography.h4,
       color: theme.colors.background,
       fontWeight: '500',
     },
