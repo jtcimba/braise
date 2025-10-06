@@ -40,7 +40,7 @@ function AddStackNavigator() {
           headerTitle: 'Add recipe',
           presentation: 'modal',
           headerShadowVisible: false,
-          headerRightContainerStyle: {paddingRight: 22, paddingTop: 10},
+          headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
           headerTitleStyle: {
             ...theme?.typography.h1,
             color: theme.colors.card,
@@ -55,11 +55,11 @@ function AddStackNavigator() {
         component={AddFromUrlScreen}
         options={({navigation}) => ({
           headerTitle: 'Add from URL',
-          headerLeft: () => BackIcon(navigation),
-          headerLeftContainerStyle: {paddingLeft: 22, paddingTop: 10},
+          headerLeft: () => BackIcon(navigation, null, theme.colors.card),
+          headerLeftContainerStyle: {paddingLeft: 15, paddingTop: 5},
           headerRight: () => CloseIcon(navigation, 'Recipes'),
           headerShadowVisible: false,
-          headerRightContainerStyle: {paddingRight: 22, paddingTop: 10},
+          headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
           headerTitleStyle: {
             ...theme.typography.h1,
             color: theme.colors.card,
@@ -125,7 +125,7 @@ function TabNavigator({navigation}: {navigation: any}) {
         options={{
           headerTitleAlign: 'left',
           headerRight: () => SettingsIcon(navigation),
-          headerRightContainerStyle: {paddingRight: 10},
+          headerRightContainerStyle: {paddingRight: 15},
           headerShadowVisible: false,
         }}
       />
@@ -172,10 +172,10 @@ export function App(): React.JSX.Element {
             options={({navigation}) => ({
               headerTitle: 'Settings',
               headerLeft: () => null,
-              headerRight: () => CloseIcon(navigation, 'Recipes'),
+              headerRight: () => CloseIcon(navigation, 'Recipes', '#2D2D2D'),
               presentation: 'modal',
               headerShadowVisible: false,
-              headerRightContainerStyle: {paddingRight: 10},
+              headerRightContainerStyle: {paddingRight: 15},
               headerTitleStyle: {
                 fontFamily: 'Satoshi Variable',
                 fontSize: 16,

@@ -3,7 +3,11 @@ import {TouchableOpacity, StyleSheet, View} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSelector} from 'react-redux';
 
-export default function BackIcon(navigation: any, component: any = null) {
+export default function BackIcon(
+  navigation: any,
+  component: any = null,
+  color: string = '#2D2D2D',
+) {
   const viewMode = useSelector((state: any) => state.viewMode.value);
 
   if (viewMode !== 'view' && component === 'RecipeDetailsScreen') {
@@ -22,7 +26,7 @@ export default function BackIcon(navigation: any, component: any = null) {
   return (
     <View style={[styles().iconContainer]}>
       <TouchableOpacity onPress={onBackPress}>
-        <Ionicons name="chevron-back-outline" size={25} color="#2D2D2D" />
+        <Ionicons name="chevron-back-outline" size={25} color={color} />
       </TouchableOpacity>
     </View>
   );

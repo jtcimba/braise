@@ -1,26 +1,28 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useTheme} from '../../theme/ThemeProvider';
-import {Theme} from '../../theme/types';
 
-export default function CloseIcon(navigation: any, parentComponent: string) {
-  const {colors} = useTheme() as unknown as Theme;
-
+export default function CloseIcon(
+  navigation: any,
+  parentComponent: string,
+  color: string = '#F6F6F4',
+) {
   return (
-    <View style={[styles(colors).iconContainer]}>
+    <View style={[styles().iconContainer]}>
       <TouchableOpacity onPress={() => navigation.navigate(parentComponent)}>
-        <Ionicons name="close-outline" size={20} color="white" />
+        <Ionicons name="close-outline" size={27} color={color} />
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = (colors: any) =>
+const styles = () =>
   StyleSheet.create({
     iconContainer: {
-      backgroundColor: colors.opaque,
       borderRadius: 48,
-      padding: 2,
+      paddingTop: 2,
+      paddingLeft: 1,
+      paddingBottom: 2,
+      paddingRight: 3,
     },
   });

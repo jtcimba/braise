@@ -142,7 +142,7 @@ const styles = (theme: any) =>
       justifyContent: 'space-between',
     },
     button: {
-      backgroundColor: theme.colors.text,
+      backgroundColor: theme.colors.primary,
       padding: 10,
       marginVertical: 10,
       borderRadius: 30,
@@ -152,19 +152,17 @@ const styles = (theme: any) =>
     },
     text: {
       color: theme.colors.card,
-      ...(theme.typography?.h2 || {fontSize: 16, fontWeight: 'bold'}),
+      ...theme.typography.h2,
       textAlign: 'center',
     },
     disabledText: {
       opacity: 0.5,
     },
     input: {
-      ...theme.typography.b2,
+      ...theme.typography.h5,
       padding: 10,
       marginVertical: 5,
-      borderRadius: 13,
-      borderWidth: 2,
-      borderColor: theme.colors.card,
+      borderRadius: 7,
       width: '100%',
       color: theme.colors.text,
       backgroundColor: theme.colors.card,
@@ -210,6 +208,6 @@ const styles = (theme: any) =>
       color: theme.colors.card,
       fontSize: 14,
       textAlign: 'center',
-      ...(theme.typography?.b2 || {fontSize: 12}),
+      ...theme.typography.b2,
     },
   });
