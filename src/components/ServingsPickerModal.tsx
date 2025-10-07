@@ -119,8 +119,6 @@ const styles = (theme: Theme) =>
       padding: 20,
       width: '80%',
       maxWidth: 300,
-      borderWidth: 2,
-      borderColor: theme.colors.border,
     },
     header: {
       alignItems: 'center',

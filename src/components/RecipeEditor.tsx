@@ -11,7 +11,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
+import {
+  launchImageLibrary,
+  ImagePickerResponse,
+  MediaType,
+} from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import InstructionsEditor from './InstructionsEditor';
 import CategoryEditor from './CategoryEditor';
@@ -20,11 +26,13 @@ import ServingsPickerModal from './ServingsPickerModal';
 import TotalTimePickerModal from './TotalTimePickerModal';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {ImageService} from '../api';
 
 export default function RecipeEditor({editingData, onChangeEditingData}: any) {
   const [modalVisible, setModalVisible] = useState(false);
   const [servingsModalVisible, setServingsModalVisible] = useState(false);
   const [totalTimeModalVisible, setTotalTimeModalVisible] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const theme = useTheme() as unknown as Theme;
 
   const handleInstructionUpdate = useCallback(
@@ -68,6 +76,58 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     [onChangeEditingData],
   );
 
+  const handleImageSelection = useCallback(() => {
+    const options = {
+      mediaType: 'photo' as MediaType,
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+      quality: 0.8 as const,
+    };
+
+    launchImageLibrary(options, async (response: ImagePickerResponse) => {
+      if (response.didCancel || response.errorMessage) {
+        return;
+      }
+
+      if (response.assets && response.assets[0]) {
+        const asset = response.assets[0];
+        if (asset.uri) {
+          setIsUploadingImage(true);
+          try {
+            // Upload the new image
+            const imageUrl = await ImageService.uploadImage(asset.uri);
+
+            // Delete the old image if it exists
+            if (editingData.image) {
+              try {
+                await ImageService.deleteImage(editingData.image);
+              } catch (deleteError) {
+                console.log('Failed to delete old image:', deleteError);
+                // Don't block the user if deletion fails
+              }
+            }
+
+            // Update the recipe data with the new image URL
+            onChangeEditingData((prevData: any) => ({
+              ...prevData,
+              image: imageUrl,
+            }));
+          } catch (error) {
+            console.error('Error uploading image:', error);
+            Alert.alert(
+              'Upload Failed',
+              'Failed to upload image. Please try again.',
+              [{text: 'OK'}],
+            );
+          } finally {
+            setIsUploadingImage(false);
+          }
+        }
+      }
+    });
+  }, [editingData.image, onChangeEditingData]);
+
   const categoriesArray = editingData.category
     ? editingData.category?.split(',').filter((cat: string) => cat.trim())
     : [];
@@ -103,12 +163,35 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 }
               />
             </View>
-            <Image
-              style={styles(theme).image}
-              source={{
-                uri: editingData.image ? editingData.image : null,
-              }}
-            />
+            <TouchableOpacity
+              style={styles(theme).imageContainer}
+              onPress={handleImageSelection}
+              disabled={isUploadingImage}
+              activeOpacity={0.8}>
+              <Image
+                style={styles(theme).image}
+                source={{
+                  uri: editingData.image ? editingData.image : null,
+                }}
+              />
+              {isUploadingImage && (
+                <View style={styles(theme).uploadingOverlay}>
+                  <Text style={styles(theme).uploadingText}>Uploading...</Text>
+                </View>
+              )}
+              {!editingData.image && !isUploadingImage && (
+                <View style={styles(theme).placeholderOverlay}>
+                  <Ionicons
+                    name="camera-outline"
+                    size={40}
+                    color={theme.colors.subtext}
+                  />
+                  <Text style={styles(theme).placeholderText}>
+                    Tap to add image
+                  </Text>
+                </View>
+              )}
+            </TouchableOpacity>
             <View style={styles(theme).bodyContainer}>
               <View style={styles(theme).detailsContainer}>
                 <View style={styles(theme).detailsRow}>
@@ -238,11 +321,44 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 25,
       paddingTop: 5,
     },
-    image: {
+    imageContainer: {
+      position: 'relative',
       width: '100%',
       height: 325,
-      resizeMode: 'cover',
       backgroundColor: theme.colors.border,
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+    },
+    uploadingOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    uploadingText: {
+      ...theme.typography.h4,
+      color: theme.colors.background,
+    },
+    placeholderOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    placeholderText: {
+      ...theme.typography.h5,
+      color: theme.colors.subtext,
+      marginTop: 10,
     },
     bodyContainer: {
       flex: 1,
@@ -285,7 +401,7 @@ const styles = (theme: Theme) =>
       backgroundColor: 'transparent',
     },
     authorInput: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.primary,
       marginBottom: 5,
       backgroundColor: 'transparent',
@@ -315,7 +431,7 @@ const styles = (theme: Theme) =>
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.b2,
+      ...theme.typography.b1,
       color: theme.colors.text,
       marginTop: 5,
     },

@@ -237,8 +237,10 @@ const styles = (theme: any) =>
     },
     image: {
       width: '100%',
-      height: 325,
+      height: '100%',
       resizeMode: 'cover',
+      alignItems: 'center',
+      justifyContent: 'center',
       backgroundColor: theme.colors.border,
     },
     bodyContainer: {
@@ -259,7 +261,7 @@ const styles = (theme: any) =>
       color: theme.colors.text,
     },
     author: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.primary,
     },
     host: {
@@ -386,7 +388,7 @@ const styles = (theme: any) =>
       width: '100%',
     },
     aboutText: {
-      ...theme.typography.b2,
+      ...theme.typography.b1,
       color: theme.colors.text,
       marginVertical: 5,
     },

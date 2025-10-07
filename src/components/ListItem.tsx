@@ -44,7 +44,7 @@ const styles = (theme: any) =>
       marginEnd: 25,
     },
     title: {
-      ...theme.typography.h3,
+      ...theme.typography.h4,
       color: theme.colors.text,
     },
     image: {

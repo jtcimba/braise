@@ -144,6 +144,7 @@ const styles = (theme: any) =>
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      marginBottom: 10,
     },
     headerText: {
       color: theme.colors.text,
