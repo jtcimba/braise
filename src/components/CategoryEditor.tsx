@@ -95,7 +95,6 @@ const styles = (theme: Theme) =>
       marginTop: 8,
     },
     chip: {
-      height: 26,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -105,6 +104,7 @@ const styles = (theme: Theme) =>
       paddingVertical: 6,
       paddingHorizontal: 10,
       marginRight: 10,
+      marginBottom: 5,
     },
     chipText: {
       color: theme.colors.text,
@@ -127,12 +127,10 @@ const styles = (theme: Theme) =>
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      height: 26,
       marginBottom: 5,
     },
     input: {
       ...theme.typography.h5,
-      height: 26,
       color: theme.colors.text,
       minWidth: 150,
     },

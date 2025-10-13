@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import {useNavigation, ParamListBase} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Recipe} from '../models';
@@ -25,13 +25,6 @@ export default function AddScreen() {
 
   return (
     <View style={styles(theme).content}>
-      <View style={styles(theme).imageContainer}>
-        <Image
-          source={require('../assets/bowl.png')}
-          style={styles(theme).bowlImage}
-          resizeMode="contain"
-        />
-      </View>
       <TouchableOpacity
         onPress={() =>
           navigation.navigate('RecipeDetailsScreen', {
@@ -63,17 +56,13 @@ const styles = (theme: any) =>
       height: '100%',
       backgroundColor: theme.colors.secondary,
       flex: 1,
-      justifyContent: 'space-between',
+      justifyContent: 'flex-end',
     },
     imageContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 5,
-    },
-    bowlImage: {
-      width: 400,
-      height: 400,
     },
     button: {
       backgroundColor: theme.colors.primary,

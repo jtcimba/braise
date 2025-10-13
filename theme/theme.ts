@@ -55,7 +55,7 @@ export const LightTheme = {
     subtext: '#5D5D5D',
     border: '#E8E6E3',
     opaque: 'rgba(45, 45, 45, 0.55)',
-    secondary: '#417748',
+    secondary: '#234E29',
   },
   typography,
 };
