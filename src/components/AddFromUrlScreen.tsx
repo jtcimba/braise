@@ -92,7 +92,7 @@ export default function AddFromUrlScreen() {
 
       Animated.timing(progressBarAnim, {
         toValue: 1,
-        duration: 10000,
+        duration: 20000,
         easing: Easing.linear,
         useNativeDriver: false,
       }).start();
@@ -161,6 +161,11 @@ export default function AddFromUrlScreen() {
       .catch(e => {
         console.log(e);
         Alert.alert('Error', 'Failed to add recipe. Please try again.');
+        setIsLoading(false);
+        setUrl('');
+        setIsValidUrl(false);
+      })
+      .finally(() => {
         setIsLoading(false);
         setUrl('');
         setIsValidUrl(false);

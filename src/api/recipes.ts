@@ -8,27 +8,67 @@ class RecipeService {
         throw new Error('Failed to get ID token');
       }
 
-      const response = await fetch(`${process.env.API_URL}recipes/import`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
+      // Step 1: Extract content from the recipe page
+      const extractResponse = await fetch(
+        `${process.env.API_URL}recipes/extract`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            url: url,
+          }),
         },
-        body: JSON.stringify({
-          url: url,
-        }),
-      });
+      );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Failed to scrape recipe. Status:', response.status);
+      if (!extractResponse.ok) {
+        const errorText = await extractResponse.text();
+        console.error(
+          'Failed to extract recipe content. Status:',
+          extractResponse.status,
+        );
         console.error('Error response:', errorText);
         throw new Error(
-          `Failed to scrape recipe: ${response.status} ${errorText}`,
+          `Failed to extract recipe content: ${extractResponse.status} ${errorText}`,
         );
       }
 
-      return await response.json();
+      const extractData = await extractResponse.json();
+      console.log('extractData', JSON.stringify(extractData, null, 2));
+
+      // Step 2: Process the extracted content
+      const processResponse = await fetch(
+        `${process.env.API_URL}recipes/process`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            content: extractData.content,
+            url: url,
+            metadata: extractData.metadata,
+            domain_info: extractData.domain_info,
+          }),
+        },
+      );
+
+      if (!processResponse.ok) {
+        const errorText = await processResponse.text();
+        console.error(
+          'Failed to process recipe content. Status:',
+          processResponse.status,
+        );
+        console.error('Error response:', errorText);
+        throw new Error(
+          `Failed to process recipe content: ${processResponse.status} ${errorText}`,
+        );
+      }
+
+      return await processResponse.json();
     } catch (error) {
       console.error('Error adding recipe from URL:', error);
       if (error instanceof Error) {

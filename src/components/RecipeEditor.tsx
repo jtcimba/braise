@@ -324,7 +324,7 @@ const styles = (theme: Theme) =>
     imageContainer: {
       position: 'relative',
       width: '100%',
-      height: 325,
+      height: 350,
       backgroundColor: theme.colors.border,
     },
     image: {

@@ -60,10 +60,12 @@ export default function RecipeViewer({data}: any) {
               <Text style={styles(theme).author}>{data.author}</Text>
             )}
           </View>
-          <Image
-            style={styles(theme).image}
-            source={{uri: data.image ? data.image : null}}
-          />
+          <View style={styles(theme).imageContainer}>
+            <Image
+              style={styles(theme).image}
+              source={{uri: data.image ? data.image : null}}
+            />
+          </View>
           <View style={styles(theme).bodyContainer}>
             <View style={styles(theme).detailsContainer}>
               <View style={styles(theme).detailsRow}>
@@ -232,16 +234,15 @@ const styles = (theme: any) =>
       minWidth: 210,
     },
     imageContainer: {
+      position: 'relative',
       width: '100%',
-      height: 325,
+      height: 350,
+      backgroundColor: theme.colors.border,
     },
     image: {
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: theme.colors.border,
     },
     bodyContainer: {
       flex: 1,
