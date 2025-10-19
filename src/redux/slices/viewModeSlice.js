@@ -1,7 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
-  value: 'edit',
+  value: 'view',
 };
 
 const viewModeSlice = createSlice({

@@ -14,9 +14,7 @@ class AuthService {
   async getIdToken(): Promise<string | null> {
     try {
       const session = await fetchAuthSession();
-      console.log('Auth session:', session);
       const idToken = session.tokens?.idToken?.toString();
-      console.log('ID token:', idToken ? 'present' : 'missing');
       if (!idToken) {
         throw new Error('ID token not found');
       }
@@ -39,8 +37,6 @@ class AuthService {
       if (!idToken) {
         throw new Error('Failed to get ID token');
       }
-      console.log('AWS ID:', awsId);
-      console.log('IDD Token:', idToken);
 
       const apiUrl = `${process.env.API_URL}users?awsid=${awsId}`;
       const response = await fetch(apiUrl, {

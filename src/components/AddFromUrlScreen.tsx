@@ -19,10 +19,14 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {RecipeService} from '../api';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {useOnboarding} from '../context/OnboardingContext';
+import {useOnboardingTarget} from '../hooks/useOnboardingTarget';
+import OnboardingTooltip from './OnboardingTooltip';
+import Storage from '../storage';
 
 type RootStackParamList = {
   AddFromUrl: undefined;
-  RecipeDetailsScreen: {item: any; newRecipe: boolean};
+  RecipeDetailsScreen: {item: any};
 };
 
 const FOOD_ICONS = [
@@ -48,6 +52,16 @@ export default function AddFromUrlScreen() {
   const progressBarAnim = useRef(new Animated.Value(0)).current;
   const iconOpacity = useRef(new Animated.Value(0)).current;
   const iconAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Onboarding
+  const {isOnboardingActive, currentStep, steps, nextStep, skipOnboarding} =
+    useOnboarding();
+  const {targetRef: urlInputTargetRef, measureTarget: measureUrlInputTarget} =
+    useOnboardingTarget('url_input');
+  const {
+    targetRef: addRecipeButtonTargetRef,
+    measureTarget: measureAddRecipeButtonTarget,
+  } = useOnboardingTarget('add_recipe_button');
 
   useEffect(() => {
     if (url.length === 0) {
@@ -143,20 +157,34 @@ export default function AddFromUrlScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, currentIconIndex]);
 
+  // Measure onboarding targets when appropriate steps are active
+  useEffect(() => {
+    if (isOnboardingActive) {
+      if (currentStep === 2) {
+        // URL input step
+        setTimeout(() => {
+          measureUrlInputTarget();
+        }, 500);
+      } else if (currentStep === 3) {
+        // Add recipe button step
+        setTimeout(() => {
+          measureAddRecipeButtonTarget();
+        }, 500);
+      }
+    }
+  }, [
+    isOnboardingActive,
+    currentStep,
+    measureUrlInputTarget,
+    measureAddRecipeButtonTarget,
+  ]);
+
   const onAddRecipe = () => {
     Keyboard.dismiss();
     setIsLoading(true);
     RecipeService.getRecipeFromUrl(url)
       .then(recipe => {
-        setUrl('');
-        setIsValidUrl(false);
-        setIsLoading(false);
-        navigation.navigate('RecipeDetailsScreen', {
-          item: {
-            ...recipe.data,
-          },
-          newRecipe: true,
-        });
+        handleSaveNewRecipe(recipe);
       })
       .catch(e => {
         console.log(e);
@@ -164,12 +192,37 @@ export default function AddFromUrlScreen() {
         setIsLoading(false);
         setUrl('');
         setIsValidUrl(false);
-      })
-      .finally(() => {
-        setIsLoading(false);
-        setUrl('');
-        setIsValidUrl(false);
       });
+  };
+
+  const handleSaveNewRecipe = async (recipe: any) => {
+    let newRecipe: any;
+    try {
+      const response = await RecipeService.addNewRecipe({
+        ...recipe.data,
+        ingredients: recipe.data.ingredients?.replace(/\\n$/, ''),
+      });
+      newRecipe = await RecipeService.getRecipe(response.id);
+      console.log('newRecipe', newRecipe);
+
+      const localRecipes = await Storage.loadRecipesFromLocal();
+      localRecipes.push(newRecipe[0]);
+      console.log('localRecipes', localRecipes);
+      await Storage.saveRecipesToLocal(localRecipes);
+    } catch (e: any) {
+      console.log('save error', e.message);
+      Alert.alert('Error', 'Failed to save recipe');
+    } finally {
+      console.log('recipe', recipe.data);
+      navigation.navigate('RecipeDetailsScreen', {
+        item: {
+          ...newRecipe[0],
+        },
+      });
+      setUrl('');
+      setIsValidUrl(false);
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -237,6 +290,7 @@ export default function AddFromUrlScreen() {
             </View>
           )}
           <TextInput
+            ref={urlInputTargetRef}
             style={styles(theme).input}
             placeholder="https://www..."
             placeholderTextColor={theme.colors.subtext}
@@ -251,6 +305,7 @@ export default function AddFromUrlScreen() {
             onSubmitEditing={() => onAddRecipe()}
           />
           <TouchableOpacity
+            ref={addRecipeButtonTargetRef}
             onPress={() => onAddRecipe()}
             style={styles(theme).button}
             disabled={!isValidUrl || isLoading}>
@@ -264,6 +319,36 @@ export default function AddFromUrlScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Onboarding Tooltips */}
+        {isOnboardingActive &&
+          currentStep === 2 &&
+          steps[2]?.targetPosition && (
+            <OnboardingTooltip
+              visible={true}
+              title={steps[2].title}
+              description={steps[2].description}
+              targetPosition={steps[2].targetPosition}
+              onNext={nextStep}
+              onSkip={skipOnboarding}
+              isLastStep={currentStep === steps.length - 1}
+            />
+          )}
+
+        {isOnboardingActive &&
+          isValidUrl &&
+          currentStep === 3 &&
+          steps[3]?.targetPosition && (
+            <OnboardingTooltip
+              visible={true}
+              title={steps[3].title}
+              description={steps[3].description}
+              targetPosition={steps[3].targetPosition}
+              onNext={nextStep}
+              onSkip={skipOnboarding}
+              isLastStep={currentStep === steps.length - 1}
+            />
+          )}
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
