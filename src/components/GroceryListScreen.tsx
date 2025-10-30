@@ -16,6 +16,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {categorizeIngredient} from '../services';
 
 interface GroceryItem {
   id: string;
@@ -46,6 +47,8 @@ export default function GroceryListScreen() {
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState('Other');
   const [newItemAmount, setNewItemAmount] = useState('');
+  const [isCategoryManuallySelected, setIsCategoryManuallySelected] =
+    useState(false);
   const [animatingItems, setAnimatingItems] = useState<Set<string>>(new Set());
   const isInitialLoad = useRef(true);
 
@@ -66,6 +69,14 @@ export default function GroceryListScreen() {
       isInitialLoad.current = false;
     }
   }, [items]);
+
+  // Auto-categorize based on item name when typing (only if not manually selected)
+  useEffect(() => {
+    if (!isCategoryManuallySelected && newItemName.trim()) {
+      const category = categorizeIngredient(newItemName);
+      setNewItemCategory(category);
+    }
+  }, [newItemName, isCategoryManuallySelected]);
 
   const loadItems = async () => {
     try {
@@ -115,6 +126,7 @@ export default function GroceryListScreen() {
       setNewItemName('');
       setNewItemCategory('Other');
       setNewItemAmount('');
+      setIsCategoryManuallySelected(false);
       setIsAddModalVisible(false);
     }
   };
@@ -136,6 +148,7 @@ export default function GroceryListScreen() {
       setNewItemName('');
       setNewItemCategory('Other');
       setNewItemAmount('');
+      setIsCategoryManuallySelected(false);
       setEditingItem(null);
       setIsEditModalVisible(false);
     }
@@ -146,6 +159,7 @@ export default function GroceryListScreen() {
     setNewItemName(item.name);
     setNewItemCategory(item.category);
     setNewItemAmount(item.amount);
+    setIsCategoryManuallySelected(true); // Existing items should keep their category
     setIsEditModalVisible(true);
   };
 
@@ -232,6 +246,7 @@ export default function GroceryListScreen() {
       setNewItemName('');
       setNewItemCategory('Other');
       setNewItemAmount('');
+      setIsCategoryManuallySelected(false);
     };
 
     return (
@@ -275,7 +290,10 @@ export default function GroceryListScreen() {
                               newItemCategory === category &&
                                 styles(theme).selectedCategoryButton,
                             ]}
-                            onPress={() => setNewItemCategory(category)}>
+                            onPress={() => {
+                              setNewItemCategory(category);
+                              setIsCategoryManuallySelected(true);
+                            }}>
                             <Text
                               style={[
                                 styles(theme).categoryButtonText,
