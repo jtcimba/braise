@@ -15,7 +15,7 @@ const TabBarIcon = forwardRef<any, TabBarIconProps>(
 
     const icons: {[key: string]: string} = {
       Recipes: 'file-tray-full-outline',
-      'Grocery Lists': 'cart-outline',
+      'Grocery List': 'cart-outline',
       Add: 'add-circle-outline',
     };
 

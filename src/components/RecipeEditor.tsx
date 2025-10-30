@@ -215,8 +215,8 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                     style={styles(theme).detailsTimeContainer}
                     onPress={() => setServingsModalVisible(true)}>
                     <Ionicons
-                      name="speedometer-outline"
-                      size={20}
+                      name="restaurant-outline"
+                      size={18}
                       color={theme.colors.primary}
                       style={styles(theme).detailsIcon}
                     />

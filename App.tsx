@@ -8,16 +8,17 @@ import SettingsScreen from './src/components/SettingsScreen';
 import AddScreen from './src/components/AddScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import RecipeDetailsScreen from './src/components/RecipeDetailsScreen';
-import DiscoverScreen from './src/components/DiscoverScreen';
+import GroceryListScreen from './src/components/GroceryListScreen';
 import TabBarIcon from './src/components/TabBarIcon';
 import SettingsIcon from './src/components/SettingsIcon';
 import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
-import DetailsMenu from './src/components/DetailsMenu';
+import DetailsMenuHeader from './src/components/DetailsMenuHeader';
 import AddFromUrlScreen from './src/components/AddFromUrlScreen';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
+import {GroceryListModalProvider} from './src/context/GroceryListModalContext';
 import {Theme} from './theme/types';
 import {
   OnboardingProvider,
@@ -144,12 +145,10 @@ function TabNavigator({navigation}: {navigation: any}) {
           })}
         />
         <Tab.Screen
-          name="Grocery Lists"
-          component={DiscoverScreen}
+          name="Grocery List"
+          component={GroceryListScreen}
           options={{
             headerTitleAlign: 'left',
-            headerRight: () => SettingsIcon(navigation),
-            headerRightContainerStyle: {paddingRight: 15},
             headerShadowVisible: false,
           }}
         />
@@ -174,56 +173,58 @@ export function App(): React.JSX.Element {
   return (
     <ThemeProvider theme={LightTheme}>
       <OnboardingProvider>
-        <NavigationContainer theme={LightTheme}>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Home"
-              component={TabNavigator}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="RecipeDetailsScreen"
-              component={RecipeDetailsScreen}
-              options={({navigation}) => ({
-                headerTransparent: true,
-                headerShadowVisible: false,
-                headerTitle: '',
-                headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
-                headerLeftContainerStyle: {paddingLeft: 15, marginBottom: 10},
-                headerRight: () => DetailsMenu(navigation),
-                headerRightContainerStyle: {paddingRight: 15, marginBottom: 10},
-              })}
-            />
-            <Stack.Screen
-              name="Add"
-              component={AddStackNavigator}
-              options={{
-                headerShown: false,
-                presentation: 'modal',
-              }}
-            />
-            <Stack.Screen
-              name="Settings"
-              component={SettingsScreen}
-              options={({navigation}) => ({
-                headerTitle: 'Settings',
-                headerLeft: () => null,
-                headerRight: () => CloseIcon(navigation, 'Recipes', '#2D2D2D'),
-                presentation: 'modal',
-                headerShadowVisible: false,
-                headerRightContainerStyle: {paddingRight: 15},
-                headerTitleStyle: {
-                  fontFamily: 'Satoshi Variable',
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  color: '#2d2d2d',
-                },
-              })}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <GroceryListModalProvider>
+          <NavigationContainer theme={LightTheme}>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Home"
+                component={TabNavigator}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="RecipeDetailsScreen"
+                component={RecipeDetailsScreen}
+                options={({navigation}) => ({
+                  headerTransparent: true,
+                  headerShadowVisible: false,
+                  headerTitle: '',
+                  headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
+                  headerLeftContainerStyle: {paddingLeft: 15, marginBottom: 10},
+                  headerRight: () => <DetailsMenuHeader navigation={navigation} />,
+                  headerRightContainerStyle: {paddingRight: 15, marginBottom: 10},
+                })}
+              />
+              <Stack.Screen
+                name="Add"
+                component={AddStackNavigator}
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                }}
+              />
+              <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={({navigation}) => ({
+                  headerTitle: 'Settings',
+                  headerLeft: () => null,
+                  headerRight: () => CloseIcon(navigation, 'Recipes', '#2D2D2D'),
+                  presentation: 'modal',
+                  headerShadowVisible: false,
+                  headerRightContainerStyle: {paddingRight: 15},
+                  headerTitleStyle: {
+                    fontFamily: 'Satoshi Variable',
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#2d2d2d',
+                  },
+                })}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </GroceryListModalProvider>
       </OnboardingProvider>
     </ThemeProvider>
   );

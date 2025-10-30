@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useMemo} from 'react';
 import {
   View,
   StyleSheet,
@@ -12,9 +12,11 @@ import {useEditingHandler} from '../context/EditingHandlerContext';
 import {RecipeService} from '../api';
 import RecipeViewer from './RecipeViewer';
 import RecipeEditor from './RecipeEditor';
+import GroceryListModal from './GroceryListModal';
 import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import DetailsMenuHeader from './DetailsMenuHeader';
 
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -23,6 +25,9 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const [isLoading, setIsLoading] = useState(false);
   const [editingData, onChangeEditingData] = useState({...route.params.item});
   const [showSavedMessage, setShowSavedMessage] = useState(false);
+  const [scaledIngredients, setScaledIngredients] = useState(
+    route.params.item.ingredients || '',
+  );
   const fadeAnim = useState(new Animated.Value(0))[0];
   const scaleAnim = useState(new Animated.Value(0.8))[0];
   const theme = useTheme() as unknown as Theme;
@@ -120,13 +125,10 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     editingData,
   ]);
 
-  // useEffect(() => {
-  //   dispatch(changeViewMode('view'));
-  // }, [dispatch, route.params.item, route.params.newRecipe]);
-
   useEffect(() => {
     if (viewMode === 'view') {
       onChangeEditingData(data);
+      setScaledIngredients(data.ingredients || '');
     }
   }, [viewMode, data]);
 
@@ -137,9 +139,32 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     [onChangeEditingData],
   );
 
+  const headerRightComponent = useMemo(
+    () => (
+      <DetailsMenuHeader
+        navigation={navigation}
+        scaledIngredients={scaledIngredients}
+      />
+    ),
+    [navigation, scaledIngredients],
+  );
+
+  useEffect(() => {
+    if (viewMode === 'view') {
+      navigation.setOptions({
+        headerRight: () => headerRightComponent,
+      });
+    }
+  }, [navigation, headerRightComponent, viewMode]);
+
   return (
     <View style={styles(theme).container}>
-      {viewMode === 'view' && <RecipeViewer data={data} />}
+      {viewMode === 'view' && (
+        <RecipeViewer
+          data={data}
+          onScaledIngredientsChange={setScaledIngredients}
+        />
+      )}
       {viewMode !== 'view' && (
         <RecipeEditor
           editingData={editingData}
@@ -162,6 +187,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
           </View>
         </Animated.View>
       )}
+      <GroceryListModal />
     </View>
   );
 }

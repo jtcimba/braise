@@ -5,15 +5,25 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
 import {useEditingHandler} from '../context/EditingHandlerContext';
+import {useGroceryListModal} from '../context/GroceryListModalContext';
 import {Theme} from '../../theme/types';
 import {useTheme} from '../../theme/ThemeProvider';
 
-export default function DetailsMenu(navigation: any) {
+interface DetailsMenuProps {
+  navigation: any;
+  ingredients?: string;
+}
+
+export default function DetailsMenu({
+  navigation,
+  ingredients = '',
+}: DetailsMenuProps) {
   const {colors} = useTheme() as unknown as Theme;
   const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
   const {handleSavePress, handleDeletePress} = useEditingHandler();
+  const {showModal} = useGroceryListModal();
 
   const onEditPress = () => {
     setmodalVisible(false);
@@ -49,6 +59,11 @@ export default function DetailsMenu(navigation: any) {
     } else {
       dispatch(changeViewMode('view'));
     }
+  };
+
+  const onAddToGroceryListPress = () => {
+    setmodalVisible(false);
+    showModal(ingredients);
   };
 
   return (
@@ -96,6 +111,12 @@ export default function DetailsMenu(navigation: any) {
               </TouchableOpacity>
             </View>
           </View>
+          <TouchableOpacity
+            style={styles(colors).modalItem}
+            onPress={onAddToGroceryListPress}>
+            <Ionicons name="list" size={18} style={styles(colors).icon} />
+            <Text style={styles(colors).editText}>Add to Grocery List</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles(colors).modalItem}
             onPress={onEditPress}>

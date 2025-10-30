@@ -22,7 +22,7 @@ import OnboardingTooltip from './OnboardingTooltip';
 // Ignore WebView errors
 LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
 
-export default function RecipeViewer({data}: any) {
+export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   const theme = useTheme() as unknown as Theme;
   const [isWebView, setIsWebView] = useState(false);
   const [tab, setTab] = useState('ingredients');
@@ -31,7 +31,7 @@ export default function RecipeViewer({data}: any) {
   const [scaledIngredients, setScaledIngredients] = useState(
     data.ingredients || '',
   );
-  // Onboarding
+
   const {isOnboardingActive, currentStep, steps, completeOnboarding} =
     useOnboarding();
   const {targetRef: completeTargetRef, measureTarget: measureCompleteTarget} =
@@ -48,8 +48,18 @@ export default function RecipeViewer({data}: any) {
 
     setCurrentServings(newServings);
     setScaledIngredients(newScaledIngredients);
+
+    if (onScaledIngredientsChange) {
+      onScaledIngredientsChange(newScaledIngredients);
+    }
   };
-  // Measure completion target when onboarding step 4 is active
+
+  useEffect(() => {
+    if (onScaledIngredientsChange) {
+      onScaledIngredientsChange(scaledIngredients);
+    }
+  }, [scaledIngredients, onScaledIngredientsChange]);
+
   useEffect(() => {
     if (isOnboardingActive && currentStep === 4) {
       console.log('measuring complete target');
@@ -107,8 +117,8 @@ export default function RecipeViewer({data}: any) {
                   style={styles(theme).detailsTimeContainer}
                   onPress={() => setShowServingsModal(true)}>
                   <Ionicons
-                    name="speedometer-outline"
-                    size={20}
+                    name="restaurant-outline"
+                    size={18}
                     color={theme.colors.primary}
                     style={styles(theme).detailsIcon}
                   />
@@ -237,7 +247,6 @@ export default function RecipeViewer({data}: any) {
         onConfirm={handleServingsConfirm}
         currentValue={currentServings}
       />
-      {/* Completion Onboarding Tooltip */}
       {showCompleteTooltip && currentStepData?.targetPosition && (
         <OnboardingTooltip
           visible={true}
