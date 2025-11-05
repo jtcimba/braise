@@ -12,11 +12,13 @@ import {useTheme} from '../../theme/ThemeProvider';
 interface DetailsMenuProps {
   navigation: any;
   ingredients?: string;
+  routeData?: any;
 }
 
 export default function DetailsMenu({
   navigation,
   ingredients = '',
+  routeData = {},
 }: DetailsMenuProps) {
   const {colors} = useTheme() as unknown as Theme;
   const [modalVisible, setmodalVisible] = useState(false);
@@ -54,7 +56,9 @@ export default function DetailsMenu({
   };
 
   const onCancelPress = () => {
-    if (viewMode === 'new') {
+    const isNewRecipe = !routeData.id || routeData.id === '';
+
+    if (viewMode === 'new' || isNewRecipe) {
       navigation.navigate('Recipes');
     } else {
       dispatch(changeViewMode('view'));

@@ -358,11 +358,11 @@ const styles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.secondary,
+      backgroundColor: theme.colors.card,
       overflow: 'hidden',
     },
     content: {
-      backgroundColor: theme.colors.secondary,
+      backgroundColor: theme.colors.card,
       padding: 22,
       alignItems: 'center',
       height: '100%',
@@ -394,6 +394,8 @@ const styles = (theme: any) =>
       width: '100%',
       color: theme.colors.text,
       backgroundColor: theme.colors.card,
+      borderWidth: 1,
+      borderColor: theme.colors.border,
     },
     loadingOverlay: {
       position: 'absolute',
@@ -401,7 +403,7 @@ const styles = (theme: any) =>
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: theme.colors.secondary,
+      backgroundColor: theme.colors.card,
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 100,

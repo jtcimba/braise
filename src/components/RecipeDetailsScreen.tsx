@@ -72,20 +72,38 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const handleSavePress = useCallback(async () => {
     setIsLoading(true);
     try {
-      await RecipeService.updateRecipe(editingData.id, {
-        ...editingData,
-        ingredients: editingData.ingredients?.replace(/\\n$/, ''),
-      });
+      const isNewRecipe = !editingData.id || editingData.id === '';
 
-      const updatedRecipe = await RecipeService.getRecipe(editingData.id);
-      onChangeData(updatedRecipe[0]);
-      onChangeEditingData(updatedRecipe[0]);
+      if (isNewRecipe) {
+        const response = await RecipeService.addNewRecipe({
+          ...editingData,
+          ingredients: editingData.ingredients?.replace(/\\n$/, ''),
+        });
+        const newRecipe = await RecipeService.getRecipe(response.id);
 
-      const localRecipes = await Storage.loadRecipesFromLocal();
-      const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
-        recipe.id === updatedRecipe[0].id ? updatedRecipe[0] : recipe,
-      );
-      await Storage.saveRecipesToLocal(updatedRecipes);
+        const localRecipes = await Storage.loadRecipesFromLocal();
+        localRecipes.push(newRecipe[0]);
+        await Storage.saveRecipesToLocal(localRecipes);
+
+        onChangeData(newRecipe[0]);
+        onChangeEditingData(newRecipe[0]);
+      } else {
+        await RecipeService.updateRecipe(editingData.id, {
+          ...editingData,
+          ingredients: editingData.ingredients?.replace(/\\n$/, ''),
+        });
+
+        const updatedRecipe = await RecipeService.getRecipe(editingData.id);
+        onChangeData(updatedRecipe[0]);
+        onChangeEditingData(updatedRecipe[0]);
+
+        const localRecipes = await Storage.loadRecipesFromLocal();
+        const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
+          recipe.id === updatedRecipe[0].id ? updatedRecipe[0] : recipe,
+        );
+        await Storage.saveRecipesToLocal(updatedRecipes);
+      }
+
       showSavedMessageTemporarily();
     } catch (e: any) {
       console.log('save error', e.message);

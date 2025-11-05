@@ -14,6 +14,13 @@ export default function DetailsMenuHeader({
   const route = useRoute();
   const ingredients =
     scaledIngredients || (route.params as any)?.item?.ingredients || '';
+  const routeData = (route.params as any)?.item || {};
 
-  return <DetailsMenu navigation={navigation} ingredients={ingredients} />;
+  return (
+    <DetailsMenu
+      navigation={navigation}
+      ingredients={ingredients}
+      routeData={routeData}
+    />
+  );
 }

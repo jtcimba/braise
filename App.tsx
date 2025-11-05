@@ -43,17 +43,17 @@ function AddStackNavigator() {
         component={AddScreen}
         options={({navigation}) => ({
           headerLeft: () => null,
-          headerRight: () => CloseIcon(navigation, 'Recipes'),
+          headerRight: () => CloseIcon(navigation, 'Recipes', theme.colors.text),
           headerTitle: 'Add recipe',
           presentation: 'modal',
           headerShadowVisible: false,
           headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
           headerTitleStyle: {
             ...theme?.typography.h1,
-            color: theme.colors.card,
+            color: theme.colors.text,
           },
           headerStyle: {
-            backgroundColor: theme.colors.secondary,
+            backgroundColor: theme.colors.card,
           },
         })}
       />
@@ -62,17 +62,18 @@ function AddStackNavigator() {
         component={AddFromUrlScreen}
         options={({navigation}) => ({
           headerTitle: 'Add from URL',
-          headerLeft: () => BackIcon(navigation, null, theme.colors.card),
+          headerLeft: () => BackIcon(navigation, null, theme.colors.text),
           headerLeftContainerStyle: {paddingLeft: 15, paddingTop: 5},
-          headerRight: () => CloseIcon(navigation, 'Recipes'),
+          headerRight: () =>
+            CloseIcon(navigation, 'Recipes', theme.colors.text),
           headerShadowVisible: false,
           headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
           headerTitleStyle: {
             ...theme.typography.h1,
-            color: theme.colors.card,
+            color: theme.colors.text,
           },
           headerStyle: {
-            backgroundColor: theme.colors.secondary,
+            backgroundColor: theme.colors.card,
           },
         })}
       />

@@ -48,14 +48,14 @@ export const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#EA672D',
+    primary: '#FC6F1E',
     background: '#F6F6F4',
     card: '#F6F6F4',
     text: '#2D2D2D',
     subtext: '#5D5D5D',
     border: '#E8E6E3',
     opaque: 'rgba(45, 45, 45, 0.55)',
-    secondary: '#234E29',
+    secondary: '#496F4E',
   },
   typography,
 };

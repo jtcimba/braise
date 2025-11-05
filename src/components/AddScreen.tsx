@@ -8,8 +8,11 @@ import {Theme} from '../../theme/types';
 import {useOnboarding} from '../context/OnboardingContext';
 import {useOnboardingTarget} from '../hooks/useOnboardingTarget';
 import OnboardingTooltip from './OnboardingTooltip';
+import {useAppDispatch} from '../redux/hooks';
+import {changeViewMode} from '../redux/slices/viewModeSlice';
 
 export default function AddScreen() {
+  const dispatch = useAppDispatch();
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
   const theme = useTheme() as unknown as Theme;
 
@@ -47,15 +50,17 @@ export default function AddScreen() {
   return (
     <View style={styles(theme).content}>
       <TouchableOpacity
-        onPress={() =>
+        onPress={() => {
+          dispatch(changeViewMode('edit'));
           navigation.navigate('RecipeDetailsScreen', {
             item: newRecipe,
-            newRecipe: true,
-          })
-        }
+          });
+        }}
         style={styles(theme).secondaryButton}>
         <View style={styles(theme).buttonContent}>
-          <Text style={styles(theme).text}>From scratch</Text>
+          <Text style={[styles(theme).text, styles(theme).secondaryText]}>
+            From scratch
+          </Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
@@ -89,7 +94,7 @@ const styles = (theme: any) =>
       padding: 22,
       alignItems: 'center',
       height: '100%',
-      backgroundColor: theme.colors.secondary,
+      backgroundColor: theme.colors.card,
       flex: 1,
       justifyContent: 'flex-end',
     },
@@ -125,12 +130,15 @@ const styles = (theme: any) =>
     },
     secondaryButton: {
       borderWidth: 2,
-      borderColor: theme.colors.card,
+      borderColor: theme.colors.secondary,
       padding: 10,
       marginVertical: 10,
       borderRadius: 30,
       width: '100%',
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    secondaryText: {
+      color: theme.colors.secondary,
     },
   });
