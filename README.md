@@ -4,7 +4,6 @@ This is a recipe manager that I am developing using React Native, PostgreSQL, an
 
 Below are some screenshots of the UI which I designed in Figma:
 
-<img width="284" alt="Screenshot 2024-06-12 at 12 32 04 PM" src="https://github.com/jtcimba/braise/assets/99924051/1975ee51-95bf-430b-95bc-f5f6a27eae47">
-<img width="285" alt="Screenshot 2024-06-12 at 12 32 27 PM" src="https://github.com/jtcimba/braise/assets/99924051/0429daac-c670-4c59-ab30-6c857e1796c2">
-<img width="286" alt="Screenshot 2024-06-12 at 12 32 41 PM" src="https://github.com/jtcimba/braise/assets/99924051/48b7c208-5567-42e9-847d-1d57cdac9451">
-
+<img width="285" height="620" alt="Screenshot 2025-11-06 at 7 45 59 PM" src="https://github.com/user-attachments/assets/d289dd7a-9fd5-488c-81ac-e8a9aa534374" />
+<img width="282" height="733" alt="Screenshot 2025-11-06 at 7 46 14 PM" src="https://github.com/user-attachments/assets/4de318eb-6a63-4f1c-91c6-a4ff82013b0e" />
+<img width="285" height="727" alt="Screenshot 2025-11-06 at 7 46 49 PM" src="https://github.com/user-attachments/assets/0f0a272c-ee8f-4429-ac5b-960464481409" />
