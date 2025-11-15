@@ -1,8 +1,12 @@
 import 'react-native-gesture-handler';
-import {withAuthenticator} from '@aws-amplify/ui-react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, {useCallback, useEffect, useRef} from 'react';
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+  ParamListBase,
+  CommonActions,
+} from '@react-navigation/native';
 import RecipesScreen from './src/components/RecipesScreen';
 import SettingsScreen from './src/components/SettingsScreen';
 import AddScreen from './src/components/AddScreen';
@@ -14,7 +18,7 @@ import SettingsIcon from './src/components/SettingsIcon';
 import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenuHeader from './src/components/DetailsMenuHeader';
-import AddFromUrlScreen from './src/components/AddFromUrlScreen';
+import AddFromBrowserScreen from './src/components/AddFromBrowserScreen';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
@@ -26,7 +30,6 @@ import {
 } from './src/context/OnboardingContext';
 import {useOnboardingTarget} from './src/hooks/useOnboardingTarget';
 import OnboardingTooltip from './src/components/OnboardingTooltip';
-
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -43,7 +46,8 @@ function AddStackNavigator() {
         component={AddScreen}
         options={({navigation}) => ({
           headerLeft: () => null,
-          headerRight: () => CloseIcon(navigation, 'Recipes', theme.colors.text),
+          headerRight: () =>
+            CloseIcon(navigation, 'Recipes', theme.colors.text),
           headerTitle: 'Add recipe',
           presentation: 'modal',
           headerShadowVisible: false,
@@ -58,10 +62,10 @@ function AddStackNavigator() {
         })}
       />
       <Stack.Screen
-        name="AddFromUrl"
-        component={AddFromUrlScreen}
+        name="AddFromBrowser"
+        component={AddFromBrowserScreen}
         options={({navigation}) => ({
-          headerTitle: 'Add from URL',
+          headerTitle: 'Add from Browser',
           headerLeft: () => BackIcon(navigation, null, theme.colors.text),
           headerLeftContainerStyle: {paddingLeft: 15, paddingTop: 5},
           headerRight: () =>
@@ -170,12 +174,88 @@ function TabNavigator({navigation}: {navigation: any}) {
   );
 }
 
-export function App(): React.JSX.Element {
+export type DeepLinkEvent = {url: string};
+
+type AppProps = {
+  pendingDeepLink?: DeepLinkEvent | null;
+  onConsumeDeepLink?: () => void;
+};
+
+export default function App({
+  pendingDeepLink,
+  onConsumeDeepLink,
+}: AppProps): React.JSX.Element {
+  const navigationRef = useRef<NavigationContainerRef<ParamListBase>>(null);
+  const navigationReadyRef = useRef(false);
+  const pendingDeepLinkRef = useRef<DeepLinkEvent | null>(null);
+
+  const processDeepLink = useCallback(
+    (event: DeepLinkEvent) => {
+      const url = event?.url;
+      if (!url) {
+        return;
+      }
+
+      try {
+        const match = url.match(/braise:\/\/import\?data=(.*)/);
+        if (match && match[1]) {
+          const encodedData = match[1];
+          const decoded = decodeURIComponent(encodedData);
+          const recipe = JSON.parse(decoded);
+
+          navigationRef.current?.dispatch(
+            CommonActions.navigate({
+              name: 'RecipeDetailsScreen',
+              params: {
+                item: {
+                  ...recipe,
+                },
+                shouldAutoSave: true,
+              },
+              key: `RecipeDetailsScreen-${Date.now()}`,
+            }),
+          );
+          onConsumeDeepLink?.();
+        } else {
+          console.warn('⚠️ No data param found in deep link');
+        }
+      } catch (err) {
+        console.error('❌ Failed to parse deep link recipe JSON:', err);
+      }
+    },
+    [onConsumeDeepLink],
+  );
+
+  useEffect(() => {
+    if (!pendingDeepLink) {
+      return;
+    }
+
+    if (!navigationReadyRef.current || !navigationRef.current) {
+      pendingDeepLinkRef.current = pendingDeepLink;
+      return;
+    }
+
+    processDeepLink(pendingDeepLink);
+    onConsumeDeepLink?.();
+  }, [pendingDeepLink, onConsumeDeepLink, processDeepLink]);
+
   return (
     <ThemeProvider theme={LightTheme}>
       <OnboardingProvider>
         <GroceryListModalProvider>
-          <NavigationContainer theme={LightTheme}>
+          <NavigationContainer
+            theme={LightTheme}
+            ref={navigationRef}
+            onReady={() => {
+              navigationReadyRef.current = true;
+              if (pendingDeepLinkRef.current) {
+                const deepLink = pendingDeepLinkRef.current;
+                pendingDeepLinkRef.current = null;
+                processDeepLink(deepLink);
+                onConsumeDeepLink?.();
+              }
+            }}>
             <Stack.Navigator>
               <Stack.Screen
                 name="Home"
@@ -193,8 +273,13 @@ export function App(): React.JSX.Element {
                   headerTitle: '',
                   headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
                   headerLeftContainerStyle: {paddingLeft: 15, marginBottom: 10},
-                  headerRight: () => <DetailsMenuHeader navigation={navigation} />,
-                  headerRightContainerStyle: {paddingRight: 15, marginBottom: 10},
+                  headerRight: () => (
+                    <DetailsMenuHeader navigation={navigation} />
+                  ),
+                  headerRightContainerStyle: {
+                    paddingRight: 15,
+                    marginBottom: 10,
+                  },
                 })}
               />
               <Stack.Screen
@@ -211,7 +296,8 @@ export function App(): React.JSX.Element {
                 options={({navigation}) => ({
                   headerTitle: 'Settings',
                   headerLeft: () => null,
-                  headerRight: () => CloseIcon(navigation, 'Recipes', '#2D2D2D'),
+                  headerRight: () =>
+                    CloseIcon(navigation, 'Recipes', '#2D2D2D'),
                   presentation: 'modal',
                   headerShadowVisible: false,
                   headerRightContainerStyle: {paddingRight: 15},
@@ -230,5 +316,3 @@ export function App(): React.JSX.Element {
     </ThemeProvider>
   );
 }
-
-export default withAuthenticator(App);

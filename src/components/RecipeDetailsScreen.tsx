@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState, useMemo} from 'react';
+import React, {useCallback, useEffect, useState, useMemo, useRef} from 'react';
 import {
   View,
   StyleSheet,
@@ -28,6 +28,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const [scaledIngredients, setScaledIngredients] = useState(
     route.params.item.ingredients || '',
   );
+  const autoSaveTriggeredRef = useRef(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
   const scaleAnim = useState(new Animated.Value(0.8))[0];
   const theme = useTheme() as unknown as Theme;
@@ -174,6 +175,17 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       });
     }
   }, [navigation, headerRightComponent, viewMode]);
+
+  useEffect(() => {
+    if (route?.params?.shouldAutoSave && !autoSaveTriggeredRef.current) {
+      autoSaveTriggeredRef.current = true;
+      handleSavePress();
+      navigation.setParams({
+        ...route.params,
+        shouldAutoSave: false,
+      });
+    }
+  }, [route.params?.shouldAutoSave, handleSavePress, navigation, route.params]);
 
   return (
     <View style={styles(theme).container}>

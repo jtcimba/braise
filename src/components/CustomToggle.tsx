@@ -63,8 +63,7 @@ const styles = (theme: Theme, textStyle?: string) =>
     },
     selectedOption: {
       borderBottomWidth: 1,
-      borderBottomColor:
-        textStyle === 'body' ? theme.colors.text : theme.colors.primary,
+      borderBottomColor: theme.colors.text,
       paddingBottom: textStyle === 'body' ? 4 : 6,
     },
     baseText: {

@@ -65,10 +65,10 @@ export default function AddScreen() {
       </TouchableOpacity>
       <TouchableOpacity
         ref={fromUrlButtonTargetRef}
-        onPress={() => navigation.navigate('AddFromUrl')}
+        onPress={() => navigation.navigate('AddFromBrowser')}
         style={styles(theme).button}>
         <View style={styles(theme).buttonContent}>
-          <Text style={styles(theme).text}>From url</Text>
+          <Text style={styles(theme).text}>From browser</Text>
         </View>
       </TouchableOpacity>
 
