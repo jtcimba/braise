@@ -5,12 +5,10 @@ import {
   Text,
   TouchableHighlight,
   SafeAreaView,
-  Alert,
 } from 'react-native';
-import {signOut} from 'aws-amplify/auth';
-import {AuthService} from '../api';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {supabase} from '../supabase-client';
 
 export default function SettingsScreen() {
   const {colors} = useTheme() as unknown as Theme;
@@ -18,21 +16,16 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     const getUser = async () => {
-      const user = await AuthService.getUser();
+      const user = await supabase.auth.getUser().then(({data: {user}}) => user);
       if (user) {
-        setEmail(user.signInDetails?.loginId);
+        setEmail(user.email);
       }
     };
     getUser();
   }, []);
 
   const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.log('error signing out: ', error);
-      Alert.alert('Error', 'Failed to sign out.');
-    }
+    await supabase.auth.signOut();
   };
 
   return (

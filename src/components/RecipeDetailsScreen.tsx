@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {useAppSelector} from '../redux/hooks';
 import {useEditingHandler} from '../context/EditingHandlerContext';
-import {RecipeService} from '../api';
+import {supabase} from '../supabase-client';
 import RecipeViewer from './RecipeViewer';
 import RecipeEditor from './RecipeEditor';
 import GroceryListModal from './GroceryListModal';
@@ -73,34 +73,92 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const handleSavePress = useCallback(async () => {
     setIsLoading(true);
     try {
+      const userId = await supabase.auth
+        .getUser()
+        .then(({data: {user}}) => user?.id);
+
+      if (!userId) {
+        throw new Error('User not authenticated');
+      }
+
       const isNewRecipe = !editingData.id || editingData.id === '';
 
       if (isNewRecipe) {
-        const response = await RecipeService.addNewRecipe({
-          ...editingData,
-          ingredients: editingData.ingredients?.replace(/\\n$/, ''),
-        });
-        const newRecipe = await RecipeService.getRecipe(response.id);
+        const {data: newRecipe, error: insertError} = await supabase
+          .from('recipes')
+          .insert({
+            ...editingData,
+            ingredients: editingData.ingredients?.replace(/\\n$/, ''),
+            user_id: userId,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        // Process newlines in the response
+        if (newRecipe.ingredients) {
+          newRecipe.ingredients = newRecipe.ingredients.replace(/\\n/g, '\n');
+        }
+        if (newRecipe.instructions) {
+          newRecipe.instructions = newRecipe.instructions.replace(/\\n/g, '\n');
+        }
 
         const localRecipes = await Storage.loadRecipesFromLocal();
-        localRecipes.push(newRecipe[0]);
+        localRecipes.push(newRecipe);
         await Storage.saveRecipesToLocal(localRecipes);
 
-        onChangeData(newRecipe[0]);
-        onChangeEditingData(newRecipe[0]);
+        onChangeData(newRecipe);
+        onChangeEditingData(newRecipe);
+        setScaledIngredients(newRecipe.ingredients || '');
       } else {
-        await RecipeService.updateRecipe(editingData.id, {
-          ...editingData,
-          ingredients: editingData.ingredients?.replace(/\\n$/, ''),
-        });
+        const {error: updateError} = await supabase
+          .from('recipes')
+          .update({
+            ...editingData,
+            ingredients: editingData.ingredients?.replace(/\\n$/, ''),
+          })
+          .eq('id', editingData.id);
 
-        const updatedRecipe = await RecipeService.getRecipe(editingData.id);
-        onChangeData(updatedRecipe[0]);
-        onChangeEditingData(updatedRecipe[0]);
+        if (updateError) {
+          throw updateError;
+        }
+
+        const {data: updatedRecipe, error: fetchError} = await supabase
+          .from('recipes')
+          .select('*')
+          .eq('id', editingData.id)
+          .single();
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        // Process newlines in the response
+        if (updatedRecipe.ingredients) {
+          updatedRecipe.ingredients = updatedRecipe.ingredients.replace(
+            /\\n/g,
+            '\n',
+          );
+        }
+        if (updatedRecipe.instructions) {
+          updatedRecipe.instructions = updatedRecipe.instructions.replace(
+            /\\n/g,
+            '\n',
+          );
+        }
+
+        console.log('updatedRecipe', updatedRecipe);
+
+        onChangeData(updatedRecipe);
+        onChangeEditingData(updatedRecipe);
+        setScaledIngredients(updatedRecipe.ingredients || '');
 
         const localRecipes = await Storage.loadRecipesFromLocal();
         const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
-          recipe.id === updatedRecipe[0].id ? updatedRecipe[0] : recipe,
+          recipe.id === updatedRecipe.id ? updatedRecipe : recipe,
         );
         await Storage.saveRecipesToLocal(updatedRecipes);
       }
@@ -117,7 +175,14 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const handleDeletePress = useCallback(async () => {
     setIsLoading(true);
     try {
-      await RecipeService.deleteRecipe(editingData.id);
+      const {error} = await supabase
+        .from('recipes')
+        .delete()
+        .eq('id', editingData.id);
+
+      if (error) {
+        throw error;
+      }
 
       const localRecipes = await Storage.loadRecipesFromLocal();
       const updatedRecipes = localRecipes.filter(

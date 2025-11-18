@@ -9,11 +9,11 @@ import {
   Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {RecipeService} from '../api';
 import ListItem from './ListItem';
 import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import SearchAndFilters from './SearchAndFilters';
+import {supabase} from '../supabase-client';
 
 type Route = {
   route: {params: {refresh: boolean}};
@@ -28,15 +28,17 @@ export default function RecipesScreen({route}: Route) {
   const theme = useTheme();
 
   const categories = useMemo(() => {
-    if (!data.length) return [];
+    if (!data.length) {
+      return [];
+    }
 
     const allCategories = data
       .map(recipe => {
-        if (typeof recipe.category === 'string') {
-          return recipe.category.split(',').map((cat: string) => cat.trim());
+        if (typeof recipe.categories === 'string') {
+          return recipe.categories.split(',').map((cat: string) => cat.trim());
         }
-        if (Array.isArray(recipe.category)) {
-          return recipe.category;
+        if (Array.isArray(recipe.categories)) {
+          return recipe.categories;
         }
         return [];
       })
@@ -54,15 +56,22 @@ export default function RecipesScreen({route}: Route) {
   };
 
   const fetchRecipes = useCallback(async () => {
-    try {
-      const recipes = await RecipeService.getRecipes();
-      setData(recipes);
-      setFilteredData(recipes);
-      await Storage.saveRecipesToLocal(recipes);
-    } catch (e) {
-      console.error('Failed to fetch recipes', e);
-      Alert.alert('Error', 'Failed to fetch recipes.');
-    }
+    const userId = await supabase.auth
+      .getUser()
+      .then(({data: {user}}) => user?.id);
+    supabase
+      .from('recipes')
+      .select('*')
+      .eq('user_id', userId)
+      .then(({data: recipesData, error}) => {
+        if (error) {
+          console.error('Failed to fetch recipes', error);
+          Alert.alert('Error', 'Failed to fetch recipes.');
+        } else {
+          setData(recipesData);
+          setFilteredData(recipesData);
+        }
+      });
   }, []);
 
   useEffect(() => {
@@ -99,12 +108,12 @@ export default function RecipesScreen({route}: Route) {
     const filteredResults = data.filter(recipe => {
       // Get recipe categories as an array
       let recipeCategories: string[] = [];
-      if (typeof recipe.category === 'string') {
-        recipeCategories = recipe.category
+      if (typeof recipe.categories === 'string') {
+        recipeCategories = recipe.categories
           .split(',')
           .map((cat: string) => cat.trim());
-      } else if (Array.isArray(recipe.category)) {
-        recipeCategories = recipe.category;
+      } else if (Array.isArray(recipe.categories)) {
+        recipeCategories = recipe.categories;
       }
 
       // Check if any of the recipe categories match any of the selected filters

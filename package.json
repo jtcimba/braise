@@ -21,6 +21,7 @@
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.29",
     "@reduxjs/toolkit": "^2.2.6",
+    "@supabase/supabase-js": "^2.81.1",
     "@tiptap/extension-list-item": "^2.11.3",
     "@tiptap/extension-ordered-list": "^2.11.3",
     "aws-amplify": "^6.0.28",

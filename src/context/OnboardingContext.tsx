@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthService, RecipeService} from '../api';
+import {supabase} from '../supabase-client';
 
 interface OnboardingStep {
   id: string;
@@ -95,7 +95,9 @@ export function OnboardingProvider({children}: OnboardingProviderProps) {
 
   const checkOnboardingStatus = async () => {
     try {
-      const userId = await AuthService.getUserId();
+      const userId = await supabase.auth
+        .getUser()
+        .then(({data: {user}}) => user?.id);
       if (!userId) {
         setHasCheckedOnboarding(true);
         return;
@@ -107,7 +109,17 @@ export function OnboardingProvider({children}: OnboardingProviderProps) {
 
       if (!onboardingCompleted) {
         // Check if user has any recipes
-        const recipes = await RecipeService.getRecipes();
+        const recipes = await supabase
+          .from('recipes')
+          .select('*')
+          .eq('user_id', userId)
+          .then(({data: recipesData, error}) => {
+            if (error) {
+              console.error('Failed to fetch recipes', error);
+              return [];
+            }
+            return recipesData;
+          });
 
         if (recipes.length === 0) {
           // First time user with no recipes - start onboarding
@@ -145,7 +157,9 @@ export function OnboardingProvider({children}: OnboardingProviderProps) {
 
   const completeOnboarding = async () => {
     try {
-      const userId = await AuthService.getUserId();
+      const userId = await supabase.auth
+        .getUser()
+        .then(({data: {user}}) => user?.id);
       if (userId) {
         await AsyncStorage.setItem(
           `${ONBOARDING_STORAGE_KEY}_${userId}`,

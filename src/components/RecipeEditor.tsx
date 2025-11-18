@@ -26,7 +26,7 @@ import ServingsPickerModal from './ServingsPickerModal';
 import TotalTimePickerModal from './TotalTimePickerModal';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
-import {ImageService} from '../api';
+import {supabase} from '../supabase-client';
 
 export default function RecipeEditor({editingData, onChangeEditingData}: any) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -59,7 +59,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     (servings: string) => {
       onChangeEditingData((prevData: any) => ({
         ...prevData,
-        yields: servings,
+        servings: servings,
       }));
     },
     [onChangeEditingData],
@@ -95,13 +95,51 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
         if (asset.uri) {
           setIsUploadingImage(true);
           try {
-            // Upload the new image
-            const imageUrl = await ImageService.uploadImage(asset.uri);
+            // Get the current user
+            const {
+              data: {user},
+            } = await supabase.auth.getUser();
+            if (!user) {
+              throw new Error('User not authenticated');
+            }
+
+            // Generate a unique filename
+            const fileExt = asset.uri.split('.').pop() || 'jpg';
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+            // Convert image URI to ArrayBuffer for Supabase storage
+            const imageResponse = await fetch(asset.uri);
+            const arrayBuffer = await imageResponse.arrayBuffer();
+
+            // Upload the new image to Supabase storage
+            const {error: uploadError} = await supabase.storage
+              .from('recipe_images')
+              .upload(fileName, arrayBuffer, {
+                contentType: asset.type || `image/${fileExt}`,
+                upsert: false,
+              });
+
+            if (uploadError) {
+              console.error('Upload error:', uploadError);
+              throw uploadError;
+            }
+
+            // Get the public URL
+            const {
+              data: {publicUrl},
+            } = supabase.storage.from('recipe_images').getPublicUrl(fileName);
 
             // Delete the old image if it exists
             if (editingData.image) {
               try {
-                await ImageService.deleteImage(editingData.image);
+                // Extract the file path from the URL
+                const urlParts = editingData.image.split('/recipe_images/');
+                if (urlParts.length > 1) {
+                  const oldFilePath = urlParts[1].split('?')[0]; // Remove query params
+                  await supabase.storage
+                    .from('recipe_images')
+                    .remove([oldFilePath]);
+                }
               } catch (deleteError) {
                 console.log('Failed to delete old image:', deleteError);
                 // Don't block the user if deletion fails
@@ -111,13 +149,13 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
             // Update the recipe data with the new image URL
             onChangeEditingData((prevData: any) => ({
               ...prevData,
-              image: imageUrl,
+              image: publicUrl,
             }));
-          } catch (error) {
+          } catch (error: any) {
             console.error('Error uploading image:', error);
             Alert.alert(
               'Upload Failed',
-              'Failed to upload image. Please try again.',
+              error.message || 'Failed to upload image. Please try again.',
               [{text: 'OK'}],
             );
           } finally {
@@ -221,7 +259,10 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                       style={styles(theme).detailsIcon}
                     />
                     <Text style={styles(theme).detailsText}>
-                      {editingData.yields || '-'} servings
+                      {editingData.servings
+                        ? editingData.servings.toString()
+                        : '-'}{' '}
+                      servings
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -285,14 +326,14 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 visible={servingsModalVisible}
                 onClose={() => setServingsModalVisible(false)}
                 onConfirm={handleServingsUpdate}
-                currentValue={editingData.yields}
+                currentValue={editingData.servings.toString()}
               />
 
               <TotalTimePickerModal
                 visible={totalTimeModalVisible}
                 onClose={() => setTotalTimeModalVisible(false)}
                 onConfirm={handleTotalTimeUpdate}
-                currentTime={editingData.total_time}
+                currentTime={editingData.total_time.toString()}
                 currentUnit={editingData.total_time_unit}
               />
             </View>

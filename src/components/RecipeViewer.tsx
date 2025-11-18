@@ -27,7 +27,7 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   const [isWebView, setIsWebView] = useState(false);
   const [tab, setTab] = useState('ingredients');
   const [showServingsModal, setShowServingsModal] = useState(false);
-  const [currentServings, setCurrentServings] = useState(data.yields || '-');
+  const [currentServings, setCurrentServings] = useState(data.servings || '-');
   const [scaledIngredients, setScaledIngredients] = useState(
     data.ingredients || '',
   );
@@ -38,12 +38,10 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
     useOnboardingTarget('complete');
 
   const handleServingsConfirm = (newServings: string) => {
-    const originalServings =
-      data.yields && data.yields !== '-' ? data.yields : '1';
     const newScaledIngredients = scaleIngredients(
       data.ingredients || '',
       newServings,
-      originalServings,
+      data.servings.toString(),
     );
 
     setCurrentServings(newServings);
@@ -61,6 +59,36 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   }, [scaledIngredients, onScaledIngredientsChange]);
 
   useEffect(() => {
+    if (data.ingredients) {
+      const originalServings =
+        data.servings && data.servings !== '-' ? data.servings.toString() : '1';
+      const servings =
+        currentServings &&
+        currentServings !== '-' &&
+        currentServings !== originalServings
+          ? currentServings
+          : originalServings;
+
+      if (servings !== originalServings) {
+        const newScaledIngredients = scaleIngredients(
+          data.ingredients,
+          servings,
+          data.servings,
+        );
+        setScaledIngredients(newScaledIngredients);
+      } else {
+        setScaledIngredients(data.ingredients);
+      }
+    }
+  }, [data.ingredients, data.servings, currentServings]);
+
+  useEffect(() => {
+    if (data.servings) {
+      setCurrentServings(data.servings);
+    }
+  }, [data.servings]);
+
+  useEffect(() => {
     if (isOnboardingActive && currentStep === 4) {
       console.log('measuring complete target');
       setTimeout(() => {
@@ -76,7 +104,7 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
     <View style={styles(theme).container}>
       {isWebView ? (
         <WebView
-          source={{uri: data.canonical_url}}
+          source={{uri: data.original_url}}
           style={styles(theme).webview}
         />
       ) : (
@@ -127,23 +155,25 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
                   </Text>
                 </TouchableOpacity>
               </View>
-              {data.category && (
+              {data.categories && (
                 <View style={styles(theme).tagsRow}>
-                  {data.category.split(',').map((cat: string, idx: number) => {
-                    const label = cat.trim();
-                    const capitalized =
-                      label.charAt(0).toUpperCase() + label.slice(1);
-                    return (
-                      <View key={idx}>
-                        <Text style={styles(theme).tagPillText}>
-                          {capitalized}
-                          {idx < data.category.split(',').length - 1
-                            ? '  •  '
-                            : ''}
-                        </Text>
-                      </View>
-                    );
-                  })}
+                  {data.categories
+                    .split(',')
+                    .map((cat: string, idx: number) => {
+                      const label = cat.trim();
+                      const capitalized =
+                        label.charAt(0).toUpperCase() + label.slice(1);
+                      return (
+                        <View key={idx}>
+                          <Text style={styles(theme).tagPillText}>
+                            {capitalized}
+                            {idx < data.categories.split(',').length - 1
+                              ? '  •  '
+                              : ''}
+                          </Text>
+                        </View>
+                      );
+                    })}
                 </View>
               )}
               {data.about && (
@@ -245,7 +275,7 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
         visible={showServingsModal}
         onClose={() => setShowServingsModal(false)}
         onConfirm={handleServingsConfirm}
-        currentValue={currentServings}
+        currentValue={currentServings.toString()}
       />
       {showCompleteTooltip && currentStepData?.targetPosition && (
         <OnboardingTooltip

@@ -6,17 +6,10 @@ import 'react-native-gesture-handler';
 import {AppRegistry, AppState} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
-import {Amplify} from 'aws-amplify';
-import amplifyconfig from './src/amplifyconfiguration.json';
 import {Provider} from 'react-redux';
 import store from './src/redux/store';
 import {EditingHandlerProvider} from './src/context/EditingHandlerContext';
 import {Linking} from 'react-native';
-import {withAuthenticator} from '@aws-amplify/ui-react-native';
-
-Amplify.configure(amplifyconfig);
-
-const AuthenticatedApp = withAuthenticator(App);
 
 function useAppForeground(callback) {
   const appState = React.useRef(AppState.currentState);
@@ -103,7 +96,7 @@ export default function RootApp() {
   return (
     <Provider store={store}>
       <EditingHandlerProvider>
-        <AuthenticatedApp
+        <App
           pendingDeepLink={pendingDeepLink}
           onConsumeDeepLink={consumeDeepLink}
         />

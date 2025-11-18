@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -30,6 +30,9 @@ import {
 } from './src/context/OnboardingContext';
 import {useOnboardingTarget} from './src/hooks/useOnboardingTarget';
 import OnboardingTooltip from './src/components/OnboardingTooltip';
+import {supabase} from './src/supabase-client';
+import {Session} from '@supabase/supabase-js';
+import Auth from './src/components/Auth';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -188,6 +191,16 @@ export default function App({
   const navigationRef = useRef<NavigationContainerRef<ParamListBase>>(null);
   const navigationReadyRef = useRef(false);
   const pendingDeepLinkRef = useRef<DeepLinkEvent | null>(null);
+  const [authSession, setAuthSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({data: {session}}) => {
+      setAuthSession(session);
+    });
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthSession(session);
+    });
+  }, []);
 
   const processDeepLink = useCallback(
     (event: DeepLinkEvent) => {
@@ -242,77 +255,85 @@ export default function App({
 
   return (
     <ThemeProvider theme={LightTheme}>
-      <OnboardingProvider>
-        <GroceryListModalProvider>
-          <NavigationContainer
-            theme={LightTheme}
-            ref={navigationRef}
-            onReady={() => {
-              navigationReadyRef.current = true;
-              if (pendingDeepLinkRef.current) {
-                const deepLink = pendingDeepLinkRef.current;
-                pendingDeepLinkRef.current = null;
-                processDeepLink(deepLink);
-                onConsumeDeepLink?.();
-              }
-            }}>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Home"
-                component={TabNavigator}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="RecipeDetailsScreen"
-                component={RecipeDetailsScreen}
-                options={({navigation}) => ({
-                  headerTransparent: true,
-                  headerShadowVisible: false,
-                  headerTitle: '',
-                  headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
-                  headerLeftContainerStyle: {paddingLeft: 15, marginBottom: 10},
-                  headerRight: () => (
-                    <DetailsMenuHeader navigation={navigation} />
-                  ),
-                  headerRightContainerStyle: {
-                    paddingRight: 15,
-                    marginBottom: 10,
-                  },
-                })}
-              />
-              <Stack.Screen
-                name="Add"
-                component={AddStackNavigator}
-                options={{
-                  headerShown: false,
-                  presentation: 'modal',
-                }}
-              />
-              <Stack.Screen
-                name="Settings"
-                component={SettingsScreen}
-                options={({navigation}) => ({
-                  headerTitle: 'Settings',
-                  headerLeft: () => null,
-                  headerRight: () =>
-                    CloseIcon(navigation, 'Recipes', '#2D2D2D'),
-                  presentation: 'modal',
-                  headerShadowVisible: false,
-                  headerRightContainerStyle: {paddingRight: 15},
-                  headerTitleStyle: {
-                    fontFamily: 'Satoshi Variable',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    color: '#2d2d2d',
-                  },
-                })}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </GroceryListModalProvider>
-      </OnboardingProvider>
+      {authSession?.user ? (
+        <OnboardingProvider>
+          <GroceryListModalProvider>
+            <NavigationContainer
+              theme={LightTheme}
+              ref={navigationRef}
+              onReady={() => {
+                navigationReadyRef.current = true;
+                if (pendingDeepLinkRef.current) {
+                  const deepLink = pendingDeepLinkRef.current;
+                  pendingDeepLinkRef.current = null;
+                  processDeepLink(deepLink);
+                  onConsumeDeepLink?.();
+                }
+              }}>
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="Home"
+                  component={TabNavigator}
+                  options={{
+                    headerShown: false,
+                  }}
+                />
+                <Stack.Screen
+                  name="RecipeDetailsScreen"
+                  component={RecipeDetailsScreen}
+                  options={({navigation}) => ({
+                    headerTransparent: true,
+                    headerShadowVisible: false,
+                    headerTitle: '',
+                    headerLeft: () =>
+                      BackIcon(navigation, 'RecipeDetailsScreen'),
+                    headerLeftContainerStyle: {
+                      paddingLeft: 15,
+                      marginBottom: 10,
+                    },
+                    headerRight: () => (
+                      <DetailsMenuHeader navigation={navigation} />
+                    ),
+                    headerRightContainerStyle: {
+                      paddingRight: 15,
+                      marginBottom: 10,
+                    },
+                  })}
+                />
+                <Stack.Screen
+                  name="Add"
+                  component={AddStackNavigator}
+                  options={{
+                    headerShown: false,
+                    presentation: 'modal',
+                  }}
+                />
+                <Stack.Screen
+                  name="Settings"
+                  component={SettingsScreen}
+                  options={({navigation}) => ({
+                    headerTitle: 'Settings',
+                    headerLeft: () => null,
+                    headerRight: () =>
+                      CloseIcon(navigation, 'Recipes', '#2D2D2D'),
+                    presentation: 'modal',
+                    headerShadowVisible: false,
+                    headerRightContainerStyle: {paddingRight: 15},
+                    headerTitleStyle: {
+                      fontFamily: 'Satoshi Variable',
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      color: '#2d2d2d',
+                    },
+                  })}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          </GroceryListModalProvider>
+        </OnboardingProvider>
+      ) : (
+        <Auth />
+      )}
     </ThemeProvider>
   );
 }
