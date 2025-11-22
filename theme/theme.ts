@@ -48,7 +48,7 @@ export const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#FC6F1E',
+    primary: 'rgb(251, 108, 52)',
     background: '#F6F6F4',
     card: '#F6F6F4',
     text: '#2D2D2D',

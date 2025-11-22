@@ -384,7 +384,7 @@ const styles = (theme: Theme) =>
       justifyContent: 'center',
     },
     uploadingText: {
-      ...theme.typography.h4,
+      ...theme.typography.h5,
       color: theme.colors.background,
     },
     placeholderOverlay: {
@@ -411,7 +411,7 @@ const styles = (theme: Theme) =>
     detailsContainer: {
       borderWidth: 1,
       borderColor: theme.colors.border,
-      borderRadius: 7,
+      borderRadius: 8,
       padding: 15,
       marginBottom: 10,
     },
@@ -462,17 +462,17 @@ const styles = (theme: Theme) =>
       marginBottom: 20,
     },
     ingredientsInput: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.text,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      borderRadius: 10,
+      borderRadius: 8,
       padding: 15,
       minHeight: 120,
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.text,
       marginTop: 5,
     },
@@ -485,7 +485,7 @@ const styles = (theme: Theme) =>
       paddingVertical: 5,
       marginBottom: 35,
       width: '100%',
-      borderRadius: 10,
+      borderRadius: 8,
       borderWidth: 1,
       borderColor: theme.colors.border,
     },
@@ -493,17 +493,17 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
     },
     lineNumber: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       marginRight: 10,
       color: theme.colors.subtext,
     },
     editInstructions: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       flex: 1,
       color: theme.colors.text,
     },
     placeholder: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.subtext,
     },
     authorRow: {

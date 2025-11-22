@@ -339,11 +339,12 @@ const styles = (theme: any) =>
       color: theme.colors.primary,
     },
     host: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
+      color: theme.colors.text,
       textDecorationLine: 'underline',
     },
     time: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.subtext,
       overflow: 'hidden',
     },
@@ -386,7 +387,7 @@ const styles = (theme: any) =>
       height: 24,
     },
     ingredientTextBold: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       flex: 1,
       color: theme.colors.text,
       textAlign: 'left',
@@ -404,7 +405,7 @@ const styles = (theme: any) =>
       marginTop: 2,
     },
     lineText: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       flex: 1,
       alignSelf: 'flex-start',
       color: theme.colors.text,
@@ -433,20 +434,10 @@ const styles = (theme: any) =>
       padding: 20,
     },
     errorText: {
+      ...theme.typography.h5,
       color: theme.colors.text,
       marginBottom: 20,
       textAlign: 'center',
-      fontSize: 16,
-    },
-    retryButton: {
-      backgroundColor: theme.colors.primary,
-      padding: 10,
-      borderRadius: 5,
-    },
-    retryButtonText: {
-      color: theme.colors.background,
-      fontSize: 16,
-      fontWeight: 'bold',
     },
     tagsRow: {
       flexDirection: 'row',
@@ -454,7 +445,7 @@ const styles = (theme: any) =>
       marginTop: 8,
     },
     tagPillText: {
-      color: theme.colors.text,
+      color: theme.colors.subtext,
       ...theme.typography.h4,
     },
     tabBarContainer: {
@@ -462,7 +453,7 @@ const styles = (theme: any) =>
       width: '100%',
     },
     aboutText: {
-      ...theme.typography.b1,
+      ...theme.typography.h5,
       color: theme.colors.text,
       marginVertical: 5,
     },
@@ -470,11 +461,11 @@ const styles = (theme: any) =>
       padding: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: 12,
+      borderRadius: 8,
       marginTop: 10,
     },
     emptyStateText: {
-      ...theme.typography.b2,
+      ...theme.typography.h5,
       color: theme.colors.subtext,
       textAlign: 'center',
     },
@@ -497,7 +488,7 @@ const styles = (theme: any) =>
     detailsContainer: {
       borderWidth: 1,
       borderColor: theme.colors.border,
-      borderRadius: 7,
+      borderRadius: 8,
       padding: 15,
     },
     detailsText: {

@@ -300,7 +300,7 @@ const styles = (theme: any) =>
       transform: [{translateX: -50}, {translateY: -50}],
       width: 100,
       height: 100,
-      borderRadius: 20,
+      borderRadius: 16,
       backgroundColor: theme.colors.opaque,
       justifyContent: 'center',
       alignItems: 'center',
@@ -316,7 +316,7 @@ const styles = (theme: any) =>
     },
     saveMessageBackground: {
       backgroundColor: theme.colors.opaque,
-      borderRadius: 10,
+      borderRadius: 16,
     },
     savedMessageText: {
       paddingHorizontal: 20,

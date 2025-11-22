@@ -68,7 +68,7 @@ class ActionViewController: UIViewController {
   // MARK: - Send to backend
   private func sendToBackend(html: String, url: String, title: String) {
       print("📤 Sending to Lambda…")
-      guard let endpoint = URL(string: "https://sqothpalde.execute-api.us-east-1.amazonaws.com/dev/recipes/import-recipe-from-browser") else {
+      guard let endpoint = URL(string: "https://i1ylo3n8sl.execute-api.us-east-1.amazonaws.com/prod/recipes/import-recipe-from-browser") else {
           handleUserFacingFailure()
           return
       }

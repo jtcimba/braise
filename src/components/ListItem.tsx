@@ -52,7 +52,7 @@ const styles = (theme: any) =>
       height: 70,
       marginRight: 15,
       backgroundColor: theme.colors.border,
-      borderRadius: 7,
+      borderRadius: 8,
     },
     author: {
       overflow: 'hidden',

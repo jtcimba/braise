@@ -2,6 +2,13 @@ import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  View,
+  ActivityIndicator,
+  StyleSheet,
+  Linking,
+  Alert,
+} from 'react-native';
+import {
   NavigationContainer,
   NavigationContainerRef,
   ParamListBase,
@@ -192,24 +199,98 @@ export default function App({
   const navigationReadyRef = useRef(false);
   const pendingDeepLinkRef = useRef<DeepLinkEvent | null>(null);
   const [authSession, setAuthSession] = useState<Session | null>(null);
+  const [resetPasswordToken, setResetPasswordToken] = useState<string | null>(
+    null,
+  );
+  const [isLoadingSession, setIsLoadingSession] = useState(true);
+  const [isRecoverySession, setIsRecoverySession] = useState(false);
 
   useEffect(() => {
+    const checkInitialURL = async () => {
+      const initialUrl = await Linking.getInitialURL();
+      if (initialUrl?.includes('reset-password')) {
+        setIsRecoverySession(true);
+        setResetPasswordToken('recovery');
+      }
+    };
+    checkInitialURL();
+
     supabase.auth.getSession().then(({data: {session}}) => {
       setAuthSession(session);
+      setIsLoadingSession(false);
+      if (session) {
+        Linking.getInitialURL().then(url => {
+          if (url?.includes('reset-password')) {
+            setIsRecoverySession(true);
+            setResetPasswordToken('recovery');
+          }
+        });
+      }
     });
-    supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: {subscription},
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setAuthSession(session);
+      setIsLoadingSession(false);
+      if (event === 'PASSWORD_RECOVERY') {
+        setResetPasswordToken('recovery');
+        setIsRecoverySession(true);
+      }
     });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const processDeepLink = useCallback(
-    (event: DeepLinkEvent) => {
+    async (event: DeepLinkEvent) => {
       const url = event?.url;
       if (!url) {
         return;
       }
 
       try {
+        if (url.includes('reset-password')) {
+          setIsRecoverySession(true);
+          setResetPasswordToken('recovery');
+
+          try {
+            const urlForParsing = url.replace('#', '?');
+            const urlObj = new URL(
+              urlForParsing.replace('braise://', 'https://'),
+            );
+            const accessToken = urlObj.searchParams.get('access_token');
+            const refreshToken = urlObj.searchParams.get('refresh_token');
+            const type = urlObj.searchParams.get('type');
+
+            if (accessToken && refreshToken && type === 'recovery') {
+              const {error: sessionError} = await supabase.auth.setSession({
+                access_token: accessToken,
+                refresh_token: refreshToken,
+              });
+
+              if (sessionError) {
+                Alert.alert('Error', 'Invalid or expired reset link');
+              }
+            } else {
+              const code = urlObj.searchParams.get('code');
+              if (code) {
+                const {error: exchangeError} =
+                  await supabase.auth.exchangeCodeForSession(code);
+                if (exchangeError) {
+                  Alert.alert('Error', 'Invalid or expired reset link');
+                }
+              }
+            }
+          } catch (parseError) {
+            // Continue - might still work with server-side verification
+          }
+
+          onConsumeDeepLink?.();
+          return;
+        }
+
         const match = url.match(/braise:\/\/import\?data=(.*)/);
         if (match && match[1]) {
           const encodedData = match[1];
@@ -229,11 +310,9 @@ export default function App({
             }),
           );
           onConsumeDeepLink?.();
-        } else {
-          console.warn('⚠️ No data param found in deep link');
         }
       } catch (err) {
-        console.error('❌ Failed to parse deep link recipe JSON:', err);
+        // Silently fail for deep link parsing errors
       }
     },
     [onConsumeDeepLink],
@@ -241,6 +320,13 @@ export default function App({
 
   useEffect(() => {
     if (!pendingDeepLink) {
+      return;
+    }
+
+    const url = pendingDeepLink?.url;
+    if (url?.includes('reset-password')) {
+      processDeepLink(pendingDeepLink);
+      onConsumeDeepLink?.();
       return;
     }
 
@@ -255,7 +341,11 @@ export default function App({
 
   return (
     <ThemeProvider theme={LightTheme}>
-      {authSession?.user ? (
+      {isLoadingSession ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={LightTheme.colors.primary} />
+        </View>
+      ) : authSession?.user && !isRecoverySession ? (
         <OnboardingProvider>
           <GroceryListModalProvider>
             <NavigationContainer
@@ -332,8 +422,23 @@ export default function App({
           </GroceryListModalProvider>
         </OnboardingProvider>
       ) : (
-        <Auth />
+        <Auth
+          resetPasswordToken={resetPasswordToken}
+          onPasswordResetComplete={() => {
+            setResetPasswordToken(null);
+            setIsRecoverySession(false);
+          }}
+        />
       )}
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: LightTheme.colors.background,
+  },
+});

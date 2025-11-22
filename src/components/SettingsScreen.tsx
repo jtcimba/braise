@@ -75,7 +75,7 @@ const styles = (colors: any) =>
     signOutButton: {
       backgroundColor: colors.primary,
       padding: 10,
-      borderRadius: 25,
+      borderRadius: 8,
       width: '100%',
       alignItems: 'center',
     },

@@ -108,7 +108,7 @@ const styles = (theme: Theme) =>
       height: 36,
       borderWidth: 1,
       borderColor: theme.colors.border,
-      borderRadius: 7,
+      borderRadius: 8,
       paddingHorizontal: 12,
       paddingRight: 40,
       color: theme.colors.text,

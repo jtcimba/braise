@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   },
   tooltip: {
     position: 'absolute',
-    borderRadius: 12,
+    borderRadius: 8,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   skipButton: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 8,
     borderWidth: 1,
   },
   skipText: {
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   nextButton: {
     paddingHorizontal: 24,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 8,
   },
   nextText: {
     fontSize: 14,
