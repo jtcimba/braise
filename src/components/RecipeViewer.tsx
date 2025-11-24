@@ -15,9 +15,6 @@ import {WebView} from 'react-native-webview';
 import ServingsPickerModal from './ServingsPickerModal';
 import {parseIngredient, scaleIngredients} from '../services';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {useOnboarding} from '../context/OnboardingContext';
-import {useOnboardingTarget} from '../hooks/useOnboardingTarget';
-import OnboardingTooltip from './OnboardingTooltip';
 
 // Ignore WebView errors
 LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
@@ -31,11 +28,6 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   const [scaledIngredients, setScaledIngredients] = useState(
     data.ingredients || '',
   );
-
-  const {isOnboardingActive, currentStep, steps, completeOnboarding} =
-    useOnboarding();
-  const {targetRef: completeTargetRef, measureTarget: measureCompleteTarget} =
-    useOnboardingTarget('complete');
 
   const handleServingsConfirm = (newServings: string) => {
     const newScaledIngredients = scaleIngredients(
@@ -88,18 +80,6 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
     }
   }, [data.servings]);
 
-  useEffect(() => {
-    if (isOnboardingActive && currentStep === 4) {
-      console.log('measuring complete target');
-      setTimeout(() => {
-        measureCompleteTarget();
-      }, 1000);
-    }
-  }, [isOnboardingActive, currentStep, measureCompleteTarget]);
-
-  const currentStepData = steps[currentStep];
-  const showCompleteTooltip = isOnboardingActive && currentStep === 4;
-
   return (
     <View style={styles(theme).container}>
       {isWebView ? (
@@ -112,13 +92,11 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
           style={styles(theme).contentContainer}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles(theme).scrollContentContainer}>
-          <View ref={completeTargetRef}>
-            <View style={styles(theme).headerContainer}>
-              <Text style={styles(theme).title}>{data.title}</Text>
-              {data.author && (
-                <Text style={styles(theme).author}>{data.author}</Text>
-              )}
-            </View>
+          <View style={styles(theme).headerContainer}>
+            <Text style={styles(theme).title}>{data.title}</Text>
+            {data.author && (
+              <Text style={styles(theme).author}>{data.author}</Text>
+            )}
           </View>
           <View style={styles(theme).imageContainer}>
             <Image
@@ -277,17 +255,6 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
         onConfirm={handleServingsConfirm}
         currentValue={currentServings.toString()}
       />
-      {showCompleteTooltip && currentStepData?.targetPosition && (
-        <OnboardingTooltip
-          visible={true}
-          title={currentStepData.title}
-          description={currentStepData.description}
-          targetPosition={currentStepData.targetPosition}
-          onNext={() => completeOnboarding()}
-          onSkip={() => completeOnboarding()}
-          isLastStep={currentStep === steps.length - 1}
-        />
-      )}
     </View>
   );
 }

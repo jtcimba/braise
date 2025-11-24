@@ -1,13 +1,10 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import {useNavigation, ParamListBase} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Recipe} from '../models';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
-import {useOnboarding} from '../context/OnboardingContext';
-import {useOnboardingTarget} from '../hooks/useOnboardingTarget';
-import OnboardingTooltip from './OnboardingTooltip';
 import {useAppDispatch} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
 
@@ -15,23 +12,6 @@ export default function AddScreen() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
   const theme = useTheme() as unknown as Theme;
-
-  // Onboarding
-  const {isOnboardingActive, currentStep, steps, nextStep, skipOnboarding} =
-    useOnboarding();
-  const {
-    targetRef: fromUrlButtonTargetRef,
-    measureTarget: measureFromUrlButtonTarget,
-  } = useOnboardingTarget('from_url_button');
-
-  // Measure from URL button target when onboarding step 2 is active
-  useEffect(() => {
-    if (isOnboardingActive && currentStep === 1) {
-      setTimeout(() => {
-        measureFromUrlButtonTarget();
-      }, 500);
-    }
-  }, [isOnboardingActive, currentStep, measureFromUrlButtonTarget]);
 
   const newRecipe: Recipe = {
     id: '',
@@ -64,26 +44,12 @@ export default function AddScreen() {
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        ref={fromUrlButtonTargetRef}
         onPress={() => navigation.navigate('AddFromBrowser')}
         style={styles(theme).button}>
         <View style={styles(theme).buttonContent}>
           <Text style={styles(theme).text}>From browser</Text>
         </View>
       </TouchableOpacity>
-
-      {/* Onboarding Tooltip */}
-      {isOnboardingActive && currentStep === 1 && steps[1]?.targetPosition && (
-        <OnboardingTooltip
-          visible={true}
-          title={steps[1].title}
-          description={steps[1].description}
-          targetPosition={steps[1].targetPosition}
-          onNext={nextStep}
-          onSkip={skipOnboarding}
-          isLastStep={currentStep === steps.length - 1}
-        />
-      )}
     </View>
   );
 }

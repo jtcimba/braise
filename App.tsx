@@ -35,8 +35,7 @@ import {
   OnboardingProvider,
   useOnboarding,
 } from './src/context/OnboardingContext';
-import {useOnboardingTarget} from './src/hooks/useOnboardingTarget';
-import OnboardingTooltip from './src/components/OnboardingTooltip';
+import OnboardingModal from './src/components/OnboardingModal';
 import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
@@ -97,22 +96,7 @@ function AddStackNavigator() {
 
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
-  const {isOnboardingActive, currentStep, steps, nextStep, skipOnboarding} =
-    useOnboarding();
-  const {targetRef: addButtonTargetRef, measureTarget: measureAddButtonTarget} =
-    useOnboardingTarget('welcome');
-
-  // Measure add button target when onboarding step 0 is active
-  React.useEffect(() => {
-    if (isOnboardingActive && currentStep === 0) {
-      setTimeout(() => {
-        measureAddButtonTarget();
-      }, 500);
-    }
-  }, [isOnboardingActive, currentStep, measureAddButtonTarget]);
-
-  const currentStepData = steps[currentStep];
-  const showAddButtonTooltip = isOnboardingActive && currentStep === 0;
+  const {showOnboardingModal, completeOnboarding} = useOnboarding();
 
   return (
     <>
@@ -122,7 +106,6 @@ function TabNavigator({navigation}: {navigation: any}) {
           tabBarIcon: ({color, size}) => {
             return (
               <TabBarIcon
-                ref={route.name === 'Add' ? addButtonTargetRef : undefined}
                 name={route.name}
                 color={color}
                 size={size}
@@ -169,17 +152,10 @@ function TabNavigator({navigation}: {navigation: any}) {
         />
       </Tab.Navigator>
 
-      {showAddButtonTooltip && currentStepData?.targetPosition && (
-        <OnboardingTooltip
-          visible={true}
-          title={currentStepData.title}
-          description={currentStepData.description}
-          targetPosition={currentStepData.targetPosition}
-          onNext={nextStep}
-          onSkip={skipOnboarding}
-          isLastStep={currentStep === steps.length - 1}
-        />
-      )}
+      <OnboardingModal
+        visible={showOnboardingModal}
+        onClose={completeOnboarding}
+      />
     </>
   );
 }
