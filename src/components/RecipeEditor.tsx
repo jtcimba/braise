@@ -326,14 +326,20 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 visible={servingsModalVisible}
                 onClose={() => setServingsModalVisible(false)}
                 onConfirm={handleServingsUpdate}
-                currentValue={editingData.servings.toString()}
+                currentValue={
+                  editingData.servings ? editingData.servings.toString() : ''
+                }
               />
 
               <TotalTimePickerModal
                 visible={totalTimeModalVisible}
                 onClose={() => setTotalTimeModalVisible(false)}
                 onConfirm={handleTotalTimeUpdate}
-                currentTime={editingData.total_time.toString()}
+                currentTime={
+                  editingData.total_time
+                    ? editingData.total_time.toString()
+                    : ''
+                }
                 currentUnit={editingData.total_time_unit}
               />
             </View>

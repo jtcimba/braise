@@ -45,13 +45,16 @@ class ActionViewController: UIViewController {
                         let html = results["html"] as? String ?? ""
                         let url = results["url"] as? String ?? ""
                         let title = results["title"] as? String ?? ""
-                        
+                        let jsonLd = results["jsonLd"] as? [String] ?? []
+                        let textLength = results["text_length"] as? Int ?? 0
                         print("✅ HTML length:", html.count)
                         print("✅ URL:", url)
                         print("✅ Title:", title)
+                        print("✅ JSON-LD length:", jsonLd.count)
+                        print("✅ Text length:", textLength)
                         
                         // Call your backend
-                        self.sendToBackend(html: html, url: url, title: title)
+                        self.sendToBackend(html: html, url: url, title: title, jsonLd: jsonLd, textLength: textLength)
                     } else {
                         print("❌ Failed to find NSExtensionJavaScriptPreprocessingResultsKey")
                         self.handleUserFacingFailure()
@@ -66,7 +69,7 @@ class ActionViewController: UIViewController {
     }
 
   // MARK: - Send to backend
-  private func sendToBackend(html: String, url: String, title: String) {
+  private func sendToBackend(html: String, url: String, title: String, jsonLd: [String], textLength: Int) {
       print("📤 Sending to Lambda…")
       guard let endpoint = URL(string: "https://i1ylo3n8sl.execute-api.us-east-1.amazonaws.com/prod/recipes/import-recipe-from-browser") else {
           handleUserFacingFailure()
@@ -80,7 +83,9 @@ class ActionViewController: UIViewController {
       let payload: [String: Any] = [
           "html": html,
           "url": url,
-          "title": title
+          "title": title,
+          "jsonLd": jsonLd.joined(separator: "\n"),
+          "text_length": textLength
       ]
 
       do {

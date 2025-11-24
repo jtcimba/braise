@@ -9,14 +9,13 @@ import {
 } from 'react-native';
 import {useAppSelector} from '../redux/hooks';
 import {useEditingHandler} from '../context/EditingHandlerContext';
-import {supabase} from '../supabase-client';
 import RecipeViewer from './RecipeViewer';
 import RecipeEditor from './RecipeEditor';
 import GroceryListModal from './GroceryListModal';
-import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import DetailsMenuHeader from './DetailsMenuHeader';
+import {recipeService} from '../services';
 
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -73,100 +72,17 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const handleSavePress = useCallback(async () => {
     setIsLoading(true);
     try {
-      const userId = await supabase.auth
-        .getUser()
-        .then(({data: {user}}) => user?.id);
-
-      if (!userId) {
-        throw new Error('User not authenticated');
-      }
-
       const isNewRecipe = !editingData.id || editingData.id === '';
+      const savedRecipe = isNewRecipe
+        ? await recipeService.createRecipe(editingData)
+        : await recipeService.updateRecipe(editingData);
 
-      if (isNewRecipe) {
-        const {data: newRecipe, error: insertError} = await supabase
-          .from('recipes')
-          .insert({
-            ...editingData,
-            ingredients: editingData.ingredients?.replace(/\\n$/, ''),
-            user_id: userId,
-          })
-          .select()
-          .single();
-
-        if (insertError) {
-          throw insertError;
-        }
-
-        // Process newlines in the response
-        if (newRecipe.ingredients) {
-          newRecipe.ingredients = newRecipe.ingredients.replace(/\\n/g, '\n');
-        }
-        if (newRecipe.instructions) {
-          newRecipe.instructions = newRecipe.instructions.replace(/\\n/g, '\n');
-        }
-
-        const localRecipes = await Storage.loadRecipesFromLocal();
-        localRecipes.push(newRecipe);
-        await Storage.saveRecipesToLocal(localRecipes);
-
-        onChangeData(newRecipe);
-        onChangeEditingData(newRecipe);
-        setScaledIngredients(newRecipe.ingredients || '');
-      } else {
-        const {error: updateError} = await supabase
-          .from('recipes')
-          .update({
-            ...editingData,
-            ingredients: editingData.ingredients?.replace(/\\n$/, ''),
-          })
-          .eq('id', editingData.id);
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        const {data: updatedRecipe, error: fetchError} = await supabase
-          .from('recipes')
-          .select('*')
-          .eq('id', editingData.id)
-          .single();
-
-        if (fetchError) {
-          throw fetchError;
-        }
-
-        // Process newlines in the response
-        if (updatedRecipe.ingredients) {
-          updatedRecipe.ingredients = updatedRecipe.ingredients.replace(
-            /\\n/g,
-            '\n',
-          );
-        }
-        if (updatedRecipe.instructions) {
-          updatedRecipe.instructions = updatedRecipe.instructions.replace(
-            /\\n/g,
-            '\n',
-          );
-        }
-
-        console.log('updatedRecipe', updatedRecipe);
-
-        onChangeData(updatedRecipe);
-        onChangeEditingData(updatedRecipe);
-        setScaledIngredients(updatedRecipe.ingredients || '');
-
-        const localRecipes = await Storage.loadRecipesFromLocal();
-        const updatedRecipes = localRecipes.map((recipe: {id: any}) =>
-          recipe.id === updatedRecipe.id ? updatedRecipe : recipe,
-        );
-        await Storage.saveRecipesToLocal(updatedRecipes);
-      }
-
+      onChangeData(savedRecipe);
+      onChangeEditingData(savedRecipe);
+      setScaledIngredients(savedRecipe.ingredients || '');
       showSavedMessageTemporarily();
     } catch (e: any) {
-      console.log('save error', e.message);
-      Alert.alert('Error', 'Failed to save recipe');
+      Alert.alert('Error', e.message || 'Failed to save recipe');
     } finally {
       setIsLoading(false);
     }
@@ -175,26 +91,12 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const handleDeletePress = useCallback(async () => {
     setIsLoading(true);
     try {
-      const {error} = await supabase
-        .from('recipes')
-        .delete()
-        .eq('id', editingData.id);
-
-      if (error) {
-        throw error;
-      }
-
-      const localRecipes = await Storage.loadRecipesFromLocal();
-      const updatedRecipes = localRecipes.filter(
-        (recipe: {id: any}) => recipe.id !== editingData.id,
-      );
-      await Storage.saveRecipesToLocal(updatedRecipes);
+      await recipeService.deleteRecipe(editingData.id);
+      navigation.navigate('Recipes', {refresh: true});
     } catch (e: any) {
-      console.log('delete error', e.message);
-      Alert.alert('Error', 'Failed to delete recipe');
+      Alert.alert('Error', e.message || 'Failed to delete recipe');
     } finally {
       setIsLoading(false);
-      navigation.navigate('Recipes', {refresh: true});
     }
   }, [editingData.id, navigation]);
 
@@ -242,7 +144,13 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   }, [navigation, headerRightComponent, viewMode]);
 
   useEffect(() => {
-    if (route?.params?.shouldAutoSave && !autoSaveTriggeredRef.current) {
+    if (
+      route?.params?.shouldAutoSave &&
+      !autoSaveTriggeredRef.current &&
+      (!editingData.id || editingData.id === '')
+    ) {
+      // Only auto-save if this is a new recipe (no ID)
+      // This prevents duplicate saves of existing recipes
       autoSaveTriggeredRef.current = true;
       handleSavePress();
       navigation.setParams({
@@ -250,7 +158,13 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
         shouldAutoSave: false,
       });
     }
-  }, [route.params?.shouldAutoSave, handleSavePress, navigation, route.params]);
+  }, [
+    route.params?.shouldAutoSave,
+    handleSavePress,
+    navigation,
+    route.params,
+    editingData.id,
+  ]);
 
   return (
     <View style={styles(theme).container}>

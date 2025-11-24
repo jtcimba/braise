@@ -13,7 +13,7 @@ import ListItem from './ListItem';
 import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import SearchAndFilters from './SearchAndFilters';
-import {supabase} from '../supabase-client';
+import {recipeService} from '../services';
 
 type Route = {
   route: {params: {refresh: boolean}};
@@ -56,23 +56,20 @@ export default function RecipesScreen({route}: Route) {
   };
 
   const fetchRecipes = useCallback(async () => {
-    const userId = await supabase.auth
-      .getUser()
-      .then(({data: {user}}) => user?.id);
-    supabase
-      .from('recipes')
-      .select('*')
-      .eq('user_id', userId)
-      .then(({data: recipesData, error}) => {
-        if (error) {
-          console.error('Failed to fetch recipes', error);
-          Alert.alert('Error', 'Failed to fetch recipes.');
-        } else {
-          setData(recipesData);
-          setFilteredData(recipesData);
-        }
-      });
+    try {
+      const recipes = await recipeService.fetchRecipes();
+      setData(recipes);
+      setFilteredData(recipes);
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to fetch recipes.');
+    }
   }, []);
+
+  useEffect(() => {
+    if (route.params?.refresh) {
+      fetchRecipes();
+    }
+  }, [route, fetchRecipes]);
 
   useEffect(() => {
     setLoading(true);

@@ -297,18 +297,45 @@ export default function App({
           const decoded = decodeURIComponent(encodedData);
           const recipe = JSON.parse(decoded);
 
-          navigationRef.current?.dispatch(
-            CommonActions.navigate({
-              name: 'RecipeDetailsScreen',
-              params: {
-                item: {
-                  ...recipe,
+          const state = navigationRef.current?.getState();
+          const currentRoute = state?.routes[state.index || 0];
+          const isAlreadyOnDetailsScreen =
+            currentRoute?.name === 'RecipeDetailsScreen';
+
+          if (isAlreadyOnDetailsScreen && state) {
+            // Go back first to remove the old RecipeDetailsScreen from stack
+            // Then navigate to the new one to prevent duplicate instances
+            navigationRef.current?.dispatch(CommonActions.goBack());
+            // Use requestAnimationFrame to ensure goBack completes before navigate
+            requestAnimationFrame(() => {
+              navigationRef.current?.dispatch(
+                CommonActions.navigate({
+                  name: 'RecipeDetailsScreen',
+                  params: {
+                    item: {
+                      ...recipe,
+                    },
+                    shouldAutoSave: true,
+                  },
+                  key: `RecipeDetailsScreen-${Date.now()}`,
+                }),
+              );
+            });
+          } else {
+            // Navigate normally if not already on RecipeDetailsScreen
+            navigationRef.current?.dispatch(
+              CommonActions.navigate({
+                name: 'RecipeDetailsScreen',
+                params: {
+                  item: {
+                    ...recipe,
+                  },
+                  shouldAutoSave: true,
                 },
-                shouldAutoSave: true,
-              },
-              key: `RecipeDetailsScreen-${Date.now()}`,
-            }),
-          );
+                key: `RecipeDetailsScreen-${Date.now()}`,
+              }),
+            );
+          }
           onConsumeDeepLink?.();
         }
       } catch (err) {
