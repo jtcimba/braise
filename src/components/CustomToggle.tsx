@@ -61,11 +61,7 @@ const styles = (theme: Theme, textStyle?: string) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
-    selectedOption: {
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.text,
-      paddingBottom: textStyle === 'body' ? 4 : 6,
-    },
+    selectedOption: {},
     baseText: {
       color: theme.colors.text,
     },
@@ -75,6 +71,5 @@ const styles = (theme: Theme, textStyle?: string) =>
     },
     unselectedText: {
       color: theme.colors.subtext,
-      paddingBottom: textStyle === 'body' ? 1 : 3,
     },
   });

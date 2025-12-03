@@ -57,10 +57,10 @@ export default function InstructionsEditor({
 
   const customCodeBlockCSS = `      
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+        font-family: 'Crimson Text', sans-serif;
         font-size: 1rem;
-        background-color: #F6F6F4;
-        color: #2D2D2D;
+        background-color: #FFFBF3;
+        color: #000000;
         line-height: 1.5;
       }
     `;
@@ -147,7 +147,7 @@ const styles = (theme: any) =>
       marginBottom: 10,
     },
     headerText: {
-      color: theme.colors.text,
+      color: theme.colors.subtext,
       ...theme.typography.h2,
     },
   });

@@ -109,7 +109,6 @@ const styles = (theme: Theme) =>
     chipText: {
       color: theme.colors.text,
       ...theme.typography.h5,
-      lineHeight: 15,
       textAlignVertical: 'center',
       includeFontPadding: false,
     },

@@ -34,7 +34,6 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 15,
       paddingVertical: 4,
       borderRadius: 15,
-      backgroundColor: theme.colors.border,
       marginRight: 6,
     },
     selectedChip: {

@@ -614,12 +614,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 8,
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   verticallySpaced: {
     paddingTop: 4,
@@ -631,14 +631,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   input: {
     borderWidth: 1,
     borderRadius: 8,
     padding: 14,
     fontSize: 16,
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   button: {
     padding: 16,
@@ -655,7 +655,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   linkButton: {
     alignSelf: 'flex-end',
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   linkText: {
     fontSize: 14,
     fontWeight: '600',
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   switchView: {
     flexDirection: 'row',
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   },
   switchText: {
     fontSize: 14,
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   successContainer: {
     alignItems: 'center',
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 16,
-    fontFamily: 'Satoshi Variable',
+    fontFamily: 'Hanken Grotesk',
   },
   mt20: {
     marginTop: 20,

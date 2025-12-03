@@ -12,13 +12,14 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		231998A52EE0EF5B0099F221 /* RecipeImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2319989B2EE0EF5B0099F221 /* RecipeImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		23C579B72EBC14F000CBC713 /* UniformTypeIdentifiers.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23C579B62EBC14F000CBC713 /* UniformTypeIdentifiers.framework */; };
 		23C579C32EBC14F000CBC713 /* RecipeActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 23C579B52EBC14EF00CBC713 /* RecipeActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		23F9559B2BEEE2CD00A94A19 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 23F955882BEEE2CD00A94A19 /* Ionicons.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-braise-braiseTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-braise-braiseTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		C09BDB8B46044C87B8EBCB5C /* Satoshi-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8856D8F716456482EA8776 /* Satoshi-Variable.ttf */; };
-		F30EFE660593420D99AE1313 /* Erode-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A9BCD14426040BA91BB802B /* Erode-Variable.ttf */; };
+		C09BDB8B46044C87B8EBCB5C /* Hanken-Grotesk.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */; };
+		F30EFE660593420D99AE1313 /* Crimson-Text-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +29,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = braise;
+		};
+		231998A32EE0EF5B0099F221 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2319989A2EE0EF5B0099F221;
+			remoteInfo = RecipeImportShareExtension;
 		};
 		23A880FA2E04329E00D15E39 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -59,6 +67,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				231998A52EE0EF5B0099F221 /* RecipeImportShareExtension.appex in Embed Foundation Extensions */,
 				23C579C32EBC14F000CBC713 /* RecipeActionExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -77,6 +86,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = braise/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = braise/main.m; sourceTree = "<group>"; };
 		19F6CBCC0A4E27FBF8BF4A61 /* libPods-braise-braiseTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-braise-braiseTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2319989B2EE0EF5B0099F221 /* RecipeImportShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RecipeImportShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		23A880ED2E04329C00D15E39 /* braise2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = braise2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		23A880F92E04329E00D15E39 /* braise2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = braise2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		23A881032E04329E00D15E39 /* braise2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = braise2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,14 +97,21 @@
 		5709B34CF0A7D63546082F79 /* Pods-braise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise.release.xcconfig"; path = "Target Support Files/Pods-braise/Pods-braise.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-braise-braiseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise-braiseTests.debug.xcconfig"; path = "Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-braise.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-braise.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6A9BCD14426040BA91BB802B /* Erode-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Erode-Variable.ttf"; path = "../src/assets/fonts/Erode-Variable.ttf"; sourceTree = "<group>"; };
+		6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Crimson-Text-Regular.ttf"; path = "../src/assets/fonts/Crimson-Text-Regular.ttf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = braise/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-braise-braiseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise-braiseTests.release.xcconfig"; path = "Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FF8856D8F716456482EA8776 /* Satoshi-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Satoshi-Variable.ttf"; path = "../src/assets/fonts/Satoshi-Variable.ttf"; sourceTree = "<group>"; };
+		FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hanken-Grotesk.ttf"; path = "../src/assets/fonts/Hanken-Grotesk.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		231998A62EE0EF5B0099F221 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 2319989A2EE0EF5B0099F221 /* RecipeImportShareExtension */;
+		};
 		23C579C72EBC14F000CBC713 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -105,6 +122,7 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		2319989C2EE0EF5B0099F221 /* RecipeImportShareExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (231998A62EE0EF5B0099F221 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = RecipeImportShareExtension; sourceTree = "<group>"; };
 		23C579B82EBC14F000CBC713 /* RecipeActionExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (23C579C72EBC14F000CBC713 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = RecipeActionExtension; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -122,6 +140,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-braise.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		231998982EE0EF5B0099F221 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,6 +246,7 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* braiseTests */,
 				23C579B82EBC14F000CBC713 /* RecipeActionExtension */,
+				2319989C2EE0EF5B0099F221 /* RecipeImportShareExtension */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -240,6 +266,7 @@
 				23A880F92E04329E00D15E39 /* braise2Tests.xctest */,
 				23A881032E04329E00D15E39 /* braise2UITests.xctest */,
 				23C579B52EBC14EF00CBC713 /* RecipeActionExtension.appex */,
+				2319989B2EE0EF5B0099F221 /* RecipeImportShareExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -247,8 +274,8 @@
 		9651252CF9884FC6BFBFE597 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6A9BCD14426040BA91BB802B /* Erode-Variable.ttf */,
-				FF8856D8F716456482EA8776 /* Satoshi-Variable.ttf */,
+				6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */,
+				FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -305,11 +332,34 @@
 			);
 			dependencies = (
 				23C579C22EBC14F000CBC713 /* PBXTargetDependency */,
+				231998A42EE0EF5B0099F221 /* PBXTargetDependency */,
 			);
 			name = braise;
 			productName = braise;
 			productReference = 13B07F961A680F5B00A75B9A /* braise.app */;
 			productType = "com.apple.product-type.application";
+		};
+		2319989A2EE0EF5B0099F221 /* RecipeImportShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 231998A72EE0EF5B0099F221 /* Build configuration list for PBXNativeTarget "RecipeImportShareExtension" */;
+			buildPhases = (
+				231998972EE0EF5B0099F221 /* Sources */,
+				231998982EE0EF5B0099F221 /* Frameworks */,
+				231998992EE0EF5B0099F221 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				2319989C2EE0EF5B0099F221 /* RecipeImportShareExtension */,
+			);
+			name = RecipeImportShareExtension;
+			packageProductDependencies = (
+			);
+			productName = RecipeImportShareExtension;
+			productReference = 2319989B2EE0EF5B0099F221 /* RecipeImportShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		23A880EC2E04329C00D15E39 /* braise2 */ = {
 			isa = PBXNativeTarget;
@@ -392,7 +442,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 2600;
+				LastSwiftUpdateCheck = 2610;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -401,6 +451,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+					};
+					2319989A2EE0EF5B0099F221 = {
+						CreatedOnToolsVersion = 26.1.1;
 					};
 					23A880EC2E04329C00D15E39 = {
 						CreatedOnToolsVersion = 16.4;
@@ -437,6 +490,7 @@
 				23A880F82E04329E00D15E39 /* braise2Tests */,
 				23A881022E04329E00D15E39 /* braise2UITests */,
 				23C579B42EBC14EF00CBC713 /* RecipeActionExtension */,
+				2319989A2EE0EF5B0099F221 /* RecipeImportShareExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -456,8 +510,15 @@
 				23F9559B2BEEE2CD00A94A19 /* Ionicons.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F30EFE660593420D99AE1313 /* Erode-Variable.ttf in Resources */,
-				C09BDB8B46044C87B8EBCB5C /* Satoshi-Variable.ttf in Resources */,
+				F30EFE660593420D99AE1313 /* Crimson-Text-Regular.ttf in Resources */,
+				C09BDB8B46044C87B8EBCB5C /* Hanken-Grotesk.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		231998992EE0EF5B0099F221 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -656,6 +717,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		231998972EE0EF5B0099F221 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		23A880E92E04329C00D15E39 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -691,6 +759,11 @@
 			isa = PBXTargetDependency;
 			target = 13B07F861A680F5B00A75B9A /* braise */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
+		};
+		231998A42EE0EF5B0099F221 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2319989A2EE0EF5B0099F221 /* RecipeImportShareExtension */;
+			targetProxy = 231998A32EE0EF5B0099F221 /* PBXContainerItemProxy */;
 		};
 		23A880FB2E04329E00D15E39 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -814,6 +887,93 @@
 				PRODUCT_NAME = braise;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		231998A82EE0EF5B0099F221 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 5HK264ADU8;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RecipeImportShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RecipeImportShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.braise.RecipeImportShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		231998A92EE0EF5B0099F221 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 5HK264ADU8;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RecipeImportShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RecipeImportShareExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.braise.RecipeImportShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1049,12 +1209,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5HK264ADU8;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RecipeActionExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Import to Braise";
+				INFOPLIST_KEY_CFBundleDisplayName = "Add to Braise";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1094,12 +1255,13 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 5HK264ADU8;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RecipeActionExtension/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Import to Braise";
+				INFOPLIST_KEY_CFBundleDisplayName = "Add to Braise";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1285,6 +1447,15 @@
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		231998A72EE0EF5B0099F221 /* Build configuration list for PBXNativeTarget "RecipeImportShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				231998A82EE0EF5B0099F221 /* Debug */,
+				231998A92EE0EF5B0099F221 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

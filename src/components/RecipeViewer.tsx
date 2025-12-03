@@ -302,7 +302,7 @@ const styles = (theme: any) =>
       color: theme.colors.text,
     },
     author: {
-      ...theme.typography.h5,
+      ...theme.typography.b1,
       color: theme.colors.primary,
     },
     host: {
@@ -314,12 +314,6 @@ const styles = (theme: any) =>
       ...theme.typography.h5,
       color: theme.colors.subtext,
       overflow: 'hidden',
-    },
-    sectionTitle: {
-      ...theme.typography.h3,
-      marginTop: 25,
-      marginBottom: 10,
-      color: theme.colors.subtext,
     },
     instructionsContainer: {
       paddingHorizontal: 20,
@@ -366,13 +360,12 @@ const styles = (theme: any) =>
       paddingVertical: 10,
     },
     lineNumber: {
-      ...theme.typography.h4,
+      ...theme.typography.b1,
       marginRight: 10,
       color: theme.colors.primary,
-      marginTop: 2,
     },
     lineText: {
-      ...theme.typography.h5,
+      ...theme.typography.b1,
       flex: 1,
       alignSelf: 'flex-start',
       color: theme.colors.text,
@@ -413,14 +406,14 @@ const styles = (theme: any) =>
     },
     tagPillText: {
       color: theme.colors.subtext,
-      ...theme.typography.h4,
+      ...theme.typography.h5,
     },
     tabBarContainer: {
       marginVertical: 10,
       width: '100%',
     },
     aboutText: {
-      ...theme.typography.h5,
+      ...theme.typography.b2,
       color: theme.colors.text,
       marginVertical: 5,
     },

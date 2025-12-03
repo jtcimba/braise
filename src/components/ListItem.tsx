@@ -57,7 +57,7 @@ const styles = (theme: any) =>
     author: {
       overflow: 'hidden',
       ...theme.typography.h5,
-      color: theme.colors.primary,
+      color: theme.colors.subtext,
     },
     subtextContainer: {
       flexDirection: 'row',

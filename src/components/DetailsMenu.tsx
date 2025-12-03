@@ -20,7 +20,7 @@ export default function DetailsMenu({
   ingredients = '',
   routeData = {},
 }: DetailsMenuProps) {
-  const {colors} = useTheme() as unknown as Theme;
+  const theme = useTheme() as unknown as Theme;
   const [modalVisible, setmodalVisible] = useState(false);
   const viewMode = useAppSelector(state => state.viewMode.value);
   const dispatch = useAppDispatch();
@@ -73,28 +73,29 @@ export default function DetailsMenu({
   return (
     <>
       {viewMode === 'view' && (
-        <View style={styles(colors).container}>
+        <View style={styles(theme).container}>
           <TouchableOpacity onPress={() => setmodalVisible(true)}>
-            <Ionicons name="ellipsis-horizontal" size={25} color="#2D2D2D" />
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={25}
+              color={theme.colors.text}
+            />
           </TouchableOpacity>
         </View>
       )}
       {viewMode !== 'view' && (
-        <View style={styles(colors).editContainer}>
+        <View style={styles(theme).editContainer}>
           <View
-            style={[styles(colors).container, styles(colors).buttonContainer]}>
+            style={[styles(theme).container, styles(theme).buttonContainer]}>
             <TouchableOpacity onPress={onCancelPress}>
-              <Text style={[styles(colors).text, styles(colors).cancel]}>
+              <Text style={[styles(theme).text, styles(theme).cancel]}>
                 Cancel
               </Text>
             </TouchableOpacity>
           </View>
-          <View
-            style={[styles(colors).container, styles(colors).saveContainer]}>
+          <View style={[styles(theme).container, styles(theme).saveContainer]}>
             <TouchableOpacity onPress={onSavePress}>
-              <Text style={[styles(colors).text, styles(colors).save]}>
-                Save
-              </Text>
+              <Text style={[styles(theme).text, styles(theme).save]}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -104,38 +105,41 @@ export default function DetailsMenu({
         onBackdropPress={() => setmodalVisible(false)}
         onSwipeComplete={() => setmodalVisible(false)}
         swipeDirection={['down']}
-        style={styles(colors).modalOverlay}>
-        <View style={styles(colors).modal}>
-          <View
-            style={[styles(colors).optionsView, styles(colors).borderBottom]}>
-            <Text style={styles(colors).optionsText}>Options</Text>
-            <View style={[styles(colors).iconContainer]}>
+        style={styles(theme).modalOverlay}>
+        <View style={styles(theme).modal}>
+          <View style={[styles(theme).optionsView, styles(theme).borderBottom]}>
+            <Text style={styles(theme).optionsText}>Options</Text>
+            <View style={[styles(theme).iconContainer]}>
               <TouchableOpacity onPress={() => setmodalVisible(false)}>
-                <Ionicons name="close-outline" size={25} color="#2D2D2D" />
+                <Ionicons
+                  name="close-outline"
+                  size={25}
+                  color={theme.colors.text}
+                />
               </TouchableOpacity>
             </View>
           </View>
           <TouchableOpacity
-            style={styles(colors).modalItem}
+            style={styles(theme).modalItem}
             onPress={onAddToGroceryListPress}>
-            <Ionicons name="list" size={18} style={styles(colors).icon} />
-            <Text style={styles(colors).editText}>Add to Grocery List</Text>
+            <Ionicons name="list" size={18} style={styles(theme).icon} />
+            <Text style={styles(theme).editText}>Add to Grocery List</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles(colors).modalItem}
+            style={styles(theme).modalItem}
             onPress={onEditPress}>
-            <Ionicons name="pencil" size={18} style={styles(colors).icon} />
-            <Text style={styles(colors).editText}>Edit</Text>
+            <Ionicons name="pencil" size={18} style={styles(theme).icon} />
+            <Text style={styles(theme).editText}>Edit</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles(colors).modalItem]}
+            style={[styles(theme).modalItem]}
             onPress={onDeletePress}>
             <Ionicons
               name="trash-outline"
               size={18}
-              style={[styles(colors).icon, styles(colors).deleteIcon]}
+              style={[styles(theme).icon, styles(theme).deleteIcon]}
             />
-            <Text style={styles(colors).deleteText}>Delete Recipe</Text>
+            <Text style={styles(theme).deleteText}>Delete Recipe</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -143,7 +147,7 @@ export default function DetailsMenu({
   );
 }
 
-const styles = (colors: any) =>
+const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       borderRadius: 48,
@@ -154,11 +158,11 @@ const styles = (colors: any) =>
     },
     buttonContainer: {
       minWidth: 70,
-      backgroundColor: colors.border,
+      backgroundColor: theme.colors.border,
     },
     saveContainer: {
       marginLeft: 10,
-      backgroundColor: colors.primary,
+      backgroundColor: theme.colors.primary,
       color: 'white',
       minWidth: 70,
     },
@@ -171,12 +175,13 @@ const styles = (colors: any) =>
       paddingBottom: 2,
       paddingRight: 7,
       textAlign: 'center',
+      ...theme.typography.h5,
     },
     cancel: {
-      color: colors.text,
+      color: theme.colors.text,
     },
     save: {
-      color: colors.background,
+      color: theme.colors.background,
     },
     modalOverlay: {
       justifyContent: 'flex-end',
@@ -185,7 +190,7 @@ const styles = (colors: any) =>
     modal: {
       width: '100%',
       height: '100%',
-      backgroundColor: colors.background,
+      backgroundColor: theme.colors.background,
       position: 'absolute',
       top: 450,
       zIndex: 12000,
@@ -202,12 +207,12 @@ const styles = (colors: any) =>
     },
     borderBottom: {
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: theme.colors.border,
       paddingBottom: 10,
     },
     borderTop: {
       borderTopWidth: 1,
-      borderTopColor: colors.border,
+      borderTopColor: theme.colors.border,
       paddingTop: 10,
     },
     modalItem: {
@@ -216,24 +221,23 @@ const styles = (colors: any) =>
       marginVertical: 10,
     },
     optionsText: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: colors.text,
+      ...theme.typography.h3,
+      color: theme.colors.text,
     },
     editText: {
-      fontSize: 16,
-      color: colors.text,
+      ...theme.typography.h5,
+      color: theme.colors.text,
     },
     deleteText: {
-      fontSize: 16,
-      color: colors.notification,
+      ...theme.typography.h5,
+      color: theme.colors.notification,
     },
     deleteIcon: {
-      color: colors.notification,
+      color: theme.colors.notification,
     },
     icon: {
       marginRight: 15,
-      color: colors.text,
+      color: theme.colors.text,
     },
     iconContainer: {
       borderRadius: 48,

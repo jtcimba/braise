@@ -413,7 +413,7 @@ export default function App({
                     headerShadowVisible: false,
                     headerRightContainerStyle: {paddingRight: 15},
                     headerTitleStyle: {
-                      fontFamily: 'Satoshi Variable',
+                      fontFamily: 'Hanken Grotesk',
                       fontSize: 16,
                       fontWeight: 'bold',
                       color: '#2d2d2d',

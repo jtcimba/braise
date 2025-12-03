@@ -2,12 +2,12 @@
   "migIndex": 1,
   "data": [
     {
-      "path": "src/assets/fonts/Erode-Variable.ttf",
-      "sha1": "0f6119af0c1faa5d96daafafbe1d0cd7eed874f1"
+      "path": "src/assets/fonts/Crimson-Text-Regular.ttf",
+      "sha1": "61b3f0d113dcf62c7619aff1bae3a6646286720b"
     },
     {
-      "path": "src/assets/fonts/Satoshi-Variable.ttf",
-      "sha1": "d49872a745842f389bc9d24b73d0a3090fce50b1"
+      "path": "src/assets/fonts/Hanken-Grotesk.ttf",
+      "sha1": "87aabc0204f013e28ff2b76c59ae8e72d28654e1"
     }
   ]
 }

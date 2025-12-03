@@ -49,7 +49,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     (newCategories: string[]) => {
       onChangeEditingData((prevData: any) => ({
         ...prevData,
-        category: newCategories.join(','),
+        categories: newCategories.join(','),
       }));
     },
     [onChangeEditingData],
@@ -166,8 +166,8 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     });
   }, [editingData.image, onChangeEditingData]);
 
-  const categoriesArray = editingData.category
-    ? editingData.category?.split(',').filter((cat: string) => cat.trim())
+  const categoriesArray = editingData.categories
+    ? editingData.categories?.split(',').filter((cat: string) => cat.trim())
     : [];
 
   return (
@@ -448,7 +448,7 @@ const styles = (theme: Theme) =>
       backgroundColor: 'transparent',
     },
     authorInput: {
-      ...theme.typography.h5,
+      ...theme.typography.b1,
       color: theme.colors.primary,
       marginBottom: 5,
       backgroundColor: 'transparent',
@@ -460,8 +460,8 @@ const styles = (theme: Theme) =>
       color: theme.colors.subtext,
     },
     tabBarContainer: {
-      marginTop: 10,
-      marginBottom: 10,
+      marginVertical: 10,
+      width: '100%',
     },
     ingredientsContainer: {
       flex: 1,
@@ -478,7 +478,7 @@ const styles = (theme: Theme) =>
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.h5,
+      ...theme.typography.b1,
       color: theme.colors.text,
       marginTop: 5,
     },
@@ -499,7 +499,7 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
     },
     lineNumber: {
-      ...theme.typography.h5,
+      ...theme.typography.b1,
       marginRight: 10,
       color: theme.colors.subtext,
     },
