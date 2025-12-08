@@ -52,12 +52,15 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
 		<string>Crimson-Text-Regular.ttf</string>
 		<string>Hanken-Grotesk.ttf</string>
+		<string>Erode-Variable.ttf</string>
+		<string>Mango-Grotesque.ttf</string>
+		<string>Satoshi-Variable.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

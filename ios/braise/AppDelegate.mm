@@ -1,7 +1,17 @@
-#import "AppDelegate.h"
+//
+//  AppDelegate.mm
+//  braise
+//
+//  Created by Jake Cimbalista on 12/6/25.
+//
 
+#import "AppDelegate.h"
 #import <React/RCTBundleURLProvider.h>
-#import <React/RCTLinkingManager.h>
+#import <React/RCTBridge.h>
+
+@interface AppDelegate ()
+@property (nonatomic, strong) id pendingRecipe;
+@end
 
 @implementation AppDelegate
 
@@ -12,15 +22,16 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
+  // Check if app was launched from a URL
+  NSURL *url = launchOptions[UIApplicationLaunchOptionsURLKey];
+  if (url) {
+    [self processImportURL:url];
+  }
+
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
-{
-  return [self getBundleURL];
-}
-
-- (NSURL *)getBundleURL
 {
 #if DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
@@ -29,45 +40,76 @@
 #endif
 }
 
-- (BOOL)application:(UIApplication *)application
-            openURL:(NSURL *)url
-            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
-{
-  if ([RCTLinkingManager application:application openURL:url options:options]) {
-    return YES;
+- (void)processImportURL:(NSURL *)url {
+  // Handle deep link: braise://import-complete
+  // Recipe data is stored in App Group UserDefaults, not in the URL
+  if ([url.scheme isEqualToString:@"braise"] && [url.host isEqualToString:@"import-complete"]) {
+    // Read recipe from App Group UserDefaults
+    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.braise.recipe"];
+    if (sharedDefaults) {
+      id recipeObj = [sharedDefaults objectForKey:@"importedRecipe"];
+      if (recipeObj) {
+        // Emit the event with the recipe
+        [self emitImportEvent:recipeObj retryCount:0];
+        // Clear the recipe from UserDefaults after reading
+        [sharedDefaults removeObjectForKey:@"importedRecipe"];
+        [sharedDefaults synchronize];
+      }
+    }
   }
-  return [super application:application openURL:url options:options];
 }
 
-- (BOOL)application:(UIApplication *)application
-            openURL:(NSURL *)url
-  sourceApplication:(NSString *)sourceApplication
-         annotation:(id)annotation
-{
-  if ([RCTLinkingManager application:application
-                             openURL:url
-                   sourceApplication:sourceApplication
-                          annotation:annotation]) {
-    return YES;
+- (void)emitImportEvent:(id)recipeObj retryCount:(int)retryCount {
+  if (self.bridge) {
+    [self.bridge enqueueJSCall:@"RCTDeviceEventEmitter"
+                         method:@"emit"
+                           args:@[@"ImportCompleted", recipeObj]
+                     completion:nil];
+    self.pendingRecipe = nil;
+  } else {
+    // Bridge not ready yet, store recipe and retry (max 10 retries = 5 seconds)
+    if (retryCount < 10) {
+      self.pendingRecipe = recipeObj;
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self emitImportEvent:recipeObj retryCount:retryCount + 1];
+      });
+    } else {
+      NSLog(@"Failed to emit ImportCompleted event - bridge never became ready");
+      self.pendingRecipe = nil;
+    }
   }
-  return [super application:application
-                     openURL:url
-           sourceApplication:sourceApplication
-                  annotation:annotation];
 }
 
-- (BOOL)application:(UIApplication *)application
-continueUserActivity:(NSUserActivity *)userActivity
- restorationHandler:(void (^)(NSArray * _Nullable))restorationHandler
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
-  if ([RCTLinkingManager application:application
-               continueUserActivity:userActivity
-                 restorationHandler:restorationHandler]) {
-    return YES;
+  [self processImportURL:url];
+  return YES;
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+  // Check for imported recipe in UserDefaults when app becomes active
+  // This handles the case where the deep link didn't fire but data was saved
+  NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.braise.recipe"];
+  if (sharedDefaults) {
+    id recipeObj = [sharedDefaults objectForKey:@"importedRecipe"];
+    NSNumber *timestamp = [sharedDefaults objectForKey:@"lastImportedRecipeTimestamp"];
+    
+    // Only process if timestamp is recent (within last 30 seconds)
+    // This prevents processing old data
+    if (recipeObj && timestamp) {
+      NSTimeInterval timeSinceImport = [[NSDate date] timeIntervalSince1970] - [timestamp doubleValue];
+      if (timeSinceImport < 30.0) {
+        NSLog(@"Found recent imported recipe in UserDefaults (%.1f seconds ago), emitting event", timeSinceImport);
+        [self emitImportEvent:recipeObj retryCount:0];
+        // Clear after reading
+        [sharedDefaults removeObjectForKey:@"importedRecipe"];
+        [sharedDefaults removeObjectForKey:@"lastImportedRecipeTimestamp"];
+        [sharedDefaults synchronize];
+      }
+    }
   }
-  return [super application:application
-        continueUserActivity:userActivity
-          restorationHandler:restorationHandler];
+  
+  [super applicationDidBecomeActive:application];
 }
 
 @end

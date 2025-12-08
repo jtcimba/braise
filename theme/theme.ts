@@ -5,13 +5,13 @@ export const typography = {
   h1: {
     fontFamily: 'Hanken Grotesk',
     fontSize: 18,
-    fontWeight: 'semibold',
+    fontWeight: 'bold',
     letterSpacing: 0.2,
   } as TextStyle,
   h2: {
     fontFamily: 'Hanken Grotesk',
     fontSize: 16,
-    fontWeight: 'semibold',
+    fontWeight: 'bold',
     letterSpacing: 0.2,
   } as TextStyle,
   h3: {
@@ -22,7 +22,7 @@ export const typography = {
   } as TextStyle,
   h4: {
     fontFamily: 'Hanken Grotesk',
-    fontWeight: 'semibold',
+    fontWeight: 'bold',
     fontSize: 15,
     letterSpacing: 0.2,
   } as TextStyle,

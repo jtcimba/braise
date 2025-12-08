@@ -1,18 +1,11 @@
 import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {
-  View,
-  ActivityIndicator,
-  StyleSheet,
-  Linking,
-  Alert,
-} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {View, ActivityIndicator, StyleSheet, Linking} from 'react-native';
 import {
   NavigationContainer,
   NavigationContainerRef,
   ParamListBase,
-  CommonActions,
 } from '@react-navigation/native';
 import RecipesScreen from './src/components/RecipesScreen';
 import SettingsScreen from './src/components/SettingsScreen';
@@ -39,8 +32,36 @@ import OnboardingModal from './src/components/OnboardingModal';
 import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
+import {NativeModules, Platform} from 'react-native';
+
+const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Store Supabase credentials in App Group for share extension
+async function storeSupabaseCredentials(session: Session) {
+  if (Platform.OS !== 'ios' || !AppGroupStorage) {
+    return;
+  }
+
+  try {
+    const supabaseURL = process.env.SUPABASE_URL;
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+    if (supabaseURL && supabaseAnonKey && session.access_token) {
+      await AppGroupStorage.setItem('supabaseURL', supabaseURL);
+      await AppGroupStorage.setItem('supabaseAnonKey', supabaseAnonKey);
+      await AppGroupStorage.setItem(
+        'supabaseAccessToken',
+        session.access_token,
+      );
+      await AppGroupStorage.setItem('supabaseUserId', session.user.id);
+      console.log('Stored Supabase credentials in App Group');
+    }
+  } catch (error) {
+    console.error('Failed to store Supabase credentials:', error);
+  }
+}
 
 function AddComponent() {
   return null;
@@ -160,20 +181,11 @@ function TabNavigator({navigation}: {navigation: any}) {
   );
 }
 
-export type DeepLinkEvent = {url: string};
+export type AppProps = {};
 
-type AppProps = {
-  pendingDeepLink?: DeepLinkEvent | null;
-  onConsumeDeepLink?: () => void;
-};
-
-export default function App({
-  pendingDeepLink,
-  onConsumeDeepLink,
-}: AppProps): React.JSX.Element {
+export default function App({}: AppProps): React.JSX.Element {
   const navigationRef = useRef<NavigationContainerRef<ParamListBase>>(null);
   const navigationReadyRef = useRef(false);
-  const pendingDeepLinkRef = useRef<DeepLinkEvent | null>(null);
   const [authSession, setAuthSession] = useState<Session | null>(null);
   const [resetPasswordToken, setResetPasswordToken] = useState<string | null>(
     null,
@@ -191,6 +203,14 @@ export default function App({
     };
     checkInitialURL();
 
+    // Listen for deep links while app is running
+    const linkingSubscription = Linking.addEventListener('url', ({url}) => {
+      if (url.includes('reset-password')) {
+        setIsRecoverySession(true);
+        setResetPasswordToken('recovery');
+      }
+    });
+
     supabase.auth.getSession().then(({data: {session}}) => {
       setAuthSession(session);
       setIsLoadingSession(false);
@@ -201,6 +221,8 @@ export default function App({
             setResetPasswordToken('recovery');
           }
         });
+        // Store Supabase credentials and auth token in App Group for share extension
+        storeSupabaseCredentials(session);
       }
     });
     const {
@@ -212,135 +234,17 @@ export default function App({
         setResetPasswordToken('recovery');
         setIsRecoverySession(true);
       }
+      // Update Supabase credentials when session changes
+      if (session) {
+        storeSupabaseCredentials(session);
+      }
     });
 
     return () => {
       subscription.unsubscribe();
+      linkingSubscription.remove();
     };
   }, []);
-
-  const processDeepLink = useCallback(
-    async (event: DeepLinkEvent) => {
-      const url = event?.url;
-      if (!url) {
-        return;
-      }
-
-      try {
-        if (url.includes('reset-password')) {
-          setIsRecoverySession(true);
-          setResetPasswordToken('recovery');
-
-          try {
-            const urlForParsing = url.replace('#', '?');
-            const urlObj = new URL(
-              urlForParsing.replace('braise://', 'https://'),
-            );
-            const accessToken = urlObj.searchParams.get('access_token');
-            const refreshToken = urlObj.searchParams.get('refresh_token');
-            const type = urlObj.searchParams.get('type');
-
-            if (accessToken && refreshToken && type === 'recovery') {
-              const {error: sessionError} = await supabase.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken,
-              });
-
-              if (sessionError) {
-                Alert.alert('Error', 'Invalid or expired reset link');
-              }
-            } else {
-              const code = urlObj.searchParams.get('code');
-              if (code) {
-                const {error: exchangeError} =
-                  await supabase.auth.exchangeCodeForSession(code);
-                if (exchangeError) {
-                  Alert.alert('Error', 'Invalid or expired reset link');
-                }
-              }
-            }
-          } catch (parseError) {
-            // Continue - might still work with server-side verification
-          }
-
-          onConsumeDeepLink?.();
-          return;
-        }
-
-        const match = url.match(/braise:\/\/import\?data=(.*)/);
-        if (match && match[1]) {
-          const encodedData = match[1];
-          const decoded = decodeURIComponent(encodedData);
-          const recipe = JSON.parse(decoded);
-
-          const state = navigationRef.current?.getState();
-          const currentRoute = state?.routes[state.index || 0];
-          const isAlreadyOnDetailsScreen =
-            currentRoute?.name === 'RecipeDetailsScreen';
-
-          if (isAlreadyOnDetailsScreen && state) {
-            // Go back first to remove the old RecipeDetailsScreen from stack
-            // Then navigate to the new one to prevent duplicate instances
-            navigationRef.current?.dispatch(CommonActions.goBack());
-            // Use requestAnimationFrame to ensure goBack completes before navigate
-            requestAnimationFrame(() => {
-              navigationRef.current?.dispatch(
-                CommonActions.navigate({
-                  name: 'RecipeDetailsScreen',
-                  params: {
-                    item: {
-                      ...recipe,
-                    },
-                    shouldAutoSave: true,
-                  },
-                  key: `RecipeDetailsScreen-${Date.now()}`,
-                }),
-              );
-            });
-          } else {
-            // Navigate normally if not already on RecipeDetailsScreen
-            navigationRef.current?.dispatch(
-              CommonActions.navigate({
-                name: 'RecipeDetailsScreen',
-                params: {
-                  item: {
-                    ...recipe,
-                  },
-                  shouldAutoSave: true,
-                },
-                key: `RecipeDetailsScreen-${Date.now()}`,
-              }),
-            );
-          }
-          onConsumeDeepLink?.();
-        }
-      } catch (err) {
-        // Silently fail for deep link parsing errors
-      }
-    },
-    [onConsumeDeepLink],
-  );
-
-  useEffect(() => {
-    if (!pendingDeepLink) {
-      return;
-    }
-
-    const url = pendingDeepLink?.url;
-    if (url?.includes('reset-password')) {
-      processDeepLink(pendingDeepLink);
-      onConsumeDeepLink?.();
-      return;
-    }
-
-    if (!navigationReadyRef.current || !navigationRef.current) {
-      pendingDeepLinkRef.current = pendingDeepLink;
-      return;
-    }
-
-    processDeepLink(pendingDeepLink);
-    onConsumeDeepLink?.();
-  }, [pendingDeepLink, onConsumeDeepLink, processDeepLink]);
 
   return (
     <ThemeProvider theme={LightTheme}>
@@ -356,12 +260,6 @@ export default function App({
               ref={navigationRef}
               onReady={() => {
                 navigationReadyRef.current = true;
-                if (pendingDeepLinkRef.current) {
-                  const deepLink = pendingDeepLinkRef.current;
-                  pendingDeepLinkRef.current = null;
-                  processDeepLink(deepLink);
-                  onConsumeDeepLink?.();
-                }
               }}>
               <Stack.Navigator>
                 <Stack.Screen

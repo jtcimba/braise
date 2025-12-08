@@ -33,7 +33,7 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
     const newScaledIngredients = scaleIngredients(
       data.ingredients || '',
       newServings,
-      data.servings.toString(),
+      data.servings != null ? data.servings.toString() : '1',
     );
 
     setCurrentServings(newServings);
@@ -53,7 +53,9 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   useEffect(() => {
     if (data.ingredients) {
       const originalServings =
-        data.servings && data.servings !== '-' ? data.servings.toString() : '1';
+        data.servings != null && data.servings !== '-'
+          ? data.servings.toString()
+          : '1';
       const servings =
         currentServings &&
         currentServings !== '-' &&
@@ -65,7 +67,7 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
         const newScaledIngredients = scaleIngredients(
           data.ingredients,
           servings,
-          data.servings,
+          originalServings,
         );
         setScaledIngredients(newScaledIngredients);
       } else {
@@ -75,9 +77,12 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   }, [data.ingredients, data.servings, currentServings]);
 
   useEffect(() => {
-    if (data.servings) {
-      setCurrentServings(data.servings);
+    // Only update currentServings if data.servings changes to a non-null value
+    // This allows user scaling to persist when original servings is null
+    if (data.servings != null) {
+      setCurrentServings(data.servings.toString());
     }
+    // If data.servings is null, don't reset currentServings - allow user scaling to persist
   }, [data.servings]);
 
   return (
@@ -253,7 +258,9 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
         visible={showServingsModal}
         onClose={() => setShowServingsModal(false)}
         onConfirm={handleServingsConfirm}
-        currentValue={currentServings.toString()}
+        currentValue={
+          currentServings != null ? currentServings.toString() : '1'
+        }
       />
     </View>
   );

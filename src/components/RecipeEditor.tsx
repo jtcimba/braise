@@ -259,7 +259,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                       style={styles(theme).detailsIcon}
                     />
                     <Text style={styles(theme).detailsText}>
-                      {editingData.servings
+                      {editingData.servings != null
                         ? editingData.servings.toString()
                         : '-'}{' '}
                       servings
@@ -327,7 +327,9 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 onClose={() => setServingsModalVisible(false)}
                 onConfirm={handleServingsUpdate}
                 currentValue={
-                  editingData.servings ? editingData.servings.toString() : ''
+                  editingData.servings != null
+                    ? editingData.servings.toString()
+                    : ''
                 }
               />
 
@@ -336,7 +338,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 onClose={() => setTotalTimeModalVisible(false)}
                 onConfirm={handleTotalTimeUpdate}
                 currentTime={
-                  editingData.total_time
+                  editingData.total_time != null
                     ? editingData.total_time.toString()
                     : ''
                 }
