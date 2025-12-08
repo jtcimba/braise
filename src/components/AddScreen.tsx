@@ -24,7 +24,7 @@ export default function AddScreen() {
     yields: '',
     ingredients: '',
     instructions: '',
-    category: '',
+    categories: '',
   };
 
   return (

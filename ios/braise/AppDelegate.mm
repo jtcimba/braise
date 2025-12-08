@@ -87,28 +87,6 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-  // Check for imported recipe in UserDefaults when app becomes active
-  // This handles the case where the deep link didn't fire but data was saved
-  NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.braise.recipe"];
-  if (sharedDefaults) {
-    id recipeObj = [sharedDefaults objectForKey:@"importedRecipe"];
-    NSNumber *timestamp = [sharedDefaults objectForKey:@"lastImportedRecipeTimestamp"];
-    
-    // Only process if timestamp is recent (within last 30 seconds)
-    // This prevents processing old data
-    if (recipeObj && timestamp) {
-      NSTimeInterval timeSinceImport = [[NSDate date] timeIntervalSince1970] - [timestamp doubleValue];
-      if (timeSinceImport < 30.0) {
-        NSLog(@"Found recent imported recipe in UserDefaults (%.1f seconds ago), emitting event", timeSinceImport);
-        [self emitImportEvent:recipeObj retryCount:0];
-        // Clear after reading
-        [sharedDefaults removeObjectForKey:@"importedRecipe"];
-        [sharedDefaults removeObjectForKey:@"lastImportedRecipeTimestamp"];
-        [sharedDefaults synchronize];
-      }
-    }
-  }
-  
   [super applicationDidBecomeActive:application];
 }
 

@@ -9,5 +9,5 @@ export interface Recipe {
   yields: string;
   ingredients: string;
   instructions: string;
-  category: string;
+  categories: string;
 }
