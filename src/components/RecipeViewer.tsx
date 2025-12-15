@@ -367,8 +367,9 @@ const styles = (theme: any) =>
       paddingVertical: 10,
     },
     lineNumber: {
-      ...theme.typography.b1,
+      ...theme.typography.h4,
       marginRight: 10,
+      marginTop: 2,
       color: theme.colors.primary,
     },
     lineText: {

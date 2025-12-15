@@ -197,7 +197,8 @@ export default function GroceryListScreen() {
                 onPress={e => {
                   e.stopPropagation();
                   toggleItem(groceryItem.id);
-                }}>
+                }}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
                 {(groceryItem.completed ||
                   animatingItems.has(groceryItem.id)) && (
                   <Text style={styles(theme).checkmark}>✓</Text>
@@ -425,8 +426,8 @@ const styles = (theme: any) =>
       alignItems: 'center',
     },
     checkbox: {
-      width: 24,
-      height: 24,
+      width: 28,
+      height: 28,
       borderWidth: 2,
       borderColor: theme.colors.primary,
       borderRadius: 4,

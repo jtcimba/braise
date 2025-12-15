@@ -52,7 +52,7 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
@@ -76,5 +76,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to allow you to upload images to Braise.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses your camera to take photos to add to Braise.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app saves images to your photo library to add to Braise.</string>
 </dict>
 </plist>

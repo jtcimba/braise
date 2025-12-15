@@ -88,7 +88,10 @@ export default function OnboardingModal({
             ]}
             onPress={onClose}>
             <Text
-              style={[styles(theme).buttonText, {color: theme.colors.card}]}>
+              style={[
+                styles(theme).buttonText,
+                {color: theme.colors.background},
+              ]}>
               Got it
             </Text>
           </TouchableOpacity>
@@ -108,7 +111,7 @@ const styles = (theme: any) =>
       padding: 20,
     },
     modalContainer: {
-      backgroundColor: theme.colors.card,
+      backgroundColor: theme.colors.background,
       borderRadius: 16,
       width: '100%',
       maxWidth: 500,

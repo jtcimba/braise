@@ -2,17 +2,27 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-	<string>Braise</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>ShareExtensionIcon</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+	</dict>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
 		<dict>
 			<key>NSExtensionActivationRule</key>
 			<dict>
-				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
-				<integer>1</integer>
 				<key>NSExtensionActivationSupportsWebPageWithMaxCount</key>
+				<integer>1</integer>
+				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
 				<integer>1</integer>
 			</dict>
 		</dict>
@@ -21,17 +31,11 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 	</dict>
-  <key>CFBundleIcons</key>
-  <dict>
-      <key>CFBundlePrimaryIcon</key>
-      <dict>
-          <key>CFBundleIconFiles</key>
-          <array>
-              <string>ShareExtensionIcon</string>
-          </array>
-          <key>UIPrerenderedIcon</key>
-          <false/>
-      </dict>
-  </dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app requires access to your photo library to allow you to upload images to Braise.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app uses your camera to take photos to add to Braise.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app saves images to your photo library to add to Braise.</string>
 </dict>
 </plist>

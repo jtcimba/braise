@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Linking} from 'react-native';
 import {useNavigation, ParamListBase} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {Recipe} from '../models';
@@ -27,29 +27,47 @@ export default function AddScreen() {
     categories: '',
   };
 
+  const handleOpenBrowser = () => {
+    Linking.openURL('http://');
+  };
+
   return (
     <View style={styles(theme).content}>
-      <TouchableOpacity
-        onPress={() => {
-          dispatch(changeViewMode('edit'));
-          navigation.navigate('RecipeDetailsScreen', {
-            item: newRecipe,
-          });
-        }}
-        style={styles(theme).secondaryButton}>
-        <View style={styles(theme).buttonContent}>
-          <Text style={[styles(theme).text, styles(theme).secondaryText]}>
-            From scratch
+      <View style={styles(theme).instructionsContainer}>
+        <Text style={styles(theme).sectionTitle}>To add a recipe:</Text>
+        <Text style={styles(theme).instructionsText}>
+          1. Open the recipe in your browser
+        </Text>
+        <Text style={styles(theme).instructionsText}>
+          2. Tap the Share button
+        </Text>
+        <Text style={styles(theme).instructionsText}>
+          3. Select "Import to Braise"
+        </Text>
+        <Text style={styles(theme).instructionsText}>
+          4. The recipe will automatically save
+        </Text>
+      </View>
+      <View style={styles(theme).buttonsContainer}>
+        <TouchableOpacity
+          onPress={handleOpenBrowser}
+          style={styles(theme).primaryButton}>
+          <Text style={styles(theme).primaryButtonText}>Open browser</Text>
+        </TouchableOpacity>
+        <Text style={styles(theme).orText}>or</Text>
+        <TouchableOpacity
+          onPress={() => {
+            dispatch(changeViewMode('edit'));
+            navigation.navigate('RecipeDetailsScreen', {
+              item: newRecipe,
+            });
+          }}
+          style={styles(theme).secondaryButton}>
+          <Text style={styles(theme).secondaryButtonText}>
+            Add recipe from scratch
           </Text>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('AddFromBrowser')}
-        style={styles(theme).button}>
-        <View style={styles(theme).buttonContent}>
-          <Text style={styles(theme).text}>From browser</Text>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -60,51 +78,71 @@ const styles = (theme: any) =>
       padding: 22,
       alignItems: 'center',
       height: '100%',
-      backgroundColor: theme.colors.card,
-      flex: 1,
-      justifyContent: 'flex-end',
-    },
-    imageContainer: {
+      backgroundColor: theme.colors.secondaryLight,
       flex: 1,
       justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 5,
     },
-    button: {
-      backgroundColor: theme.colors.primary,
-      padding: 10,
-      marginVertical: 10,
-      borderRadius: 8,
+    instructionsContainer: {
       width: '100%',
+      paddingHorizontal: 20,
+      marginBottom: 60,
+      alignItems: 'center',
+    },
+    sectionTitle: {
+      ...theme.typography.h3,
+      color: theme.colors.secondary,
+      marginBottom: 15,
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    instructionsText: {
+      ...theme.typography.h4,
+      color: theme.colors.secondary,
+      marginBottom: 12,
+      lineHeight: 24,
+      textAlign: 'center',
+    },
+    buttonsContainer: {
+      width: '100%',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+    },
+    primaryButton: {
+      backgroundColor: theme.colors.tertiary,
+      paddingVertical: 18,
+      paddingHorizontal: 40,
+      borderRadius: 30,
+      width: '100%',
+      maxWidth: 300,
       justifyContent: 'center',
       alignItems: 'center',
+      marginBottom: 16,
     },
-    buttonContent: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    text: {
+    primaryButtonText: {
       color: theme.colors.card,
       ...theme.typography.h2,
+      fontWeight: '600',
     },
-    subtext: {
-      color: theme.colors.subtext,
-      fontSize: 14,
-      marginTop: 2,
-      ...theme.typography.b2,
+    orText: {
+      ...theme.typography.h5,
+      color: theme.colors.secondary,
+      marginBottom: 16,
+      textAlign: 'center',
     },
     secondaryButton: {
-      borderWidth: 2,
+      borderWidth: 1,
       borderColor: theme.colors.secondary,
-      padding: 10,
-      marginVertical: 10,
-      borderRadius: 8,
+      backgroundColor: 'transparent',
+      paddingVertical: 14,
+      paddingHorizontal: 30,
+      borderRadius: 25,
       width: '100%',
+      maxWidth: 250,
       justifyContent: 'center',
       alignItems: 'center',
     },
-    secondaryText: {
+    secondaryButtonText: {
       color: theme.colors.secondary,
+      ...theme.typography.h4,
     },
   });

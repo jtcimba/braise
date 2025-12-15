@@ -18,7 +18,6 @@ import SettingsIcon from './src/components/SettingsIcon';
 import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenuHeader from './src/components/DetailsMenuHeader';
-import AddFromBrowserScreen from './src/components/AddFromBrowserScreen';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
@@ -77,37 +76,17 @@ function AddStackNavigator() {
         options={({navigation}) => ({
           headerLeft: () => null,
           headerRight: () =>
-            CloseIcon(navigation, 'Recipes', theme.colors.text),
+            CloseIcon(navigation, 'Recipes', theme.colors.secondary),
           headerTitle: 'Add recipe',
           presentation: 'modal',
           headerShadowVisible: false,
           headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
           headerTitleStyle: {
             ...theme?.typography.h1,
-            color: theme.colors.text,
+            color: theme.colors.secondary,
           },
           headerStyle: {
-            backgroundColor: theme.colors.card,
-          },
-        })}
-      />
-      <Stack.Screen
-        name="AddFromBrowser"
-        component={AddFromBrowserScreen}
-        options={({navigation}) => ({
-          headerTitle: 'Add from Browser',
-          headerLeft: () => BackIcon(navigation, null, theme.colors.text),
-          headerLeftContainerStyle: {paddingLeft: 15, paddingTop: 5},
-          headerRight: () =>
-            CloseIcon(navigation, 'Recipes', theme.colors.text),
-          headerShadowVisible: false,
-          headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
-          headerTitleStyle: {
-            ...theme.typography.h1,
-            color: theme.colors.text,
-          },
-          headerStyle: {
-            backgroundColor: theme.colors.card,
+            backgroundColor: theme.colors.secondaryLight,
           },
         })}
       />
@@ -148,7 +127,6 @@ function TabNavigator({navigation}: {navigation: any}) {
             headerShadowVisible: false,
             headerTitleStyle: {
               ...theme?.typography.h1,
-              color: theme.colors.text,
             },
           }}
         />
@@ -306,7 +284,7 @@ export default function App({}: AppProps): React.JSX.Element {
                     headerTitle: 'Settings',
                     headerLeft: () => null,
                     headerRight: () =>
-                      CloseIcon(navigation, 'Recipes', '#2D2D2D'),
+                      CloseIcon(navigation, 'Recipes', '#4A0B12'),
                     presentation: 'modal',
                     headerShadowVisible: false,
                     headerRightContainerStyle: {paddingRight: 15},
@@ -314,7 +292,10 @@ export default function App({}: AppProps): React.JSX.Element {
                       fontFamily: 'Hanken Grotesk',
                       fontSize: 16,
                       fontWeight: 'bold',
-                      color: '#2d2d2d',
+                      color: '#4A0B12',
+                    },
+                    headerStyle: {
+                      backgroundColor: '#E1A898',
                     },
                   })}
                 />

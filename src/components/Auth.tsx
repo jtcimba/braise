@@ -226,17 +226,19 @@ export default function Auth({
 
   const renderSignIn = () => (
     <>
-      <View style={styles.header}>
-        <Text style={[styles.title, {color: theme.colors.text}]}>
-          Welcome Back
+      <View style={styles(theme).header}>
+        <Text style={[styles(theme).title, {color: theme.colors.text}]}>
+          Welcome to Braise
         </Text>
-        <Text style={[styles.subtitle, {color: theme.colors.subtext}]}>
+        <Text style={[styles(theme).subtitle, {color: theme.colors.subtext}]}>
           Sign in to continue
         </Text>
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>Email</Text>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
+          Email
+        </Text>
         <TextInput
           onChangeText={(text: string) => setEmail(text)}
           value={email}
@@ -246,7 +248,7 @@ export default function Auth({
           keyboardType="email-address"
           autoComplete="email"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -256,8 +258,10 @@ export default function Auth({
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>Password</Text>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
+          Password
+        </Text>
         <TextInput
           onChangeText={(text: string) => setPassword(text)}
           value={password}
@@ -267,7 +271,7 @@ export default function Auth({
           autoCapitalize="none"
           autoComplete="password"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -279,33 +283,33 @@ export default function Auth({
 
       <TouchableOpacity
         onPress={() => setView('reset')}
-        style={styles.linkButton}>
-        <Text style={[styles.linkText, {color: theme.colors.primary}]}>
+        style={styles(theme).linkButton}>
+        <Text style={[styles(theme).linkText, {color: theme.colors.primary}]}>
           Forgot password?
         </Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[
-          styles.button,
+          styles(theme).button,
           {backgroundColor: theme.colors.primary},
-          loading && styles.buttonDisabled,
+          loading && styles(theme).buttonDisabled,
         ]}
         disabled={loading}
         onPress={signInWithEmail}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Sign In</Text>
+          <Text style={styles(theme).buttonText}>Sign In</Text>
         )}
       </TouchableOpacity>
 
-      <View style={styles.switchView}>
-        <Text style={[styles.switchText, {color: theme.colors.subtext}]}>
+      <View style={styles(theme).switchView}>
+        <Text style={[styles(theme).switchText, {color: theme.colors.subtext}]}>
           Don't have an account?{' '}
         </Text>
         <TouchableOpacity onPress={() => setView('signup')}>
-          <Text style={[styles.linkText, {color: theme.colors.primary}]}>
+          <Text style={[styles(theme).linkText, {color: theme.colors.primary}]}>
             Sign Up
           </Text>
         </TouchableOpacity>
@@ -315,17 +319,19 @@ export default function Auth({
 
   const renderSignUp = () => (
     <>
-      <View style={styles.header}>
-        <Text style={[styles.title, {color: theme.colors.text}]}>
+      <View style={styles(theme).header}>
+        <Text style={[styles(theme).title, {color: theme.colors.text}]}>
           Create Account
         </Text>
-        <Text style={[styles.subtitle, {color: theme.colors.subtext}]}>
+        <Text style={[styles(theme).subtitle, {color: theme.colors.subtext}]}>
           Sign up to get started
         </Text>
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>Email</Text>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
+          Email
+        </Text>
         <TextInput
           onChangeText={(text: string) => setEmail(text)}
           value={email}
@@ -335,7 +341,7 @@ export default function Auth({
           keyboardType="email-address"
           autoComplete="email"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -345,8 +351,10 @@ export default function Auth({
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>Password</Text>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
+          Password
+        </Text>
         <TextInput
           onChangeText={(text: string) => setPassword(text)}
           value={password}
@@ -356,7 +364,7 @@ export default function Auth({
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -366,8 +374,8 @@ export default function Auth({
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
           Confirm Password
         </Text>
         <TextInput
@@ -379,7 +387,7 @@ export default function Auth({
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -391,25 +399,25 @@ export default function Auth({
 
       <TouchableOpacity
         style={[
-          styles.button,
+          styles(theme).button,
           {backgroundColor: theme.colors.primary},
-          loading && styles.buttonDisabled,
+          loading && styles(theme).buttonDisabled,
         ]}
         disabled={loading}
         onPress={signUpWithEmail}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Sign Up</Text>
+          <Text style={styles(theme).buttonText}>Sign Up</Text>
         )}
       </TouchableOpacity>
 
-      <View style={styles.switchView}>
-        <Text style={[styles.switchText, {color: theme.colors.subtext}]}>
+      <View style={styles(theme).switchView}>
+        <Text style={[styles(theme).switchText, {color: theme.colors.subtext}]}>
           Already have an account?{' '}
         </Text>
         <TouchableOpacity onPress={() => setView('signin')}>
-          <Text style={[styles.linkText, {color: theme.colors.primary}]}>
+          <Text style={[styles(theme).linkText, {color: theme.colors.primary}]}>
             Sign In
           </Text>
         </TouchableOpacity>
@@ -419,39 +427,43 @@ export default function Auth({
 
   const renderResetPassword = () => (
     <>
-      <View style={styles.header}>
-        <Text style={[styles.title, {color: theme.colors.text}]}>
+      <View style={styles(theme).header}>
+        <Text style={[styles(theme).title, {color: theme.colors.text}]}>
           Reset Password
         </Text>
-        <Text style={[styles.subtitle, {color: theme.colors.subtext}]}>
+        <Text style={[styles(theme).subtitle, {color: theme.colors.subtext}]}>
           Enter your email address and we'll send you a link to reset your
           password
         </Text>
       </View>
 
       {resetEmailSent ? (
-        <View style={styles.successContainer}>
-          <Text style={[styles.successText, {color: theme.colors.secondary}]}>
+        <View style={styles(theme).successContainer}>
+          <Text
+            style={[
+              styles(theme).successText,
+              {color: theme.colors.secondary},
+            ]}>
             Password reset email sent! Please check your inbox.
           </Text>
           <TouchableOpacity
             style={[
-              styles.button,
+              styles(theme).button,
               {backgroundColor: theme.colors.primary},
-              styles.mt20,
+              styles(theme).mt20,
             ]}
             onPress={() => {
               setResetEmailSent(false);
               setEmail('');
               setView('signin');
             }}>
-            <Text style={styles.buttonText}>Back to Sign In</Text>
+            <Text style={styles(theme).buttonText}>Back to Sign In</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <>
-          <View style={styles.verticallySpaced}>
-            <Text style={[styles.label, {color: theme.colors.text}]}>
+          <View style={styles(theme).verticallySpaced}>
+            <Text style={[styles(theme).label, {color: theme.colors.text}]}>
               Email
             </Text>
             <TextInput
@@ -463,7 +475,7 @@ export default function Auth({
               keyboardType="email-address"
               autoComplete="email"
               style={[
-                styles.input,
+                styles(theme).input,
                 {
                   borderColor: theme.colors.border,
                   color: theme.colors.text,
@@ -475,22 +487,23 @@ export default function Auth({
 
           <TouchableOpacity
             style={[
-              styles.button,
+              styles(theme).button,
               {backgroundColor: theme.colors.primary},
-              loading && styles.buttonDisabled,
+              loading && styles(theme).buttonDisabled,
             ]}
             disabled={loading}
             onPress={resetPassword}>
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Send Reset Link</Text>
+              <Text style={styles(theme).buttonText}>Send Reset Link</Text>
             )}
           </TouchableOpacity>
 
-          <View style={styles.switchView}>
+          <View style={styles(theme).switchView}>
             <TouchableOpacity onPress={() => setView('signin')}>
-              <Text style={[styles.linkText, {color: theme.colors.primary}]}>
+              <Text
+                style={[styles(theme).linkText, {color: theme.colors.primary}]}>
                 Back to Sign In
               </Text>
             </TouchableOpacity>
@@ -502,17 +515,17 @@ export default function Auth({
 
   const renderNewPassword = () => (
     <>
-      <View style={styles.header}>
-        <Text style={[styles.title, {color: theme.colors.text}]}>
+      <View style={styles(theme).header}>
+        <Text style={[styles(theme).title, {color: theme.colors.text}]}>
           Set New Password
         </Text>
-        <Text style={[styles.subtitle, {color: theme.colors.subtext}]}>
+        <Text style={[styles(theme).subtitle, {color: theme.colors.subtext}]}>
           Enter your new password below
         </Text>
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
           New Password
         </Text>
         <TextInput
@@ -524,7 +537,7 @@ export default function Auth({
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -534,8 +547,8 @@ export default function Auth({
         />
       </View>
 
-      <View style={styles.verticallySpaced}>
-        <Text style={[styles.label, {color: theme.colors.text}]}>
+      <View style={styles(theme).verticallySpaced}>
+        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
           Confirm New Password
         </Text>
         <TextInput
@@ -547,7 +560,7 @@ export default function Auth({
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
-            styles.input,
+            styles(theme).input,
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
@@ -559,16 +572,16 @@ export default function Auth({
 
       <TouchableOpacity
         style={[
-          styles.button,
+          styles(theme).button,
           {backgroundColor: theme.colors.primary},
-          loading && styles.buttonDisabled,
+          loading && styles(theme).buttonDisabled,
         ]}
         disabled={loading}
         onPress={updatePassword}>
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Update Password</Text>
+          <Text style={styles(theme).buttonText}>Update Password</Text>
         )}
       </TouchableOpacity>
     </>
@@ -577,11 +590,11 @@ export default function Auth({
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={[styles.container, {backgroundColor: theme.colors.background}]}>
+      style={styles(theme).container}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles(theme).scrollContent}
         keyboardShouldPersistTaps="handled">
-        <View style={styles.content}>
+        <View style={styles(theme).content}>
           {view === 'signin' && renderSignIn()}
           {view === 'signup' && renderSignUp()}
           {view === 'reset' && renderResetPassword()}
@@ -592,102 +605,97 @@ export default function Auth({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-  },
-  content: {
-    padding: 24,
-    maxWidth: 400,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  header: {
-    marginBottom: 32,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    fontFamily: 'Hanken Grotesk',
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    fontFamily: 'Hanken Grotesk',
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
-    fontFamily: 'Hanken Grotesk',
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 14,
-    fontSize: 16,
-    fontFamily: 'Hanken Grotesk',
-  },
-  button: {
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-    minHeight: 50,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: 'Hanken Grotesk',
-  },
-  linkButton: {
-    alignSelf: 'flex-end',
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  linkText: {
-    fontSize: 14,
-    fontWeight: '600',
-    fontFamily: 'Hanken Grotesk',
-  },
-  switchView: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 24,
-  },
-  switchText: {
-    fontSize: 14,
-    fontFamily: 'Hanken Grotesk',
-  },
-  successContainer: {
-    alignItems: 'center',
-    padding: 20,
-  },
-  successText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 16,
-    fontFamily: 'Hanken Grotesk',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-});
+const styles = (theme: any) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+    },
+    content: {
+      padding: 24,
+      maxWidth: 400,
+      width: '100%',
+      alignSelf: 'center',
+    },
+    header: {
+      marginBottom: 32,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      marginBottom: 8,
+      ...theme.typography.h1,
+    },
+    subtitle: {
+      ...theme.typography.h3,
+      textAlign: 'center',
+    },
+    verticallySpaced: {
+      paddingTop: 4,
+      paddingBottom: 4,
+      alignSelf: 'stretch',
+      marginBottom: 16,
+    },
+    label: {
+      ...theme.typography.h3,
+      fontWeight: '600',
+      marginBottom: 8,
+    },
+    input: {
+      borderWidth: 1,
+      borderRadius: 8,
+      padding: 14,
+      ...theme.typography.h3,
+    },
+    button: {
+      padding: 16,
+      borderRadius: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 8,
+      minHeight: 50,
+    },
+    buttonDisabled: {
+      opacity: 0.6,
+    },
+    buttonText: {
+      color: theme.colors.card,
+      ...theme.typography.h3,
+      fontWeight: '600',
+    },
+    linkButton: {
+      alignSelf: 'flex-end',
+      marginTop: 8,
+      marginBottom: 16,
+    },
+    linkText: {
+      ...theme.typography.h5,
+      fontWeight: '600',
+    },
+    switchView: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 24,
+    },
+    switchText: {
+      ...theme.typography.h5,
+    },
+    successContainer: {
+      alignItems: 'center',
+      padding: 20,
+    },
+    successText: {
+      ...theme.typography.h3,
+      textAlign: 'center',
+      marginBottom: 16,
+    },
+    mt20: {
+      marginTop: 20,
+    },
+  });

@@ -60,9 +60,8 @@ export default function DetailsMenu({
 
     if (viewMode === 'new' || isNewRecipe) {
       navigation.navigate('Recipes');
-    } else {
-      dispatch(changeViewMode('view'));
     }
+    dispatch(changeViewMode('view'));
   };
 
   const onAddToGroceryListPress = () => {
