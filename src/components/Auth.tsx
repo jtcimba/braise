@@ -6,10 +6,12 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   ActivityIndicator,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
-  ScrollView,
+  Dimensions,
 } from 'react-native';
 import {supabase} from '../supabase-client';
 import {useTheme} from '../../theme/ThemeProvider';
@@ -27,6 +29,9 @@ export default function Auth({
   onPasswordResetComplete,
 }: AuthProps = {}) {
   const theme = useTheme() as unknown as Theme;
+  const screenHeight = Dimensions.get('window').height;
+  const paddingTop = Math.max(40, screenHeight * 0.07);
+  const paddingBottom = Math.max(80, screenHeight * 0.15);
   const [view, setView] = useState<AuthView>(
     resetPasswordToken ? 'newpassword' : 'signin',
   );
@@ -591,16 +596,17 @@ export default function Auth({
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles(theme).container}>
-      <ScrollView
-        contentContainerStyle={styles(theme).scrollContent}
-        keyboardShouldPersistTaps="handled">
-        <View style={styles(theme).content}>
-          {view === 'signin' && renderSignIn()}
-          {view === 'signup' && renderSignUp()}
-          {view === 'reset' && renderResetPassword()}
-          {view === 'newpassword' && renderNewPassword()}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View
+          style={[styles(theme).scrollContent, {paddingTop, paddingBottom}]}>
+          <View style={styles(theme).content}>
+            {view === 'signin' && renderSignIn()}
+            {view === 'signup' && renderSignUp()}
+            {view === 'reset' && renderResetPassword()}
+            {view === 'newpassword' && renderNewPassword()}
+          </View>
         </View>
-      </ScrollView>
+      </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
 }
@@ -613,7 +619,6 @@ const styles = (theme: any) =>
     },
     scrollContent: {
       flexGrow: 1,
-      justifyContent: 'center',
     },
     content: {
       padding: 24,

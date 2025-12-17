@@ -46,24 +46,6 @@ export default function OnboardingModal({
               Import recipes from your browser
             </Text>
             <View style={styles(theme).instructionsContainer}>
-              <Text style={styles(theme).sectionTitle}>First time setup:</Text>
-              <Text style={styles(theme).instructionsText}>
-                1. Open a recipe website in your browser
-              </Text>
-              <Text style={styles(theme).instructionsText}>
-                2. Tap the Share button
-              </Text>
-              <Text style={styles(theme).instructionsText}>
-                3. Scroll to the bottom of the share sheet and tap "Edit
-                Actions"
-              </Text>
-              <Text style={styles(theme).instructionsText}>
-                4. Find "Import to Braise" and toggle it on
-              </Text>
-              <Text style={styles(theme).instructionsText}>
-                5. Tap "Done" to save
-              </Text>
-              <View style={styles(theme).divider} />
               <Text style={styles(theme).sectionTitle}>
                 To import a recipe:
               </Text>
@@ -171,8 +153,8 @@ const styles = (theme: any) =>
     },
     button: {
       padding: 16,
-      borderRadius: 8,
-      margin: 24,
+      borderRadius: 25,
+      marginTop: 24,
       alignItems: 'center',
     },
     buttonText: {

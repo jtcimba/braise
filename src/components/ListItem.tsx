@@ -21,8 +21,10 @@ export default function Item({item, navigation}: any) {
       <View style={styles(theme).itemBody}>
         <Text style={styles(theme).title}>{item.title}</Text>
         <View style={styles(theme).subtextContainer}>
-          {item.author && (
-            <Text style={styles(theme).author}>{item.author}</Text>
+          {item.total_time && (
+            <Text style={styles(theme).time}>
+              {item.total_time} {item.total_time_unit || 'min'}
+            </Text>
           )}
         </View>
       </View>
@@ -54,7 +56,7 @@ const styles = (theme: any) =>
       backgroundColor: theme.colors.border,
       borderRadius: 8,
     },
-    author: {
+    time: {
       overflow: 'hidden',
       ...theme.typography.h5,
       color: theme.colors.subtext,
