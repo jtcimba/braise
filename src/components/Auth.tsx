@@ -106,7 +106,7 @@ export default function Auth({
 
     setLoading(true);
     const {
-      data: {session},
+      data: {session, user},
       error,
     } = await supabase.auth.signUp({
       email: email.trim(),
@@ -115,7 +115,22 @@ export default function Auth({
 
     if (error) {
       Alert.alert('Sign Up Error', error.message);
-    } else if (!session) {
+      setLoading(false);
+      return;
+    }
+
+    if (user) {
+      const {error: insertError} = await supabase.from('users').insert({
+        user_id: user.id,
+        email: user.email,
+      });
+
+      if (insertError) {
+        console.error('Error creating user record:', insertError);
+      }
+    }
+
+    if (!session) {
       Alert.alert(
         'Verification Email Sent',
         'Please check your inbox for email verification!',
