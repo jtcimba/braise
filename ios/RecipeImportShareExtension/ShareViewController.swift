@@ -91,11 +91,7 @@ class ShareViewController: UIViewController {
     
     func processHTML(html: String, url: String?) {
         guard let jsonld = extractJsonLd(from: html) else {
-            showFailureAnimation {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    self.completeRequest()
-                }
-            }
+            fetchRecipeFromAPI(html: html, url: url)
             return
         }
         
@@ -125,6 +121,101 @@ class ShareViewController: UIViewController {
                 }
             }
         }
+    }
+    
+    func fetchRecipeFromAPI(html: String, url: String?) {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
+              let apiURLString = sharedDefaults.string(forKey: "recipeImportAPIURL"),
+              let apiURL = URL(string: apiURLString) else {
+            showFailureAnimation {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.completeRequest()
+                }
+            }
+            return
+        }
+        
+        var request = URLRequest(url: apiURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = 30.0
+        
+        let requestBody: [String: Any] = ["html": html]
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: requestBody) else {
+            showFailureAnimation {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.completeRequest()
+                }
+            }
+            return
+        }
+        
+        request.httpBody = jsonData
+        
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            
+            if let error = error {
+                self.showFailureAnimation {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.completeRequest()
+                    }
+                }
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
+                  let data = data,
+                  let jsonAny = try? JSONSerialization.jsonObject(with: data) else {
+                self.showFailureAnimation {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.completeRequest()
+                    }
+                }
+                return
+            }
+                
+            guard let recipe = jsonAny as? [String: Any] else {
+                self.showFailureAnimation {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.completeRequest()
+                    }
+                }
+                return
+            }
+            
+            var recipeWithURL = recipe
+            if let urlString = url {
+                if recipeWithURL["original_url"] == nil {
+                    recipeWithURL["original_url"] = urlString
+                }
+                if recipeWithURL["host_url"] == nil || recipeWithURL["host_name"] == nil,
+                   let urlObj = URL(string: urlString) {
+                    recipeWithURL["host_url"] = "\(urlObj.scheme ?? "")://\(urlObj.host ?? "")"
+                    recipeWithURL["host_name"] = urlObj.host ?? ""
+                }
+            }
+            
+            self.saveRecipeToSupabase(recipeWithURL) { [weak self] success, error in
+                guard let self = self else { return }
+                
+                if success {
+                    self.showSuccessAnimation {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.completeRequest()
+                        }
+                    }
+                } else {
+                    self.showFailureAnimation {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            self.completeRequest()
+                        }
+                    }
+                }
+            }
+        }.resume()
     }
     
     func extractHTML(from attachments: [NSItemProvider], completion: @escaping (String?, String?) -> Void) {
@@ -618,7 +709,7 @@ class ShareViewController: UIViewController {
             
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
-            label.text = "Failed to Add Recipe"
+            label.text = "Failed to add recipe"
             label.font = UIFont.systemFont(ofSize: 20, weight: .semibold)
             label.textColor = .label
             label.textAlignment = .center
