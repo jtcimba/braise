@@ -124,7 +124,9 @@ class ShareViewController: UIViewController {
     }
     
     func fetchRecipeFromAPI(html: String, url: String?) {
-        guard let apiURL = URL(string: "https://i1ylo3n8sl.execute-api.us-east-1.amazonaws.com/prod/recipes/import-recipe-from-browser") else {
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
+              let apiURLString = sharedDefaults.string(forKey: "recipeImportAPIURL"),
+              let apiURL = URL(string: apiURLString) else {
             showFailureAnimation {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     self.completeRequest()

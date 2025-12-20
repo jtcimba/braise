@@ -46,6 +46,7 @@ async function storeSupabaseCredentials(session: Session) {
   try {
     const supabaseURL = process.env.SUPABASE_URL;
     const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+    const recipeImportAPIURL = process.env.RECIPE_IMPORT_API_URL;
 
     if (supabaseURL && supabaseAnonKey && session.access_token) {
       await AppGroupStorage.setItem('supabaseURL', supabaseURL);
@@ -55,6 +56,12 @@ async function storeSupabaseCredentials(session: Session) {
         session.access_token,
       );
       await AppGroupStorage.setItem('supabaseUserId', session.user.id);
+      
+      // Store API URL if provided
+      if (recipeImportAPIURL) {
+        await AppGroupStorage.setItem('recipeImportAPIURL', recipeImportAPIURL);
+      }
+      
       console.log('Stored Supabase credentials in App Group');
     }
   } catch (error) {
