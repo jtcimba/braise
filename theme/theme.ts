@@ -32,6 +32,12 @@ export const typography = {
     fontSize: 15,
     letterSpacing: 0.2,
   } as TextStyle,
+  h6: {
+    fontFamily: 'Hanken Grotesk',
+    fontWeight: 'medium',
+    fontSize: 12,
+    letterSpacing: 0.2,
+  } as TextStyle,
   b1: {
     fontFamily: 'Crimson Text',
     fontWeight: 'medium',
