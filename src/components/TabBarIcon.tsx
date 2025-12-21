@@ -28,7 +28,7 @@ const TabBarIcon = forwardRef<any, TabBarIconProps>(
 
     const labels: {[key: string]: string} = {
       Recipes: 'Recipes',
-      'Grocery List': 'Shopping List',
+      'Grocery List': 'Grocery List',
       Add: 'Add New',
     };
 
