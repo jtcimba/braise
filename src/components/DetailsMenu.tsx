@@ -66,7 +66,11 @@ export default function DetailsMenu({
 
   const onAddToGroceryListPress = () => {
     setmodalVisible(false);
-    showModal(ingredients);
+    const recipeInfo =
+      routeData?.id && routeData?.title
+        ? {id: routeData.id, title: routeData.title}
+        : undefined;
+    showModal(ingredients, recipeInfo);
   };
 
   return (

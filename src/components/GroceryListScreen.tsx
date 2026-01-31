@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {categorizeIngredient} from '../services';
@@ -24,6 +25,8 @@ interface GroceryItem {
   category: string;
   completed: boolean;
   amount: string;
+  recipeId?: string;
+  recipeTitle?: string;
 }
 
 const CATEGORIES = [
@@ -50,6 +53,17 @@ export default function GroceryListScreen() {
   const [isCategoryManuallySelected, setIsCategoryManuallySelected] =
     useState(false);
   const [animatingItems, setAnimatingItems] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState<'category' | 'checked' | 'recipe'>(
+    'category',
+  );
+  const [isSortModalVisible, setIsSortModalVisible] = useState(false);
+  const sortButtonRef = useRef<TouchableOpacity>(null);
+  const [sortButtonLayout, setSortButtonLayout] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
@@ -70,7 +84,6 @@ export default function GroceryListScreen() {
     }
   }, [items]);
 
-  // Auto-categorize based on item name when typing (only if not manually selected)
   useEffect(() => {
     if (!isCategoryManuallySelected && newItemName.trim()) {
       const category = categorizeIngredient(newItemName);
@@ -104,13 +117,21 @@ export default function GroceryListScreen() {
     setAnimatingItems(prev => new Set(prev).add(id));
 
     setTimeout(() => {
-      setItems(prevItems => prevItems.filter(item => item.id !== id));
+      setItems(prevItems =>
+        prevItems.map(item =>
+          item.id === id ? {...item, completed: !item.completed} : item,
+        ),
+      );
       setAnimatingItems(prev => {
         const newSet = new Set(prev);
         newSet.delete(id);
         return newSet;
       });
     }, 500);
+  };
+
+  const deleteItem = (id: string) => {
+    setItems(prevItems => prevItems.filter(item => item.id !== id));
   };
 
   const addItem = () => {
@@ -159,26 +180,72 @@ export default function GroceryListScreen() {
     setNewItemName(item.name);
     setNewItemCategory(item.category);
     setNewItemAmount(item.amount);
-    setIsCategoryManuallySelected(true); // Existing items should keep their category
+    setIsCategoryManuallySelected(true);
     setIsEditModalVisible(true);
   };
 
+  const clearCompletedItems = () => {
+    setItems(prevItems => prevItems.filter(item => !item.completed));
+  };
+
+  const hasCompletedItems = items.some(item => item.completed);
+
   const getItemsByCategory = () => {
-    const activeItems = items.filter(item => !item.completed);
     const groupedItems: {[key: string]: GroceryItem[]} = {};
 
-    activeItems.forEach(item => {
-      if (!groupedItems[item.category]) {
-        groupedItems[item.category] = [];
+    if (sortBy === 'category') {
+      items.forEach(item => {
+        if (!groupedItems[item.category]) {
+          groupedItems[item.category] = [];
+        }
+        groupedItems[item.category].push(item);
+      });
+
+      return Object.entries(groupedItems).sort(([a], [b]) => {
+        const aIndex = CATEGORIES.indexOf(a);
+        const bIndex = CATEGORIES.indexOf(b);
+        return aIndex - bIndex;
+      });
+    }
+
+    if (sortBy === 'recipe') {
+      const otherKey = 'Other';
+      items.forEach(item => {
+        const groupKey =
+          item.recipeId && item.recipeTitle ? item.recipeTitle : otherKey;
+        if (!groupedItems[groupKey]) {
+          groupedItems[groupKey] = [];
+        }
+        groupedItems[groupKey].push(item);
+      });
+      const entries = Object.entries(groupedItems);
+      const otherEntries = entries.filter(([key]) => key === otherKey);
+      const recipeEntries = entries
+        .filter(([key]) => key !== otherKey)
+        .sort(([a], [b]) => a.localeCompare(b));
+      return [...recipeEntries, ...otherEntries];
+    }
+
+    // Sort by checked/unchecked
+    const uncheckedItems: GroceryItem[] = [];
+    const checkedItems: GroceryItem[] = [];
+
+    items.forEach(item => {
+      if (item.completed) {
+        checkedItems.push(item);
+      } else {
+        uncheckedItems.push(item);
       }
-      groupedItems[item.category].push(item);
     });
 
-    return Object.entries(groupedItems).sort(([a], [b]) => {
-      const aIndex = CATEGORIES.indexOf(a);
-      const bIndex = CATEGORIES.indexOf(b);
-      return aIndex - bIndex;
-    });
+    if (uncheckedItems.length > 0) {
+      groupedItems.Unchecked = uncheckedItems;
+    }
+    if (checkedItems.length > 0) {
+      groupedItems.Checked = checkedItems;
+    }
+
+    return Object.entries(groupedItems);
   };
 
   const renderCategorySection = ({item}: {item: [string, GroceryItem[]]}) => {
@@ -204,26 +271,42 @@ export default function GroceryListScreen() {
                   <Text style={styles(theme).checkmark}>✓</Text>
                 )}
               </TouchableOpacity>
-              <Text
-                style={[
-                  styles(theme).itemText,
-                  (groceryItem.completed ||
-                    animatingItems.has(groceryItem.id)) &&
-                    styles(theme).completedText,
-                ]}>
-                {groceryItem.name}
-              </Text>
-              {groceryItem.amount && (
+              <View style={styles(theme).itemTextContainer}>
                 <Text
                   style={[
-                    styles(theme).amountText,
+                    styles(theme).itemText,
                     (groceryItem.completed ||
                       animatingItems.has(groceryItem.id)) &&
                       styles(theme).completedText,
                   ]}>
-                  {groceryItem.amount}
+                  {groceryItem.name}
                 </Text>
-              )}
+                {groceryItem.amount && (
+                  <Text
+                    style={[
+                      styles(theme).amountText,
+                      (groceryItem.completed ||
+                        animatingItems.has(groceryItem.id)) &&
+                        styles(theme).completedText,
+                    ]}>
+                    {groceryItem.amount}
+                  </Text>
+                )}
+              </View>
+              <TouchableOpacity
+                style={styles(theme).deleteButton}
+                onPress={e => {
+                  e.stopPropagation();
+                  deleteItem(groceryItem.id);
+                }}
+                hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+                <Ionicons
+                  name="close"
+                  size={20}
+                  color={theme.colors.subtext}
+                  style={styles(theme).deleteIcon}
+                />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         ))}
@@ -333,6 +416,96 @@ export default function GroceryListScreen() {
     );
   };
 
+  const getSortModalStyle = () => {
+    return {
+      top: sortButtonLayout.y + sortButtonLayout.height + 8,
+      left: 20,
+    };
+  };
+
+  const renderSortModal = () => {
+    return (
+      <Modal
+        visible={isSortModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsSortModalVisible(false)}>
+        <TouchableWithoutFeedback onPress={() => setIsSortModalVisible(false)}>
+          <View style={styles(theme).sortModalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View
+                style={[styles(theme).sortModalContainer, getSortModalStyle()]}>
+                <TouchableOpacity
+                  style={[
+                    styles(theme).sortOption,
+                    sortBy === 'category' && styles(theme).sortOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setSortBy('category');
+                    setIsSortModalVisible(false);
+                  }}>
+                  <Text
+                    style={[
+                      styles(theme).sortOptionText,
+                      sortBy === 'category' &&
+                        styles(theme).sortOptionTextSelected,
+                    ]}>
+                    Category
+                  </Text>
+                  {sortBy === 'category' && (
+                    <Text style={styles(theme).sortCheckmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles(theme).sortOption,
+                    sortBy === 'recipe' && styles(theme).sortOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setSortBy('recipe');
+                    setIsSortModalVisible(false);
+                  }}>
+                  <Text
+                    style={[
+                      styles(theme).sortOptionText,
+                      sortBy === 'recipe' &&
+                        styles(theme).sortOptionTextSelected,
+                    ]}>
+                    Recipe
+                  </Text>
+                  {sortBy === 'recipe' && (
+                    <Text style={styles(theme).sortCheckmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles(theme).sortOption,
+                    sortBy === 'checked' && styles(theme).sortOptionSelected,
+                  ]}
+                  onPress={() => {
+                    setSortBy('checked');
+                    setIsSortModalVisible(false);
+                  }}>
+                  <Text
+                    style={[
+                      styles(theme).sortOptionText,
+                      sortBy === 'checked' &&
+                        styles(theme).sortOptionTextSelected,
+                    ]}>
+                    Checked
+                  </Text>
+                  {sortBy === 'checked' && (
+                    <Text style={styles(theme).sortCheckmark}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    );
+  };
+
   const groupedItems = getItemsByCategory();
 
   return (
@@ -347,13 +520,51 @@ export default function GroceryListScreen() {
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={groupedItems}
-          renderItem={renderCategorySection}
-          keyExtractor={([category]) => category}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles(theme).listContainer}
-        />
+        <>
+          <View style={styles(theme).controlsContainer}>
+            <TouchableOpacity
+              ref={sortButtonRef}
+              style={styles(theme).sortButton}
+              onPress={() => {
+                sortButtonRef.current?.measure(
+                  (x, y, width, height, pageX, pageY) => {
+                    setSortButtonLayout({
+                      x: pageX,
+                      y: pageY,
+                      width,
+                      height,
+                    });
+                    setIsSortModalVisible(true);
+                  },
+                );
+              }}>
+              <Text style={styles(theme).sortButtonText}>
+                Sort by:{' '}
+                {sortBy === 'category'
+                  ? 'Category'
+                  : sortBy === 'recipe'
+                  ? 'Recipe'
+                  : 'Checked'}
+              </Text>
+            </TouchableOpacity>
+            {hasCompletedItems && (
+              <TouchableOpacity
+                style={styles(theme).clearButton}
+                onPress={clearCompletedItems}>
+                <Text style={styles(theme).clearButtonText}>
+                  Clear checked items
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <FlatList
+            data={groupedItems}
+            renderItem={renderCategorySection}
+            keyExtractor={([category]) => category}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles(theme).listContainer}
+          />
+        </>
       )}
 
       <TouchableOpacity
@@ -363,6 +574,7 @@ export default function GroceryListScreen() {
       </TouchableOpacity>
 
       {renderItemModal()}
+      {renderSortModal()}
     </View>
   );
 }
@@ -400,6 +612,32 @@ const styles = (theme: any) =>
     listContainer: {
       paddingBottom: 100,
     },
+    controlsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginHorizontal: 20,
+      marginTop: 20,
+      marginBottom: 10,
+    },
+    clearButton: {
+      backgroundColor: theme.colors.card,
+      alignItems: 'flex-end',
+    },
+    clearButtonText: {
+      ...theme.typography.h5,
+      color: theme.colors.primary,
+    },
+    sortButton: {
+      backgroundColor: theme.colors.card,
+      paddingVertical: 8,
+      paddingEnd: 12,
+      borderRadius: 8,
+    },
+    sortButtonText: {
+      ...theme.typography.h5,
+      color: theme.colors.primary,
+    },
     categorySection: {
       marginTop: 20,
     },
@@ -424,6 +662,7 @@ const styles = (theme: any) =>
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: 'space-between',
     },
     checkbox: {
       width: 28,
@@ -440,15 +679,26 @@ const styles = (theme: any) =>
       fontSize: 16,
       fontWeight: 'bold',
     },
+    itemTextContainer: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     itemText: {
       ...theme.typography.h4,
       color: theme.colors.text,
-      flex: 1,
     },
     amountText: {
       ...theme.typography.h5,
       color: theme.colors.subtext,
       marginLeft: 8,
+    },
+    deleteButton: {
+      padding: 4,
+      opacity: 0.5,
+    },
+    deleteIcon: {
+      opacity: 1,
     },
     completedText: {
       textDecorationLine: 'line-through',
@@ -574,5 +824,46 @@ const styles = (theme: any) =>
       ...theme.typography.h4,
       color: theme.colors.background,
       fontWeight: '500',
+    },
+    sortModalOverlay: {
+      flex: 1,
+      backgroundColor: 'transparent',
+    },
+    sortModalContainer: {
+      position: 'absolute',
+      backgroundColor: theme.colors.card,
+      borderRadius: 8,
+      paddingVertical: 8,
+      minWidth: 150,
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    sortOption: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+    },
+    sortOptionSelected: {
+      backgroundColor: theme.colors.background,
+    },
+    sortOptionText: {
+      ...theme.typography.h4,
+      color: theme.colors.text,
+    },
+    sortOptionTextSelected: {
+      color: theme.colors.primary,
+    },
+    sortCheckmark: {
+      ...theme.typography.h4,
+      color: theme.colors.primary,
+      marginLeft: 8,
     },
   });
