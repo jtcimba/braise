@@ -190,62 +190,68 @@ export default function GroceryListScreen() {
 
   const hasCompletedItems = items.some(item => item.completed);
 
-  const getItemsByCategory = () => {
+  const getItemsByCategory = (itemsToGroup: GroceryItem[]) => {
     const groupedItems: {[key: string]: GroceryItem[]} = {};
+    itemsToGroup.forEach(item => {
+      if (!groupedItems[item.category]) {
+        groupedItems[item.category] = [];
+      }
+      groupedItems[item.category].push(item);
+    });
+    return Object.entries(groupedItems).sort(([a], [b]) => {
+      const aIndex = CATEGORIES.indexOf(a);
+      const bIndex = CATEGORIES.indexOf(b);
+      return aIndex - bIndex;
+    });
+  };
 
-    if (sortBy === 'category') {
-      items.forEach(item => {
-        if (!groupedItems[item.category]) {
-          groupedItems[item.category] = [];
-        }
-        groupedItems[item.category].push(item);
-      });
+  const getItemsByRecipe = (itemsToGroup: GroceryItem[]) => {
+    const otherKey = 'Other';
+    const groupedItems: {[key: string]: GroceryItem[]} = {};
+    itemsToGroup.forEach(item => {
+      const groupKey =
+        item.recipeId && item.recipeTitle ? item.recipeTitle : otherKey;
+      if (!groupedItems[groupKey]) {
+        groupedItems[groupKey] = [];
+      }
+      groupedItems[groupKey].push(item);
+    });
+    const entries = Object.entries(groupedItems);
+    const otherEntries = entries.filter(([key]) => key === otherKey);
+    const recipeEntries = entries
+      .filter(([key]) => key !== otherKey)
+      .sort(([a], [b]) => a.localeCompare(b));
+    return [...recipeEntries, ...otherEntries];
+  };
 
-      return Object.entries(groupedItems).sort(([a], [b]) => {
-        const aIndex = CATEGORIES.indexOf(a);
-        const bIndex = CATEGORIES.indexOf(b);
-        return aIndex - bIndex;
-      });
-    }
-
-    if (sortBy === 'recipe') {
-      const otherKey = 'Other';
-      items.forEach(item => {
-        const groupKey =
-          item.recipeId && item.recipeTitle ? item.recipeTitle : otherKey;
-        if (!groupedItems[groupKey]) {
-          groupedItems[groupKey] = [];
-        }
-        groupedItems[groupKey].push(item);
-      });
-      const entries = Object.entries(groupedItems);
-      const otherEntries = entries.filter(([key]) => key === otherKey);
-      const recipeEntries = entries
-        .filter(([key]) => key !== otherKey)
-        .sort(([a], [b]) => a.localeCompare(b));
-      return [...recipeEntries, ...otherEntries];
-    }
-
-    // Sort by checked/unchecked
+  const getItemsByChecked = (itemsToGroup: GroceryItem[]) => {
+    const groupedItems: {[key: string]: GroceryItem[]} = {};
     const uncheckedItems: GroceryItem[] = [];
     const checkedItems: GroceryItem[] = [];
-
-    items.forEach(item => {
+    itemsToGroup.forEach(item => {
       if (item.completed) {
         checkedItems.push(item);
       } else {
         uncheckedItems.push(item);
       }
     });
-
     if (uncheckedItems.length > 0) {
       groupedItems.Unchecked = uncheckedItems;
     }
     if (checkedItems.length > 0) {
       groupedItems.Checked = checkedItems;
     }
-
     return Object.entries(groupedItems);
+  };
+
+  const getItemsBySort = () => {
+    if (sortBy === 'category') {
+      return getItemsByCategory(items);
+    }
+    if (sortBy === 'recipe') {
+      return getItemsByRecipe(items);
+    }
+    return getItemsByChecked(items);
   };
 
   const renderCategorySection = ({item}: {item: [string, GroceryItem[]]}) => {
@@ -506,7 +512,7 @@ export default function GroceryListScreen() {
     );
   };
 
-  const groupedItems = getItemsByCategory();
+  const groupedItems = getItemsBySort();
 
   return (
     <View style={styles(theme).container}>
