@@ -30,13 +30,20 @@ interface GroceryItem {
   category: string;
   completed: boolean;
   amount: string;
+  recipeId?: string;
+  recipeTitle?: string;
 }
 
 const STORAGE_KEY = 'grocery_list_items';
 
 export default function GroceryListModal() {
   const theme = useTheme() as unknown as Theme;
-  const {isVisible: visible, ingredients, hideModal} = useGroceryListModal();
+  const {
+    isVisible: visible,
+    ingredients,
+    recipe,
+    hideModal,
+  } = useGroceryListModal();
   const [selectedIngredients, setSelectedIngredients] = useState<Set<string>>(
     new Set(),
   );
@@ -63,10 +70,11 @@ export default function GroceryListModal() {
   const parsedIngredients = parseIngredients(ingredients);
 
   useEffect(() => {
-    if (visible) {
-      setSelectedIngredients(new Set());
+    if (visible && ingredients) {
+      const parsed = parseIngredients(ingredients);
+      setSelectedIngredients(new Set(parsed.map(ingredient => ingredient.id)));
     }
-  }, [visible]);
+  }, [visible, ingredients]);
 
   const toggleIngredient = (id: string) => {
     setSelectedIngredients(prev => {
@@ -87,7 +95,7 @@ export default function GroceryListModal() {
   const handleConfirm = async () => {
     const ingredientsToAdd =
       selectedIngredients.size === 0
-        ? parsedIngredients
+        ? []
         : parsedIngredients.filter(ingredient =>
             selectedIngredients.has(ingredient.id),
           );
@@ -98,34 +106,66 @@ export default function GroceryListModal() {
         ? JSON.parse(storedItems)
         : [];
 
+      const recipeId = recipe?.id;
+      const recipeTitle = recipe?.title;
+
       const existingItemsMap = new Map<string, GroceryItem>();
       existingItems.forEach(item => {
         const normalizedName = item.name.toLowerCase().trim();
-        existingItemsMap.set(normalizedName, item);
+        const key = recipeId
+          ? `${normalizedName}::${item.recipeId ?? ''}`
+          : normalizedName;
+        if (!existingItemsMap.has(key)) {
+          existingItemsMap.set(key, item);
+        }
       });
 
       const updatedItems = [...existingItems];
       const newItems: GroceryItem[] = [];
+      const newItemsMap = new Map<string, GroceryItem>();
 
       ingredientsToAdd.forEach(ingredient => {
         const normalizedName = ingredient.name.toLowerCase().trim();
-        const existingItem = existingItemsMap.get(normalizedName);
+        const matchKey = recipeId
+          ? `${normalizedName}::${recipeId}`
+          : normalizedName;
+        const noRecipeKey = `${normalizedName}::`;
+        const existingItem =
+          existingItemsMap.get(matchKey) ?? existingItemsMap.get(noRecipeKey);
 
-        if (existingItem && ingredient.amount) {
+        const canMerge =
+          existingItem &&
+          (!existingItem.recipeId || existingItem.recipeId === recipeId);
+
+        if (existingItem && canMerge && ingredient.amount) {
           const combinedAmount = combineAmounts(
             existingItem.amount,
             ingredient.amount,
           );
           existingItem.amount = combinedAmount;
-        } else if (!existingItem) {
-          const newItem: GroceryItem = {
-            id: Date.now().toString() + Math.random().toString(),
-            name: ingredient.name.trim(),
-            category: categorizeIngredient(ingredient.name),
-            completed: false,
-            amount: ingredient.amount || '',
-          };
-          newItems.push(newItem);
+          if (recipeId && recipeTitle) {
+            existingItem.recipeId = recipeId;
+            existingItem.recipeTitle = recipeTitle;
+          }
+        } else if (!existingItem || !canMerge) {
+          const existingNew = newItemsMap.get(matchKey);
+          if (existingNew && ingredient.amount) {
+            existingNew.amount = combineAmounts(
+              existingNew.amount,
+              ingredient.amount,
+            );
+          } else if (!existingNew) {
+            const newItem: GroceryItem = {
+              id: Date.now().toString() + Math.random().toString(),
+              name: ingredient.name.trim(),
+              category: categorizeIngredient(ingredient.name),
+              completed: false,
+              amount: ingredient.amount || '',
+              ...(recipeId && recipeTitle ? {recipeId, recipeTitle} : {}),
+            };
+            newItems.push(newItem);
+            newItemsMap.set(matchKey, newItem);
+          }
         }
       });
 
@@ -233,7 +273,8 @@ export default function GroceryListModal() {
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}>
-                {selectedIngredients.size === 0
+                {selectedIngredients.size === parsedIngredients.length &&
+                parsedIngredients.length > 0
                   ? 'Add all'
                   : `Add selected (${selectedIngredients.size})`}
               </Text>
