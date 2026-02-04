@@ -9,16 +9,19 @@ import {
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {supabase} from '../supabase-client';
+import {User} from '@supabase/supabase-js';
 
 export default function SettingsScreen() {
-  const {colors} = useTheme() as unknown as Theme;
-  const [email, setEmail] = useState<string | undefined>('');
+  const theme = useTheme() as unknown as Theme;
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
-      const user = await supabase.auth.getUser().then(({data: {user}}) => user);
+      const {
+        data: {user},
+      } = await supabase.auth.getUser();
       if (user) {
-        setEmail(user.email);
+        setUser(user);
       }
     };
     getUser();
@@ -28,30 +31,57 @@ export default function SettingsScreen() {
     await supabase.auth.signOut();
   };
 
+  const formatDate = (date: string | undefined) => {
+    if (!date) {
+      return null;
+    }
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   return (
-    <View style={styles(colors).container}>
-      <SafeAreaView style={styles(colors).settings}>
-        <Text style={styles(colors).email}>{email}</Text>
+    <View style={styles(theme).container}>
+      <SafeAreaView style={styles(theme).settings}>
+        <View style={styles(theme).userInfo}>
+          <Text style={styles(theme).email}>{user?.email}</Text>
+          <Text style={styles(theme).memberSince}>
+            Member since {formatDate(user?.created_at)}
+          </Text>
+        </View>
         <TouchableHighlight
           onPress={handleSignOut}
-          style={styles(colors).signOutButton}>
-          <Text style={styles(colors).signOutText}>Sign Out</Text>
+          style={styles(theme).signOutButton}>
+          <Text style={styles(theme).signOutText}>Sign Out</Text>
         </TouchableHighlight>
       </SafeAreaView>
       <View>
-        <Text style={styles(colors).version}>Version 1.0.0</Text>
+        <Text style={styles(theme).version}>v1.0</Text>
       </View>
     </View>
   );
 }
 
-const styles = (colors: any) =>
+const styles = (theme: Theme) =>
   StyleSheet.create({
+    userInfo: {
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+      width: '100%',
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      padding: 20,
+      marginBottom: 20,
+    },
     container: {
       flex: 1,
       justifyContent: 'space-between',
       alignItems: 'center',
-      backgroundColor: colors.secondaryLight,
+      backgroundColor: theme.colors['neutral-100'],
       paddingHorizontal: 20,
     },
     settings: {
@@ -60,22 +90,25 @@ const styles = (colors: any) =>
       width: '100%',
     },
     version: {
-      color: colors.subtext,
+      color: theme.colors['neutral-400'],
+      ...theme.typography.h4,
+      paddingBottom: 20,
     },
     email: {
-      color: colors.secondary,
-      fontSize: 16,
+      color: theme.colors['neutral-800'],
+      ...theme.typography['h2-emphasized'],
       marginBottom: 20,
-      marginTop: 20,
+    },
+    memberSince: {
+      color: theme.colors['neutral-400'],
+      ...theme.typography.h4,
     },
     signOutText: {
-      color: colors.card,
-      fontSize: 16,
-      fontWeight: '600',
-      fontFamily: 'Hanken Grotesk',
+      color: theme.colors['neutral-100'],
+      ...theme.typography['h2-emphasized'],
     },
     signOutButton: {
-      backgroundColor: colors.tertiary,
+      backgroundColor: theme.colors['neutral-800'],
       padding: 10,
       borderRadius: 25,
       width: '100%',

@@ -18,6 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {categorizeIngredient} from '../services';
+import FilterChip from './FilterChip';
 
 interface GroceryItem {
   id: string;
@@ -56,14 +57,6 @@ export default function GroceryListScreen() {
   const [sortBy, setSortBy] = useState<'category' | 'checked' | 'recipe'>(
     'category',
   );
-  const [isSortModalVisible, setIsSortModalVisible] = useState(false);
-  const sortButtonRef = useRef<TouchableOpacity>(null);
-  const [sortButtonLayout, setSortButtonLayout] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
@@ -257,7 +250,7 @@ export default function GroceryListScreen() {
   const renderCategorySection = ({item}: {item: [string, GroceryItem[]]}) => {
     const [category, categoryItems] = item;
     return (
-      <View style={styles(theme).categorySection}>
+      <View>
         <Text style={styles(theme).categoryHeader}>{category}</Text>
         {categoryItems.map(groceryItem => (
           <TouchableOpacity
@@ -309,7 +302,7 @@ export default function GroceryListScreen() {
                 <Ionicons
                   name="close"
                   size={20}
-                  color={theme.colors.subtext}
+                  color={theme.colors['neutral-400']}
                   style={styles(theme).deleteIcon}
                 />
               </TouchableOpacity>
@@ -359,6 +352,7 @@ export default function GroceryListScreen() {
                     <TextInput
                       style={styles(theme).textInput}
                       placeholder="Item name"
+                      placeholderTextColor={theme.colors['neutral-400']}
                       value={newItemName}
                       onChangeText={setNewItemName}
                       autoFocus
@@ -366,6 +360,7 @@ export default function GroceryListScreen() {
                     <TextInput
                       style={styles(theme).textInput}
                       placeholder="Amount (e.g., 2 lbs, 1 dozen)"
+                      placeholderTextColor={theme.colors['neutral-400']}
                       value={newItemAmount}
                       onChangeText={setNewItemAmount}
                     />
@@ -422,96 +417,6 @@ export default function GroceryListScreen() {
     );
   };
 
-  const getSortModalStyle = () => {
-    return {
-      top: sortButtonLayout.y + sortButtonLayout.height + 8,
-      left: 20,
-    };
-  };
-
-  const renderSortModal = () => {
-    return (
-      <Modal
-        visible={isSortModalVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setIsSortModalVisible(false)}>
-        <TouchableWithoutFeedback onPress={() => setIsSortModalVisible(false)}>
-          <View style={styles(theme).sortModalOverlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View
-                style={[styles(theme).sortModalContainer, getSortModalStyle()]}>
-                <TouchableOpacity
-                  style={[
-                    styles(theme).sortOption,
-                    sortBy === 'category' && styles(theme).sortOptionSelected,
-                  ]}
-                  onPress={() => {
-                    setSortBy('category');
-                    setIsSortModalVisible(false);
-                  }}>
-                  <Text
-                    style={[
-                      styles(theme).sortOptionText,
-                      sortBy === 'category' &&
-                        styles(theme).sortOptionTextSelected,
-                    ]}>
-                    Category
-                  </Text>
-                  {sortBy === 'category' && (
-                    <Text style={styles(theme).sortCheckmark}>✓</Text>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles(theme).sortOption,
-                    sortBy === 'recipe' && styles(theme).sortOptionSelected,
-                  ]}
-                  onPress={() => {
-                    setSortBy('recipe');
-                    setIsSortModalVisible(false);
-                  }}>
-                  <Text
-                    style={[
-                      styles(theme).sortOptionText,
-                      sortBy === 'recipe' &&
-                        styles(theme).sortOptionTextSelected,
-                    ]}>
-                    Recipe
-                  </Text>
-                  {sortBy === 'recipe' && (
-                    <Text style={styles(theme).sortCheckmark}>✓</Text>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles(theme).sortOption,
-                    sortBy === 'checked' && styles(theme).sortOptionSelected,
-                  ]}
-                  onPress={() => {
-                    setSortBy('checked');
-                    setIsSortModalVisible(false);
-                  }}>
-                  <Text
-                    style={[
-                      styles(theme).sortOptionText,
-                      sortBy === 'checked' &&
-                        styles(theme).sortOptionTextSelected,
-                    ]}>
-                    Checked
-                  </Text>
-                  {sortBy === 'checked' && (
-                    <Text style={styles(theme).sortCheckmark}>✓</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    );
-  };
-
   const groupedItems = getItemsBySort();
 
   return (
@@ -528,41 +433,32 @@ export default function GroceryListScreen() {
       ) : (
         <>
           <View style={styles(theme).controlsContainer}>
+            <FilterChip
+              label="Category"
+              selected={sortBy === 'category'}
+              onPress={() => setSortBy('category')}
+            />
+            <FilterChip
+              label="Recipe"
+              selected={sortBy === 'recipe'}
+              onPress={() => setSortBy('recipe')}
+            />
+            <FilterChip
+              label="Checked"
+              selected={sortBy === 'checked'}
+              onPress={() => setSortBy('checked')}
+            />
+          </View>
+          {hasCompletedItems && (
             <TouchableOpacity
-              ref={sortButtonRef}
-              style={styles(theme).sortButton}
-              onPress={() => {
-                sortButtonRef.current?.measure(
-                  (x, y, width, height, pageX, pageY) => {
-                    setSortButtonLayout({
-                      x: pageX,
-                      y: pageY,
-                      width,
-                      height,
-                    });
-                    setIsSortModalVisible(true);
-                  },
-                );
-              }}>
-              <Text style={styles(theme).sortButtonText}>
-                Sort by:{' '}
-                {sortBy === 'category'
-                  ? 'Category'
-                  : sortBy === 'recipe'
-                  ? 'Recipe'
-                  : 'Checked'}
+              style={[styles(theme).clearButton]}
+              onPress={clearCompletedItems}
+              disabled={!hasCompletedItems}>
+              <Text style={styles(theme).clearButtonText}>
+                Clear checked items
               </Text>
             </TouchableOpacity>
-            {hasCompletedItems && (
-              <TouchableOpacity
-                style={styles(theme).clearButton}
-                onPress={clearCompletedItems}>
-                <Text style={styles(theme).clearButtonText}>
-                  Clear checked items
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          )}
           <FlatList
             data={groupedItems}
             renderItem={renderCategorySection}
@@ -578,9 +474,7 @@ export default function GroceryListScreen() {
         onPress={() => setIsAddModalVisible(true)}>
         <Text style={styles(theme).floatingAddButtonText}>+</Text>
       </TouchableOpacity>
-
       {renderItemModal()}
-      {renderSortModal()}
     </View>
   );
 }
@@ -589,13 +483,13 @@ const styles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
     },
     floatingAddButton: {
       position: 'absolute',
-      bottom: 20,
-      right: 20,
-      backgroundColor: theme.colors.primary,
+      bottom: 15,
+      right: 15,
+      backgroundColor: theme.colors['rust-600'],
       width: 56,
       height: 56,
       borderRadius: 28,
@@ -611,58 +505,47 @@ const styles = (theme: any) =>
       shadowRadius: 3.84,
     },
     floatingAddButtonText: {
-      color: theme.colors.card,
+      color: theme.colors['neutral-100'],
       fontSize: 28,
       fontWeight: 'bold',
     },
     listContainer: {
-      paddingBottom: 100,
+      paddingBottom: 75,
     },
     controlsContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginHorizontal: 20,
-      marginTop: 20,
-      marginBottom: 10,
+      marginHorizontal: 15,
+      marginTop: 10,
+      marginBottom: 5,
     },
     clearButton: {
-      backgroundColor: theme.colors.card,
-      alignItems: 'flex-end',
+      alignSelf: 'flex-end',
+      marginRight: 15,
+      marginTop: 5,
+      paddingTop: 10,
+      paddingBottom: 5,
     },
     clearButtonText: {
-      ...theme.typography.h5,
-      color: theme.colors.primary,
+      ...theme.typography.h4,
+      color: theme.colors['rust-600'],
     },
-    sortButton: {
-      backgroundColor: theme.colors.card,
-      paddingVertical: 8,
-      paddingEnd: 12,
-      borderRadius: 8,
-    },
-    sortButtonText: {
-      ...theme.typography.h5,
-      color: theme.colors.primary,
-    },
-    categorySection: {
-      marginTop: 20,
+    sortPillsContainer: {
+      flexDirection: 'row',
     },
     categoryHeader: {
-      ...theme.typography.h3,
-      color: theme.colors.primary,
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      backgroundColor: theme.colors.card,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
+      marginHorizontal: 15,
+      marginTop: 15,
+      marginBottom: 5,
     },
     itemContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: 20,
+      marginHorizontal: 15,
       paddingVertical: 12,
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      borderBottomColor: theme.colors['neutral-300'],
     },
     itemContent: {
       flex: 1,
@@ -674,14 +557,14 @@ const styles = (theme: any) =>
       width: 28,
       height: 28,
       borderWidth: 2,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors['rust-600'],
       borderRadius: 4,
       marginRight: 12,
       justifyContent: 'center',
       alignItems: 'center',
     },
     checkmark: {
-      color: theme.colors.primary,
+      color: theme.colors['rust-600'],
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -691,12 +574,12 @@ const styles = (theme: any) =>
       alignItems: 'center',
     },
     itemText: {
-      ...theme.typography.h4,
-      color: theme.colors.text,
+      ...theme.typography['h4-emphasized'],
+      color: theme.colors['neutral-800'],
     },
     amountText: {
-      ...theme.typography.h5,
-      color: theme.colors.subtext,
+      ...theme.typography.h4,
+      color: theme.colors['neutral-400'],
       marginLeft: 8,
     },
     deleteButton: {
@@ -708,7 +591,7 @@ const styles = (theme: any) =>
     },
     completedText: {
       textDecorationLine: 'line-through',
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
     },
     emptyState: {
       flex: 1,
@@ -717,14 +600,14 @@ const styles = (theme: any) =>
       paddingHorizontal: 40,
     },
     emptyText: {
-      ...theme.typography.h2,
-      color: theme.colors.text,
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
       textAlign: 'center',
       marginBottom: 8,
     },
     emptySubtext: {
-      ...theme.typography.h5,
-      color: theme.colors.subtext,
+      ...theme.typography.h4,
+      color: theme.colors['neutral-400'],
       textAlign: 'center',
     },
     modalOverlay: {
@@ -754,51 +637,50 @@ const styles = (theme: any) =>
       flexGrow: 1,
     },
     modalTitle: {
-      ...theme.typography.h2,
-      color: theme.colors.text,
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
     },
     textInput: {
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
       borderRadius: 8,
       paddingHorizontal: 12,
       paddingVertical: 10,
-      marginBottom: 20,
+      marginBottom: 10,
       ...theme.typography.h4,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     categoryContainer: {
       marginBottom: 20,
     },
     categoryLabel: {
-      ...theme.typography.h4,
-      color: theme.colors.text,
+      ...theme.typography['h4-emphasized'],
+      color: theme.colors['neutral-800'],
       marginBottom: 10,
     },
     categoryButtons: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      gap: 8,
+      gap: 5,
     },
     categoryButton: {
       paddingHorizontal: 12,
       paddingVertical: 6,
-      borderRadius: 8,
+      borderRadius: 24,
       borderWidth: 1,
-      borderColor: theme.colors.border,
-      backgroundColor: theme.colors.background,
+      borderColor: theme.colors['neutral-300'],
     },
     selectedCategoryButton: {
-      backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors['rust-600'],
+      borderColor: theme.colors['rust-600'],
     },
     categoryButtonText: {
-      ...theme.typography.h5,
-      color: theme.colors.text,
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
       fontSize: 12,
     },
     selectedCategoryButtonText: {
-      color: theme.colors.card,
+      color: theme.colors['neutral-100'],
     },
     buttonContainer: {
       flexDirection: 'row',
@@ -809,67 +691,30 @@ const styles = (theme: any) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      borderRadius: 8,
+      borderRadius: 24,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
       alignItems: 'center',
     },
     cancelButtonText: {
       ...theme.typography.h4,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-800'],
     },
     confirmButton: {
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      borderRadius: 8,
-      backgroundColor: theme.colors.primary,
+      borderRadius: 24,
+      backgroundColor: theme.colors['neutral-800'],
       alignItems: 'center',
     },
     confirmButtonText: {
       ...theme.typography.h4,
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
       fontWeight: '500',
     },
-    sortModalOverlay: {
-      flex: 1,
-      backgroundColor: 'transparent',
-    },
-    sortModalContainer: {
-      position: 'absolute',
-      backgroundColor: theme.colors.card,
-      borderRadius: 8,
-      paddingVertical: 8,
-      minWidth: 150,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-    },
-    sortOption: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-    },
-    sortOptionSelected: {
-      backgroundColor: theme.colors.background,
-    },
-    sortOptionText: {
-      ...theme.typography.h4,
-      color: theme.colors.text,
-    },
-    sortOptionTextSelected: {
-      color: theme.colors.primary,
-    },
-    sortCheckmark: {
-      ...theme.typography.h4,
-      color: theme.colors.primary,
-      marginLeft: 8,
+    clearButtonHidden: {
+      opacity: 0,
+      pointerEvents: 'none',
     },
   });

@@ -35,15 +35,18 @@ const styles = (theme: Theme) =>
       paddingVertical: 4,
       borderRadius: 15,
       marginRight: 6,
+      borderColor: theme.colors['neutral-300'],
+      borderWidth: 1,
     },
     selectedChip: {
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors['neutral-800'],
+      borderColor: theme.colors['neutral-800'],
     },
     label: {
-      ...theme.typography.h5,
-      color: theme.colors.text,
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
     },
     selectedLabel: {
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
     },
   });

@@ -9,7 +9,6 @@ import {
 } from '@react-navigation/native';
 import RecipesScreen from './src/components/RecipesScreen';
 import SettingsScreen from './src/components/SettingsScreen';
-import AddScreen from './src/components/AddScreen';
 import {createStackNavigator} from '@react-navigation/stack';
 import RecipeDetailsScreen from './src/components/RecipeDetailsScreen';
 import GroceryListScreen from './src/components/GroceryListScreen';
@@ -18,6 +17,7 @@ import SettingsIcon from './src/components/SettingsIcon';
 import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenuHeader from './src/components/DetailsMenuHeader';
+import AddModal from './src/components/AddModal';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
@@ -56,12 +56,12 @@ async function storeSupabaseCredentials(session: Session) {
         session.access_token,
       );
       await AppGroupStorage.setItem('supabaseUserId', session.user.id);
-      
+
       // Store API URL if provided
       if (recipeImportAPIURL) {
         await AppGroupStorage.setItem('recipeImportAPIURL', recipeImportAPIURL);
       }
-      
+
       console.log('Stored Supabase credentials in App Group');
     }
   } catch (error) {
@@ -73,37 +73,13 @@ function AddComponent() {
   return null;
 }
 
-function AddStackNavigator() {
-  const theme = useTheme() as unknown as Theme;
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="AddScreen"
-        component={AddScreen}
-        options={({navigation}) => ({
-          headerLeft: () => null,
-          headerRight: () =>
-            CloseIcon(navigation, 'Recipes', theme.colors.secondary),
-          headerTitle: 'Add recipe',
-          presentation: 'modal',
-          headerShadowVisible: false,
-          headerRightContainerStyle: {paddingRight: 15, paddingTop: 5},
-          headerTitleStyle: {
-            ...theme?.typography.h1,
-            color: theme.colors.secondary,
-          },
-          headerStyle: {
-            backgroundColor: theme.colors.secondaryLight,
-          },
-        })}
-      />
-    </Stack.Navigator>
-  );
-}
-
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
   const {showOnboardingModal, completeOnboarding} = useOnboarding();
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+
+  const openAddModal = () => setIsAddModalVisible(true);
+  const closeAddModal = () => setIsAddModalVisible(false);
 
   return (
     <>
@@ -116,17 +92,23 @@ function TabNavigator({navigation}: {navigation: any}) {
                 name={route.name}
                 color={color}
                 size={size}
-                onPressFunction={() => navigation.navigate(route.name)}
+                onPressFunction={() => {
+                  if (route.name === 'Add') {
+                    openAddModal();
+                    return;
+                  }
+                  navigation.navigate(route.name);
+                }}
               />
             );
           },
-          tabBarActiveTintColor: '#323232',
-          tabBarInactiveTintColor: 'gray',
+          tabBarActiveTintColor: theme.colors['neutral-800'],
+          tabBarInactiveTintColor: theme.colors['neutral-400'],
           tabBarShowLabel: false,
         })}>
         <Tab.Screen
           name="Recipes"
-          component={RecipesScreen}
+          component={RecipesScreen as React.ComponentType<any>}
           options={{
             headerTitleAlign: 'left',
             headerRight: () => SettingsIcon(navigation),
@@ -134,6 +116,7 @@ function TabNavigator({navigation}: {navigation: any}) {
             headerShadowVisible: false,
             headerTitleStyle: {
               ...theme?.typography.h1,
+              color: theme.colors['neutral-800'],
             },
           }}
         />
@@ -143,8 +126,7 @@ function TabNavigator({navigation}: {navigation: any}) {
           listeners={() => ({
             tabPress: e => {
               e.preventDefault();
-              navigation.navigate('Add');
-              navigation.removeListener('tabPress');
+              openAddModal();
             },
           })}
         />
@@ -154,9 +136,15 @@ function TabNavigator({navigation}: {navigation: any}) {
           options={{
             headerTitleAlign: 'left',
             headerShadowVisible: false,
+            headerTitleStyle: {
+              ...theme?.typography.h1,
+              color: theme.colors['neutral-800'],
+            },
           }}
         />
       </Tab.Navigator>
+
+      <AddModal visible={isAddModalVisible} onClose={closeAddModal} />
 
       <OnboardingModal
         visible={showOnboardingModal}
@@ -235,7 +223,10 @@ export default function App({}: AppProps): React.JSX.Element {
     <ThemeProvider theme={LightTheme}>
       {isLoadingSession ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={LightTheme.colors.primary} />
+          <ActivityIndicator
+            size="large"
+            color={LightTheme.colors['rust-600']}
+          />
         </View>
       ) : authSession?.user && !isRecoverySession ? (
         <OnboardingProvider>
@@ -271,18 +262,10 @@ export default function App({}: AppProps): React.JSX.Element {
                       <DetailsMenuHeader navigation={navigation} />
                     ),
                     headerRightContainerStyle: {
-                      paddingRight: 15,
+                      paddingRight: 20,
                       marginBottom: 10,
                     },
                   })}
-                />
-                <Stack.Screen
-                  name="Add"
-                  component={AddStackNavigator}
-                  options={{
-                    headerShown: false,
-                    presentation: 'modal',
-                  }}
                 />
                 <Stack.Screen
                   name="Settings"
@@ -294,15 +277,15 @@ export default function App({}: AppProps): React.JSX.Element {
                       CloseIcon(navigation, 'Recipes', '#4A0B12'),
                     presentation: 'modal',
                     headerShadowVisible: false,
-                    headerRightContainerStyle: {paddingRight: 15},
+                    headerRightContainerStyle: {paddingRight: 10},
                     headerTitleStyle: {
-                      fontFamily: 'Hanken Grotesk',
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      color: '#4A0B12',
+                      fontFamily: 'Noto Serif',
+                      fontSize: 22,
+                      fontWeight: '600',
+                      color: '#291E0D',
                     },
                     headerStyle: {
-                      backgroundColor: '#E1A898',
+                      backgroundColor: LightTheme.colors['neutral-100'],
                     },
                   })}
                 />
@@ -328,6 +311,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: LightTheme.colors.background,
+    backgroundColor: LightTheme.colors['neutral-100'],
   },
 });

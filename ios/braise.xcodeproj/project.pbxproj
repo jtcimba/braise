@@ -21,6 +21,9 @@
 		C09BDB8B46044C87B8EBCB5C /* Hanken-Grotesk.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */; };
 		F30EFE660593420D99AE1313 /* Crimson-Text-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */; };
 		FC52E19EF8BF49C4B434873E /* Erode-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89851E676AAC453E819CB3D0 /* Erode-Variable.ttf */; };
+		A1B2C3D4080345DBBC65A99F /* NotoSerif-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5C0D3464DBDA9E807 /* NotoSerif-Variable.ttf */; };
+		B2C3D4E5080345DBBC65A9A0 /* SourceSerif4-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6C0D3464DBDA9E808 /* SourceSerif4-Regular.ttf */; };
+		C3D4E5F6080345DBBC65A9A1 /* Switzer-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D4E5F607C0D3464DBDA9E809 /* Switzer-Variable.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +85,9 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		FF20F38EC0D3464DBDA9E806 /* Satoshi-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Satoshi-Variable.ttf"; path = "../src/assets/fonts/Satoshi-Variable.ttf"; sourceTree = "<group>"; };
 		FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hanken-Grotesk.ttf"; path = "../src/assets/fonts/Hanken-Grotesk.ttf"; sourceTree = "<group>"; };
+		B2C3D4E5C0D3464DBDA9E807 /* NotoSerif-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSerif-Variable.ttf"; path = "../src/assets/fonts/NotoSerif-Variable.ttf"; sourceTree = "<group>"; };
+		C3D4E5F6C0D3464DBDA9E808 /* SourceSerif4-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SourceSerif4-Regular.ttf"; path = "../src/assets/fonts/SourceSerif4-Regular.ttf"; sourceTree = "<group>"; };
+		D4E5F607C0D3464DBDA9E809 /* Switzer-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Switzer-Variable.ttf"; path = "../src/assets/fonts/Switzer-Variable.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -226,6 +232,9 @@
 				89851E676AAC453E819CB3D0 /* Erode-Variable.ttf */,
 				7B1B428B75B74C0BA3289BA5 /* Mango-Grotesque.ttf */,
 				FF20F38EC0D3464DBDA9E806 /* Satoshi-Variable.ttf */,
+				B2C3D4E5C0D3464DBDA9E807 /* NotoSerif-Variable.ttf */,
+				C3D4E5F6C0D3464DBDA9E808 /* SourceSerif4-Regular.ttf */,
+				D4E5F607C0D3464DBDA9E809 /* Switzer-Variable.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -368,6 +377,9 @@
 				FC52E19EF8BF49C4B434873E /* Erode-Variable.ttf in Resources */,
 				A287D0B509C2427787E243CA /* Mango-Grotesque.ttf in Resources */,
 				03AD4B2B080345DBBC65A99E /* Satoshi-Variable.ttf in Resources */,
+				A1B2C3D4080345DBBC65A99F /* NotoSerif-Variable.ttf in Resources */,
+				B2C3D4E5080345DBBC65A9A0 /* SourceSerif4-Regular.ttf in Resources */,
+				C3D4E5F6080345DBBC65A9A1 /* Switzer-Variable.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

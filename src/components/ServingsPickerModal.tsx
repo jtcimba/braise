@@ -157,12 +157,12 @@ const styles = (theme: Theme) =>
       paddingVertical: 12,
       paddingHorizontal: 20,
       borderRadius: 8,
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors['rust-600'],
       alignItems: 'center',
     },
     confirmButtonText: {
       ...theme.typography.h4,
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
       fontWeight: '500',
     },
   });

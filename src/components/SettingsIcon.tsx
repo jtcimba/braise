@@ -12,7 +12,7 @@ function SettingsIcon(navigation: any) {
       <Ionicons
         name="settings-outline"
         size={24}
-        color={theme.colors.subtext}
+        color={theme.colors['neutral-800']}
       />
     </TouchableOpacity>
   );

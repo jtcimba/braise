@@ -134,7 +134,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     modalContainer: {
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
       borderRadius: 16,
       padding: 20,
       width: '90%',
@@ -146,7 +146,7 @@ const styles = (theme: Theme) =>
     },
     title: {
       ...theme.typography.h2,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     pickerRow: {
       flexDirection: 'row',
@@ -170,24 +170,24 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 20,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
       alignItems: 'center',
     },
     cancelButtonText: {
       ...theme.typography.h4,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
     },
     confirmButton: {
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
       borderRadius: 8,
-      backgroundColor: theme.colors.primary,
+      backgroundColor: theme.colors['rust-600'],
       alignItems: 'center',
     },
     confirmButtonText: {
       ...theme.typography.h4,
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
       fontWeight: '500',
     },
   });

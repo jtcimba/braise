@@ -15,11 +15,11 @@ import {useTheme} from '../../theme/ThemeProvider';
 import SearchAndFilters from './SearchAndFilters';
 import {recipeService} from '../services';
 
-type Route = {
-  route: {params: {refresh: boolean}};
+type RecipesScreenProps = {
+  route?: {params?: {refresh?: boolean}};
 };
 
-export default function RecipesScreen({route}: Route) {
+export default function RecipesScreen({route}: RecipesScreenProps) {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -156,7 +156,7 @@ const styles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
     },
     noRecipes: {
       flex: 1,
@@ -165,7 +165,7 @@ const styles = (theme: any) =>
       justifyContent: 'center',
     },
     subtext: {
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-800'],
       overflow: 'hidden',
     },
   });

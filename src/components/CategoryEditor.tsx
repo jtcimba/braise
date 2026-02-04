@@ -73,7 +73,7 @@ export default function CategoryEditor({
             ref={inputRef}
             style={styles(theme).input}
             placeholder="Add a tag..."
-            placeholderTextColor={theme.colors.subtext}
+            placeholderTextColor={theme.colors['neutral-400']}
             value={newCategory}
             onChangeText={setNewCategory}
             onSubmitEditing={handleSubmitEditing}
@@ -108,7 +108,7 @@ const styles = (theme: Theme) =>
     },
     chipText: {
       color: theme.colors.text,
-      ...theme.typography.h5,
+      ...theme.typography.h4,
       textAlignVertical: 'center',
       includeFontPadding: false,
     },
@@ -129,7 +129,7 @@ const styles = (theme: Theme) =>
       marginBottom: 5,
     },
     input: {
-      ...theme.typography.h5,
+      ...theme.typography.h4,
       color: theme.colors.text,
       minWidth: 150,
     },
