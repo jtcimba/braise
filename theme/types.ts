@@ -1,15 +1,15 @@
 import {TextStyle} from 'react-native';
 
 export interface TypographyStyles {
-  // Header styles using Lora
   h1: TextStyle;
   h2: TextStyle;
+  'h2-emphasized': TextStyle;
   h3: TextStyle;
+  'h3-emphasized': TextStyle;
   h4: TextStyle;
+  'h4-emphasized': TextStyle;
   h5: TextStyle;
   h6: TextStyle;
-
-  // Body text styles using Merriweather Sans
   b1: TextStyle;
   b2: TextStyle;
 }

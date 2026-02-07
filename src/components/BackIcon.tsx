@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 export default function BackIcon(
   navigation: any,
   component: any = null,
-  color: string = '#2D2D2D',
+  color: string = '#9E9E9E',
 ) {
   const viewMode = useSelector((state: any) => state.viewMode.value);
 

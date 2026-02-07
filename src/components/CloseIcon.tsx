@@ -5,7 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export default function CloseIcon(
   navigation: any,
   parentComponent: string,
-  color: string = '#F6F6F4',
+  color: string = '#9E9E9E',
 ) {
   return (
     <View style={[styles().iconContainer]}>

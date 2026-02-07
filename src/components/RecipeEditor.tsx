@@ -22,7 +22,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import InstructionsEditor from './InstructionsEditor';
 import CategoryEditor from './CategoryEditor';
 import CustomToggle from './CustomToggle';
-import ServingsPickerModal from './ServingsPickerModal';
 import TotalTimePickerModal from './TotalTimePickerModal';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
@@ -30,7 +29,6 @@ import {supabase} from '../supabase-client';
 
 export default function RecipeEditor({editingData, onChangeEditingData}: any) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [servingsModalVisible, setServingsModalVisible] = useState(false);
   const [totalTimeModalVisible, setTotalTimeModalVisible] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const theme = useTheme() as unknown as Theme;
@@ -185,7 +183,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 style={styles(theme).titleInput}
                 value={editingData.title}
                 placeholder="Recipe name"
-                placeholderTextColor={theme.colors.subtext}
+                placeholderTextColor={theme.colors['neutral-400']}
                 onChangeText={text =>
                   onChangeEditingData({...editingData, title: text})
                 }
@@ -195,7 +193,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 style={styles(theme).authorInput}
                 value={editingData.author}
                 placeholder="Author"
-                placeholderTextColor={theme.colors.subtext}
+                placeholderTextColor={theme.colors['neutral-400']}
                 onChangeText={text =>
                   onChangeEditingData({...editingData, author: text})
                 }
@@ -222,7 +220,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   <Ionicons
                     name="camera-outline"
                     size={40}
-                    color={theme.colors.subtext}
+                    color={theme.colors['neutral-400']}
                   />
                   <Text style={styles(theme).placeholderText}>
                     Tap to add image
@@ -233,15 +231,53 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
             <View style={styles(theme).bodyContainer}>
               <View style={styles(theme).detailsContainer}>
                 <View style={styles(theme).detailsRow}>
+                  <View style={styles(theme).metadataServingsContainer}>
+                    <Text style={styles(theme).metadataText}>Servings</Text>
+                    <View style={styles(theme).servingsToggleContainer}>
+                      <TouchableOpacity
+                        style={styles(theme).servingsToggleButton}
+                        onPress={() => {
+                          const num = parseInt(
+                            editingData.servings?.toString() || '1',
+                            10,
+                          );
+                          if (num > 1) {
+                            handleServingsUpdate(String(num - 1));
+                          }
+                        }}>
+                        <Ionicons
+                          name="remove-outline"
+                          size={16}
+                          color={theme.colors['neutral-800']}
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles(theme).servingsValue}>
+                        {editingData.servings != null
+                          ? editingData.servings.toString()
+                          : '-'}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles(theme).servingsToggleButton}
+                        onPress={() => {
+                          const num = parseInt(
+                            editingData.servings?.toString() || '1',
+                            10,
+                          );
+                          handleServingsUpdate(String(num + 1));
+                        }}>
+                        <Ionicons
+                          name="add-outline"
+                          size={16}
+                          color={theme.colors['neutral-800']}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                   <TouchableOpacity
-                    style={styles(theme).detailsTimeContainer}
+                    style={styles(theme).metadataTimeContainer}
                     onPress={() => setTotalTimeModalVisible(true)}>
-                    <Ionicons
-                      name="time-outline"
-                      size={20}
-                      color={theme.colors.primary}
-                    />
-                    <Text style={styles(theme).detailsText}>
+                    <Text style={styles(theme).metadataText}>Total Time</Text>
+                    <Text style={styles(theme).metadataValue}>
                       {editingData.total_time
                         ? editingData.total_time +
                           ' ' +
@@ -249,32 +285,12 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                         : '-'}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles(theme).detailsTimeContainer}
-                    onPress={() => setServingsModalVisible(true)}>
-                    <Ionicons
-                      name="restaurant-outline"
-                      size={18}
-                      color={theme.colors.primary}
-                      style={styles(theme).detailsIcon}
-                    />
-                    <Text style={styles(theme).detailsText}>
-                      {editingData.servings != null
-                        ? editingData.servings.toString()
-                        : '-'}{' '}
-                      servings
-                    </Text>
-                  </TouchableOpacity>
                 </View>
-                <CategoryEditor
-                  categories={categoriesArray}
-                  onChange={handleCategoryUpdate}
-                />
                 <TextInput
                   style={styles(theme).aboutInput}
                   value={editingData.about}
                   placeholder="Add a description or notes about this recipe..."
-                  placeholderTextColor={theme.colors.subtext}
+                  placeholderTextColor={theme.colors['neutral-400']}
                   onChangeText={(text: any) => {
                     onChangeEditingData({
                       ...editingData,
@@ -283,6 +299,10 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   }}
                   multiline
                   scrollEnabled={false}
+                />
+                <CategoryEditor
+                  categories={categoriesArray}
+                  onChange={handleCategoryUpdate}
                 />
               </View>
               <View style={styles(theme).tabBarContainer}>
@@ -303,7 +323,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   style={styles(theme).ingredientsInput}
                   value={editingData.ingredients}
                   placeholder="Enter ingredients, one per line..."
-                  placeholderTextColor={theme.colors.subtext}
+                  placeholderTextColor={theme.colors['neutral-400']}
                   onChangeText={(text: any) => {
                     onChangeEditingData({
                       ...editingData,
@@ -320,17 +340,6 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 handleInstructionsUpdate={handleInstructionUpdate}
                 handleModalClose={() => setModalVisible(false)}
                 modalVisible={modalVisible}
-              />
-
-              <ServingsPickerModal
-                visible={servingsModalVisible}
-                onClose={() => setServingsModalVisible(false)}
-                onConfirm={handleServingsUpdate}
-                currentValue={
-                  editingData.servings != null
-                    ? editingData.servings.toString()
-                    : ''
-                }
               />
 
               <TotalTimePickerModal
@@ -356,7 +365,7 @@ const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
     },
     contentContainer: {
       flex: 1,
@@ -367,19 +376,20 @@ const styles = (theme: Theme) =>
     },
     headerContainer: {
       marginBottom: 10,
-      paddingHorizontal: 25,
+      paddingHorizontal: 20,
       paddingTop: 5,
     },
     imageContainer: {
-      position: 'relative',
-      width: '100%',
-      height: 350,
-      backgroundColor: theme.colors.border,
+      height: 260,
+      marginHorizontal: 20,
+      backgroundColor: theme.colors['neutral-300'],
+      borderRadius: 8,
     },
     image: {
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
+      borderRadius: 8,
     },
     uploadingOverlay: {
       position: 'absolute',
@@ -393,65 +403,83 @@ const styles = (theme: Theme) =>
     },
     uploadingText: {
       ...theme.typography.h5,
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
     },
     placeholderOverlay: {
       position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
+      width: '100%',
+      height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
     },
     placeholderText: {
       ...theme.typography.h5,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
       marginTop: 10,
     },
     bodyContainer: {
       flex: 1,
       paddingHorizontal: 20,
       paddingTop: 18,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
       minHeight: '100%',
     },
     detailsContainer: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      borderRadius: 8,
-      padding: 15,
       marginBottom: 10,
     },
     detailsRow: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       alignContent: 'center',
+      marginBottom: 10,
     },
-    detailsTimeContainer: {
+    metadataServingsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       marginRight: 15,
     },
-    detailsText: {
-      ...theme.typography.h5,
-      color: theme.colors.text,
-      marginLeft: 5,
+    metadataTimeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
     },
-    detailsIcon: {
-      marginRight: 3,
+    metadataText: {
+      ...theme.typography['h3-emphasized'],
+      color: theme.colors['neutral-800'],
+      marginRight: 10,
+    },
+    metadataValue: {
+      ...theme.typography['h3-emphasized'],
+      color: theme.colors['neutral-800'],
+    },
+    servingsToggleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      borderRadius: 24,
+      minWidth: 70,
+    },
+    servingsValue: {
+      ...theme.typography['h3-emphasized'],
+      color: theme.colors['neutral-800'],
+      minWidth: 28,
+      textAlign: 'center',
+    },
+    servingsToggleButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
     },
     titleInput: {
       ...theme.typography.h1,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
       marginBottom: 5,
       width: '100%',
       padding: 0,
       backgroundColor: 'transparent',
     },
     authorInput: {
-      ...theme.typography.b1,
-      color: theme.colors.primary,
+      ...theme.typography.h2,
+      color: theme.colors['neutral-400'],
       marginBottom: 5,
       backgroundColor: 'transparent',
     },
@@ -459,30 +487,32 @@ const styles = (theme: Theme) =>
       ...theme.typography.h3,
       marginTop: 25,
       marginBottom: 10,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
     },
     tabBarContainer: {
-      marginVertical: 10,
+      marginBottom: 10,
       width: '100%',
     },
     ingredientsContainer: {
       flex: 1,
       marginBottom: 20,
+      paddingHorizontal: 30,
+      paddingVertical: 5,
     },
     ingredientsInput: {
-      ...theme.typography.h5,
-      color: theme.colors.text,
+      ...theme.typography.b1,
+      color: theme.colors['neutral-800'],
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
       borderRadius: 8,
       padding: 15,
       minHeight: 120,
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.b1,
-      color: theme.colors.text,
-      marginTop: 5,
+      ...theme.typography.b2,
+      color: theme.colors['neutral-800'],
+      marginBottom: 5,
     },
     instructionsContainer: {
       flex: 1,
@@ -495,7 +525,7 @@ const styles = (theme: Theme) =>
       width: '100%',
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
     },
     editLineContainer: {
       flexDirection: 'row',
@@ -503,16 +533,16 @@ const styles = (theme: Theme) =>
     lineNumber: {
       ...theme.typography.b1,
       marginRight: 10,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
     },
     editInstructions: {
       ...theme.typography.h5,
       flex: 1,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     placeholder: {
       ...theme.typography.h5,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
     },
     authorRow: {
       marginBottom: 10,

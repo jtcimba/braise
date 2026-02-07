@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* braiseTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* braiseTests.m */; };
-		03AD4B2B080345DBBC65A99E /* Satoshi-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF20F38EC0D3464DBDA9E806 /* Satoshi-Variable.ttf */; };
 		0477314E191EFF8864C786F1 /* libPods-braise-braiseTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 76B36059A661030102DC73EC /* libPods-braise-braiseTests.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		231998A52EE0EF5B0099F221 /* RecipeImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2319989B2EE0EF5B0099F221 /* RecipeImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -17,10 +16,9 @@
 		23C242F22EE4B413004FC0D4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 23C242F12EE4B413004FC0D4 /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		854860AF9DAB314AB6D42182 /* libPods-braise.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 02C25174A8433DC540490E38 /* libPods-braise.a */; };
-		A287D0B509C2427787E243CA /* Mango-Grotesque.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B1B428B75B74C0BA3289BA5 /* Mango-Grotesque.ttf */; };
-		C09BDB8B46044C87B8EBCB5C /* Hanken-Grotesk.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */; };
-		F30EFE660593420D99AE1313 /* Crimson-Text-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */; };
-		FC52E19EF8BF49C4B434873E /* Erode-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89851E676AAC453E819CB3D0 /* Erode-Variable.ttf */; };
+		A1B2C3D4080345DBBC65A99F /* NotoSerif-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5C0D3464DBDA9E807 /* NotoSerif-Variable.ttf */; };
+		B2C3D4E5080345DBBC65A9A0 /* SourceSerif4-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6C0D3464DBDA9E808 /* SourceSerif4-Regular.ttf */; };
+		C3D4E5F6080345DBBC65A9A1 /* Switzer-Variable.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D4E5F607C0D3464DBDA9E809 /* Switzer-Variable.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,17 +69,15 @@
 		23C242F12EE4B413004FC0D4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = braise/main.m; sourceTree = "<group>"; };
 		23F955882BEEE2CD00A94A19 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = braise/Fonts/Ionicons.ttf; sourceTree = "<group>"; };
 		4A0D6C95DC299DABAEBF7135 /* Pods-braise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise.release.xcconfig"; path = "Target Support Files/Pods-braise/Pods-braise.release.xcconfig"; sourceTree = "<group>"; };
-		6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Crimson-Text-Regular.ttf"; path = "../src/assets/fonts/Crimson-Text-Regular.ttf"; sourceTree = "<group>"; };
 		6C4AB02E2B652D928C2BEE7B /* Pods-braise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise.debug.xcconfig"; path = "Target Support Files/Pods-braise/Pods-braise.debug.xcconfig"; sourceTree = "<group>"; };
 		76B36059A661030102DC73EC /* libPods-braise-braiseTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-braise-braiseTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7B1B428B75B74C0BA3289BA5 /* Mango-Grotesque.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Mango-Grotesque.ttf"; path = "../src/assets/fonts/Mango-Grotesque.ttf"; sourceTree = "<group>"; };
 		7E7349F68582CF5179C49972 /* Pods-braise-braiseTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise-braiseTests.release.xcconfig"; path = "Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = braise/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		89851E676AAC453E819CB3D0 /* Erode-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Erode-Variable.ttf"; path = "../src/assets/fonts/Erode-Variable.ttf"; sourceTree = "<group>"; };
+		B2C3D4E5C0D3464DBDA9E807 /* NotoSerif-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NotoSerif-Variable.ttf"; path = "../src/assets/fonts/NotoSerif-Variable.ttf"; sourceTree = "<group>"; };
+		C3D4E5F6C0D3464DBDA9E808 /* SourceSerif4-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "SourceSerif4-Regular.ttf"; path = "../src/assets/fonts/SourceSerif4-Regular.ttf"; sourceTree = "<group>"; };
 		C4C888291D50499F01282852 /* Pods-braise-braiseTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-braise-braiseTests.debug.xcconfig"; path = "Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D4E5F607C0D3464DBDA9E809 /* Switzer-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Switzer-Variable.ttf"; path = "../src/assets/fonts/Switzer-Variable.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FF20F38EC0D3464DBDA9E806 /* Satoshi-Variable.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Satoshi-Variable.ttf"; path = "../src/assets/fonts/Satoshi-Variable.ttf"; sourceTree = "<group>"; };
-		FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Hanken-Grotesk.ttf"; path = "../src/assets/fonts/Hanken-Grotesk.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -221,11 +217,9 @@
 		9651252CF9884FC6BFBFE597 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				6A9BCD14426040BA91BB802B /* Crimson-Text-Regular.ttf */,
-				FF8856D8F716456482EA8776 /* Hanken-Grotesk.ttf */,
-				89851E676AAC453E819CB3D0 /* Erode-Variable.ttf */,
-				7B1B428B75B74C0BA3289BA5 /* Mango-Grotesque.ttf */,
-				FF20F38EC0D3464DBDA9E806 /* Satoshi-Variable.ttf */,
+				B2C3D4E5C0D3464DBDA9E807 /* NotoSerif-Variable.ttf */,
+				C3D4E5F6C0D3464DBDA9E808 /* SourceSerif4-Regular.ttf */,
+				D4E5F607C0D3464DBDA9E809 /* Switzer-Variable.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -363,11 +357,9 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F30EFE660593420D99AE1313 /* Crimson-Text-Regular.ttf in Resources */,
-				C09BDB8B46044C87B8EBCB5C /* Hanken-Grotesk.ttf in Resources */,
-				FC52E19EF8BF49C4B434873E /* Erode-Variable.ttf in Resources */,
-				A287D0B509C2427787E243CA /* Mango-Grotesque.ttf in Resources */,
-				03AD4B2B080345DBBC65A99E /* Satoshi-Variable.ttf in Resources */,
+				A1B2C3D4080345DBBC65A99F /* NotoSerif-Variable.ttf in Resources */,
+				B2C3D4E5080345DBBC65A9A0 /* SourceSerif4-Regular.ttf in Resources */,
+				C3D4E5F6080345DBBC65A9A1 /* Switzer-Variable.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,13 +397,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -470,13 +458,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise/Pods-braise-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise/Pods-braise-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -491,13 +475,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise-braiseTests/Pods-braise-braiseTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -512,13 +492,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise/Pods-braise-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-braise/Pods-braise-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -841,7 +817,10 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				PRODUCT_MODULE_NAME = braise;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
@@ -910,7 +889,10 @@
 					"-DFOLLY_USE_LIBCPP=1",
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				PRODUCT_MODULE_NAME = braise;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;

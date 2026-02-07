@@ -126,7 +126,7 @@ export default function DetailsMenu({
             style={styles(theme).modalItem}
             onPress={onAddToGroceryListPress}>
             <Ionicons name="list" size={18} style={styles(theme).icon} />
-            <Text style={styles(theme).editText}>Add to Grocery List</Text>
+            <Text style={styles(theme).editText}>Add to grocery list</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles(theme).modalItem}
@@ -142,7 +142,7 @@ export default function DetailsMenu({
               size={18}
               style={[styles(theme).icon, styles(theme).deleteIcon]}
             />
-            <Text style={styles(theme).deleteText}>Delete Recipe</Text>
+            <Text style={styles(theme).deleteText}>Delete recipe</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -161,12 +161,13 @@ const styles = (theme: Theme) =>
     },
     buttonContainer: {
       minWidth: 70,
-      backgroundColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
+      borderWidth: 1,
     },
     saveContainer: {
       marginLeft: 10,
-      backgroundColor: theme.colors.primary,
-      color: 'white',
+      backgroundColor: theme.colors['neutral-800'],
+      color: theme.colors['neutral-100'],
       minWidth: 70,
     },
     editContainer: {
@@ -178,13 +179,13 @@ const styles = (theme: Theme) =>
       paddingBottom: 2,
       paddingRight: 7,
       textAlign: 'center',
-      ...theme.typography.h5,
+      ...theme.typography.h4,
     },
     cancel: {
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     save: {
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
     },
     modalOverlay: {
       justifyContent: 'flex-end',
@@ -193,7 +194,7 @@ const styles = (theme: Theme) =>
     modal: {
       width: '100%',
       height: '100%',
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
       position: 'absolute',
       top: 450,
       zIndex: 12000,
@@ -210,12 +211,12 @@ const styles = (theme: Theme) =>
     },
     borderBottom: {
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      borderBottomColor: theme.colors['neutral-300'],
       paddingBottom: 10,
     },
     borderTop: {
       borderTopWidth: 1,
-      borderTopColor: theme.colors.border,
+      borderTopColor: theme.colors['neutral-300'],
       paddingTop: 10,
     },
     modalItem: {
@@ -224,15 +225,15 @@ const styles = (theme: Theme) =>
       marginVertical: 10,
     },
     optionsText: {
-      ...theme.typography.h3,
-      color: theme.colors.text,
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
     },
     editText: {
-      ...theme.typography.h5,
-      color: theme.colors.text,
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
     },
     deleteText: {
-      ...theme.typography.h5,
+      ...theme.typography.h4,
       color: theme.colors.notification,
     },
     deleteIcon: {

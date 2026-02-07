@@ -13,6 +13,8 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
+import {SvgXml} from 'react-native-svg';
+import {braiseLogoSvg} from '../assets/images/braiseLogoSvg';
 import {supabase} from '../supabase-client';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
@@ -247,12 +249,12 @@ export default function Auth({
   const renderSignIn = () => (
     <>
       <View style={styles(theme).header}>
-        <Text style={[styles(theme).title, {color: theme.colors.text}]}>
-          Welcome to Braise
-        </Text>
-        <Text style={[styles(theme).subtitle, {color: theme.colors.subtext}]}>
-          Sign in to continue
-        </Text>
+        <SvgXml
+          xml={braiseLogoSvg}
+          width={150}
+          height={75}
+          style={styles(theme).logo}
+        />
       </View>
 
       <View style={styles(theme).verticallySpaced}>
@@ -263,7 +265,7 @@ export default function Auth({
           onChangeText={(text: string) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -272,22 +274,35 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
       </View>
 
       <View style={styles(theme).verticallySpaced}>
-        <Text style={[styles(theme).label, {color: theme.colors.text}]}>
-          Password
-        </Text>
+        <View style={styles(theme).passwordContainer}>
+          <Text style={[styles(theme).label, {color: theme.colors.text}]}>
+            Password
+          </Text>
+          <TouchableOpacity
+            onPress={() => setView('reset')}
+            style={styles(theme).linkButton}>
+            <Text
+              style={[
+                styles(theme).linkText,
+                {color: theme.colors['neutral-400']},
+              ]}>
+              Forgot password?
+            </Text>
+          </TouchableOpacity>
+        </View>
         <TextInput
           onChangeText={(text: string) => setPassword(text)}
           value={password}
           secureTextEntry={true}
           placeholder="Password"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           autoComplete="password"
           style={[
@@ -295,25 +310,16 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
       </View>
-
-      <TouchableOpacity
-        onPress={() => setView('reset')}
-        style={styles(theme).linkButton}>
-        <Text style={[styles(theme).linkText, {color: theme.colors.primary}]}>
-          Forgot password?
-        </Text>
-      </TouchableOpacity>
-
       <TouchableOpacity
         style={[
           styles(theme).button,
-          {backgroundColor: theme.colors.primary},
           loading && styles(theme).buttonDisabled,
+          {backgroundColor: theme.colors['neutral-800']},
         ]}
         disabled={loading}
         onPress={signInWithEmail}>
@@ -329,7 +335,8 @@ export default function Auth({
           Don't have an account?{' '}
         </Text>
         <TouchableOpacity onPress={() => setView('signup')}>
-          <Text style={[styles(theme).linkText, {color: theme.colors.primary}]}>
+          <Text
+            style={[styles(theme).linkText, {color: theme.colors['rust-600']}]}>
             Sign Up
           </Text>
         </TouchableOpacity>
@@ -356,7 +363,7 @@ export default function Auth({
           onChangeText={(text: string) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -365,7 +372,7 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
@@ -380,7 +387,7 @@ export default function Auth({
           value={password}
           secureTextEntry={true}
           placeholder="Password (min. 6 characters)"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -388,7 +395,7 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
@@ -403,7 +410,7 @@ export default function Auth({
           value={confirmPassword}
           secureTextEntry={true}
           placeholder="Confirm password"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -411,7 +418,7 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
@@ -420,7 +427,7 @@ export default function Auth({
       <TouchableOpacity
         style={[
           styles(theme).button,
-          {backgroundColor: theme.colors.primary},
+          {backgroundColor: theme.colors['rust-600']},
           loading && styles(theme).buttonDisabled,
         ]}
         disabled={loading}
@@ -437,7 +444,8 @@ export default function Auth({
           Already have an account?{' '}
         </Text>
         <TouchableOpacity onPress={() => setView('signin')}>
-          <Text style={[styles(theme).linkText, {color: theme.colors.primary}]}>
+          <Text
+            style={[styles(theme).linkText, {color: theme.colors['rust-600']}]}>
             Sign In
           </Text>
         </TouchableOpacity>
@@ -462,14 +470,14 @@ export default function Auth({
           <Text
             style={[
               styles(theme).successText,
-              {color: theme.colors.secondary},
+              {color: theme.colors['rust-600']},
             ]}>
             Password reset email sent! Please check your inbox.
           </Text>
           <TouchableOpacity
             style={[
               styles(theme).button,
-              {backgroundColor: theme.colors.primary},
+              {backgroundColor: theme.colors['rust-600']},
               styles(theme).mt20,
             ]}
             onPress={() => {
@@ -490,7 +498,7 @@ export default function Auth({
               onChangeText={(text: string) => setEmail(text)}
               value={email}
               placeholder="email@address.com"
-              placeholderTextColor={theme.colors.subtext}
+              placeholderTextColor={theme.colors['neutral-400']}
               autoCapitalize="none"
               keyboardType="email-address"
               autoComplete="email"
@@ -499,7 +507,7 @@ export default function Auth({
                 {
                   borderColor: theme.colors.border,
                   color: theme.colors.text,
-                  backgroundColor: theme.colors.card,
+                  backgroundColor: theme.colors['neutral-100'],
                 },
               ]}
             />
@@ -508,7 +516,7 @@ export default function Auth({
           <TouchableOpacity
             style={[
               styles(theme).button,
-              {backgroundColor: theme.colors.primary},
+              {backgroundColor: theme.colors['rust-600']},
               loading && styles(theme).buttonDisabled,
             ]}
             disabled={loading}
@@ -523,7 +531,10 @@ export default function Auth({
           <View style={styles(theme).switchView}>
             <TouchableOpacity onPress={() => setView('signin')}>
               <Text
-                style={[styles(theme).linkText, {color: theme.colors.primary}]}>
+                style={[
+                  styles(theme).linkText,
+                  {color: theme.colors['rust-600']},
+                ]}>
                 Back to Sign In
               </Text>
             </TouchableOpacity>
@@ -553,7 +564,7 @@ export default function Auth({
           value={newPassword}
           secureTextEntry={true}
           placeholder="New password (min. 6 characters)"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -561,7 +572,7 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
@@ -576,7 +587,7 @@ export default function Auth({
           value={confirmNewPassword}
           secureTextEntry={true}
           placeholder="Confirm new password"
-          placeholderTextColor={theme.colors.subtext}
+          placeholderTextColor={theme.colors['neutral-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -584,18 +595,14 @@ export default function Auth({
             {
               borderColor: theme.colors.border,
               color: theme.colors.text,
-              backgroundColor: theme.colors.card,
+              backgroundColor: theme.colors['neutral-100'],
             },
           ]}
         />
       </View>
 
       <TouchableOpacity
-        style={[
-          styles(theme).button,
-          {backgroundColor: theme.colors.primary},
-          loading && styles(theme).buttonDisabled,
-        ]}
+        style={[styles(theme).button, loading && styles(theme).buttonDisabled]}
         disabled={loading}
         onPress={updatePassword}>
         {loading ? (
@@ -642,7 +649,7 @@ const styles = (theme: any) =>
       alignSelf: 'center',
     },
     header: {
-      marginBottom: 32,
+      marginBottom: 16,
       alignItems: 'center',
     },
     title: {
@@ -650,6 +657,11 @@ const styles = (theme: any) =>
       fontWeight: 'bold',
       marginBottom: 8,
       ...theme.typography.h1,
+    },
+    logo: {
+      width: 200,
+      height: 100,
+      marginBottom: 8,
     },
     subtitle: {
       ...theme.typography.h3,
@@ -673,6 +685,7 @@ const styles = (theme: any) =>
       ...theme.typography.h3,
     },
     button: {
+      backgroundColor: theme.colors['neutral-800'],
       padding: 16,
       borderRadius: 25,
       alignItems: 'center',
@@ -684,27 +697,23 @@ const styles = (theme: any) =>
       opacity: 0.6,
     },
     buttonText: {
-      color: theme.colors.card,
-      ...theme.typography.h3,
-      fontWeight: '600',
+      color: theme.colors['neutral-100'],
+      ...theme.typography['h2-emphasized'],
     },
     linkButton: {
-      alignSelf: 'flex-end',
-      marginTop: 8,
-      marginBottom: 16,
+      marginBottom: 8,
     },
     linkText: {
-      ...theme.typography.h5,
-      fontWeight: '600',
+      ...theme.typography.h4,
     },
     switchView: {
       flexDirection: 'row',
       justifyContent: 'center',
       alignItems: 'center',
-      marginTop: 24,
+      marginTop: 12,
     },
     switchText: {
-      ...theme.typography.h5,
+      ...theme.typography.h4,
     },
     successContainer: {
       alignItems: 'center',
@@ -717,5 +726,10 @@ const styles = (theme: any) =>
     },
     mt20: {
       marginTop: 20,
+    },
+    passwordContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
   });

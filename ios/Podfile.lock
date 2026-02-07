@@ -1126,6 +1126,8 @@ PODS:
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - React-RCTImage
+  - RNSVG (15.15.2):
+    - React-Core
   - RNVectorIcons (10.1.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1219,6 +1221,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - "tentap (from `../node_modules/@10play/tentap-editor`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1354,6 +1357,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   tentap:
@@ -1431,6 +1436,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 5a5237e0ca63009caaf0b34050a2c337686361b3
   RNReanimated: 1a98f269fddb4f586f692ee25799bde55f5920ef
   RNScreens: 321d9067091167f6255474ea0567f4b4ac09958a
+  RNSVG: e2504b6ec16dfc262d1c93cfd934e194e79cd78d
   RNVectorIcons: 0b5569bc6d955e496b3fa9bc6718c390c7f37f51
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   tentap: 1c7ff6ac3e93c48d06513f9c94f255c70adf88c5

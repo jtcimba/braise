@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   ScrollView,
 } from 'react-native';
 import {useTheme} from '../../theme/ThemeProvider';
@@ -12,8 +13,8 @@ import {Theme} from '../../theme/types';
 import {LogBox} from 'react-native';
 import CustomToggle from './CustomToggle';
 import {WebView} from 'react-native-webview';
-import ServingsPickerModal from './ServingsPickerModal';
 import {parseIngredient, scaleIngredients} from '../services';
+import {useGroceryListModal} from '../context/GroceryListModalContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 // Ignore WebView errors
@@ -21,15 +22,15 @@ LogBox.ignoreLogs(["Can't open url: about:srcdoc"]);
 
 export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   const theme = useTheme() as unknown as Theme;
+  const {showModal} = useGroceryListModal();
   const [isWebView, setIsWebView] = useState(false);
   const [tab, setTab] = useState('ingredients');
-  const [showServingsModal, setShowServingsModal] = useState(false);
   const [currentServings, setCurrentServings] = useState(data.servings || '-');
   const [scaledIngredients, setScaledIngredients] = useState(
     data.ingredients || '',
   );
 
-  const handleServingsConfirm = (newServings: string) => {
+  const updateServings = (newServings: string) => {
     const newScaledIngredients = scaleIngredients(
       data.ingredients || '',
       newServings,
@@ -42,6 +43,24 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
     if (onScaledIngredientsChange) {
       onScaledIngredientsChange(newScaledIngredients);
     }
+  };
+
+  const handleDecreaseServings = () => {
+    const num = parseInt(currentServings, 10) || 1;
+    if (num > 1) {
+      updateServings(String(num - 1));
+    }
+  };
+
+  const handleIncreaseServings = () => {
+    const num = parseInt(currentServings, 10) || 1;
+    updateServings(String(num + 1));
+  };
+
+  const onAddToShoppingListPress = () => {
+    const recipeInfo =
+      data?.id && data?.title ? {id: data.id, title: data.title} : undefined;
+    showModal(scaledIngredients, recipeInfo);
   };
 
   useEffect(() => {
@@ -110,59 +129,57 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
             />
           </View>
           <View style={styles(theme).bodyContainer}>
-            <View style={styles(theme).detailsContainer}>
-              <View style={styles(theme).detailsRow}>
-                <View style={styles(theme).detailsTimeContainer}>
-                  <Ionicons
-                    name="time-outline"
-                    size={20}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={styles(theme).detailsText}>
-                    {data.total_time
-                      ? data.total_time + ' ' + (data.total_time_unit || 'min')
-                      : '-'}
+            <View style={styles(theme).detailsRow}>
+              <View style={styles(theme).metadataServingsContainer}>
+                <Text style={styles(theme).metadataText}>Servings</Text>
+                <View style={styles(theme).servingsToggleContainer}>
+                  <TouchableOpacity
+                    style={styles(theme).servingsToggleButton}
+                    onPress={handleDecreaseServings}>
+                    <Ionicons
+                      name="remove-outline"
+                      size={16}
+                      color={theme.colors['neutral-800']}
+                    />
+                  </TouchableOpacity>
+                  <Text style={styles(theme).servingsValue}>
+                    {currentServings}
                   </Text>
+                  <TouchableOpacity
+                    style={styles(theme).servingsToggleButton}
+                    onPress={handleIncreaseServings}>
+                    <Ionicons
+                      name="add-outline"
+                      size={16}
+                      color={theme.colors['neutral-800']}
+                    />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  style={styles(theme).detailsTimeContainer}
-                  onPress={() => setShowServingsModal(true)}>
-                  <Ionicons
-                    name="restaurant-outline"
-                    size={18}
-                    color={theme.colors.primary}
-                    style={styles(theme).detailsIcon}
-                  />
-                  <Text style={styles(theme).detailsText}>
-                    {currentServings} servings
-                  </Text>
-                </TouchableOpacity>
               </View>
-              {data.categories && (
-                <View style={styles(theme).tagsRow}>
-                  {data.categories
-                    .split(',')
-                    .map((cat: string, idx: number) => {
-                      const label = cat.trim();
-                      const capitalized =
-                        label.charAt(0).toUpperCase() + label.slice(1);
-                      return (
-                        <View key={idx}>
-                          <Text style={styles(theme).tagPillText}>
-                            {capitalized}
-                            {idx < data.categories.split(',').length - 1
-                              ? '  •  '
-                              : ''}
-                          </Text>
-                        </View>
-                      );
-                    })}
-                </View>
-              )}
-              {data.about && (
-                <Text style={styles(theme).aboutText}>{data.about}</Text>
-              )}
+              <View style={styles(theme).metadataTimeContainer}>
+                <Text style={styles(theme).metadataText}>Total Time</Text>
+                <Text style={styles(theme).metadataValue}>
+                  {data.total_time
+                    ? data.total_time + ' ' + (data.total_time_unit || 'min')
+                    : '-'}
+                </Text>
+              </View>
             </View>
+            {data.about && (
+              <Text style={styles(theme).aboutText}>{data.about}</Text>
+            )}
+            {data.categories && (
+              <View style={styles(theme).tagsRow}>
+                {data.categories.split(',').map((cat: string, idx: number) => {
+                  const label = cat.trim().toUpperCase();
+                  return (
+                    <View key={idx} style={styles(theme).tagPill}>
+                      <Text style={styles(theme).tagPillText}>{label}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
             <View style={styles(theme).tabBarContainer}>
               <CustomToggle
                 value={tab === 'directions'}
@@ -197,7 +214,7 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
                               <View style={styles(theme).emptyQuantity} />
                             )}
                           </View>
-                          <Text style={styles(theme).ingredientTextBold}>
+                          <Text style={styles(theme).ingredientText}>
                             {text}
                           </Text>
                         </View>
@@ -242,6 +259,22 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
                 </View>
               </>
             )}
+            <Pressable
+              style={({pressed}) => [
+                styles(theme).addToShoppingListButton,
+                pressed && {backgroundColor: '#98A3B5'},
+              ]}
+              onPress={onAddToShoppingListPress}>
+              <Ionicons
+                name="list-outline"
+                size={20}
+                color={theme.colors['neutral-100']}
+                style={styles(theme).addToShoppingListIcon}
+              />
+              <Text style={styles(theme).addToShoppingListText}>
+                Add to grocery list
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       )}
@@ -254,14 +287,6 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
           textStyle="body"
         />
       </View>
-      <ServingsPickerModal
-        visible={showServingsModal}
-        onClose={() => setShowServingsModal(false)}
-        onConfirm={handleServingsConfirm}
-        currentValue={
-          currentServings != null ? currentServings.toString() : '1'
-        }
-      />
     </View>
   );
 }
@@ -270,7 +295,7 @@ const styles = (theme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
     },
     toggleContainer: {
       position: 'absolute',
@@ -283,8 +308,7 @@ const styles = (theme: any) =>
     imageContainer: {
       position: 'relative',
       width: '100%',
-      height: 350,
-      backgroundColor: theme.colors.border,
+      height: 260,
     },
     image: {
       width: '100%',
@@ -295,31 +319,26 @@ const styles = (theme: any) =>
       flex: 1,
       paddingHorizontal: 20,
       paddingTop: 18,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
       minHeight: '100%',
-      marginTop: -75,
     },
     detailsRow: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       alignContent: 'center',
+      marginBottom: 10,
     },
     title: {
       ...theme.typography.h1,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     author: {
-      ...theme.typography.b1,
-      color: theme.colors.primary,
-    },
-    host: {
-      ...theme.typography.h5,
-      color: theme.colors.text,
-      textDecorationLine: 'underline',
+      ...theme.typography.h2,
+      color: theme.colors['neutral-400'],
     },
     time: {
       ...theme.typography.h5,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
       overflow: 'hidden',
     },
     instructionsContainer: {
@@ -327,7 +346,7 @@ const styles = (theme: any) =>
       paddingVertical: 5,
     },
     ingredientsContainer: {
-      paddingHorizontal: 15,
+      paddingHorizontal: 30,
       paddingVertical: 5,
     },
     ingredientLine: {
@@ -338,7 +357,7 @@ const styles = (theme: any) =>
     },
     ingredientDivider: {
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.border,
+      borderBottomColor: theme.colors['neutral-300'],
     },
     quantityContainer: {
       width: 80,
@@ -346,18 +365,18 @@ const styles = (theme: any) =>
       paddingRight: 15,
     },
     quantity: {
-      ...theme.typography.h4,
+      ...theme.typography['h4-emphasized'],
       textAlign: 'right',
-      color: theme.colors.primary,
+      color: theme.colors['neutral-800'],
     },
     emptyQuantity: {
       width: 1,
       height: 24,
     },
-    ingredientTextBold: {
-      ...theme.typography.h5,
+    ingredientText: {
+      ...theme.typography.b1,
       flex: 1,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
       textAlign: 'left',
       marginLeft: 0,
     },
@@ -367,16 +386,16 @@ const styles = (theme: any) =>
       paddingVertical: 10,
     },
     lineNumber: {
-      ...theme.typography.h4,
+      ...theme.typography['h4-emphasized'],
       marginRight: 10,
       marginTop: 2,
-      color: theme.colors.primary,
+      color: theme.colors['neutral-800'],
     },
     lineText: {
       ...theme.typography.b1,
       flex: 1,
       alignSelf: 'flex-start',
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     paddingRight: {
       paddingRight: 5,
@@ -390,7 +409,7 @@ const styles = (theme: any) =>
       marginTop: 105,
     },
     scrollContentContainer: {
-      paddingBottom: 40,
+      paddingBottom: 10,
     },
     hidden: {
       display: 'none',
@@ -403,27 +422,35 @@ const styles = (theme: any) =>
     },
     errorText: {
       ...theme.typography.h5,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
       marginBottom: 20,
       textAlign: 'center',
     },
     tagsRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      marginTop: 8,
+    },
+    tagPill: {
+      backgroundColor: theme.colors['rust-200'],
+      borderRadius: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      marginVertical: 5,
+      marginRight: 5,
     },
     tagPillText: {
-      color: theme.colors.subtext,
+      color: theme.colors['rust-600'],
       ...theme.typography.h5,
     },
     tabBarContainer: {
-      marginVertical: 10,
+      marginTop: 15,
+      marginBottom: 5,
       width: '100%',
     },
     aboutText: {
       ...theme.typography.b2,
-      color: theme.colors.text,
-      marginVertical: 5,
+      color: theme.colors['neutral-800'],
+      marginBottom: 5,
     },
     emptyStateContainer: {
       padding: 20,
@@ -433,8 +460,8 @@ const styles = (theme: any) =>
       marginTop: 10,
     },
     emptyStateText: {
-      ...theme.typography.h5,
-      color: theme.colors.subtext,
+      ...theme.typography.h4,
+      color: theme.colors['neutral-400'],
       textAlign: 'center',
     },
     flex: {
@@ -442,34 +469,74 @@ const styles = (theme: any) =>
     },
     horizontalLine: {
       borderBottomWidth: 1,
-      borderBottomColor: theme.colors.opaque,
-      marginBottom: 10,
-    },
-    authorRow: {
+      borderBottomColor: theme.colors['neutral-300'],
       marginBottom: 10,
     },
     headerContainer: {
       marginBottom: 10,
-      paddingHorizontal: 25,
+      paddingHorizontal: 20,
       paddingTop: 5,
-    },
-    detailsContainer: {
-      borderWidth: 1,
-      borderColor: theme.colors.border,
-      borderRadius: 8,
-      padding: 15,
     },
     detailsText: {
       ...theme.typography.h5,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
       marginLeft: 5,
     },
     detailsIcon: {
       marginRight: 3,
     },
-    detailsTimeContainer: {
+    metadataServingsContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       marginRight: 15,
+    },
+    metadataTimeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    metadataText: {
+      ...theme.typography.h3,
+      color: theme.colors['neutral-400'],
+      marginRight: 10,
+    },
+    metadataValue: {
+      ...theme.typography['h3-emphasized'],
+      color: theme.colors['neutral-800'],
+    },
+    servingsToggleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      borderRadius: 24,
+      minWidth: 70,
+    },
+    servingsValue: {
+      ...theme.typography['h3-emphasized'],
+      color: theme.colors['neutral-800'],
+      minWidth: 18,
+      textAlign: 'center',
+    },
+    servingsToggleButton: {
+      paddingVertical: 6,
+      paddingHorizontal: 10,
+    },
+    addToShoppingListButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors['neutral-800'],
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+      borderRadius: 24,
+      marginTop: 24,
+      marginBottom: 20,
+    },
+    addToShoppingListIcon: {
+      marginRight: 8,
+    },
+    addToShoppingListText: {
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-100'],
     },
   });

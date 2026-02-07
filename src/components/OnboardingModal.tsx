@@ -38,7 +38,7 @@ export default function OnboardingModal({
               <Ionicons
                 name="share-outline"
                 size={60}
-                color={theme.colors.primary}
+                color={theme.colors['rust-600']}
               />
             </View>
             <Text style={styles(theme).title}>Welcome to Braise!</Text>
@@ -66,13 +66,13 @@ export default function OnboardingModal({
           <TouchableOpacity
             style={[
               styles(theme).button,
-              {backgroundColor: theme.colors.primary},
+              {backgroundColor: theme.colors['rust-600']},
             ]}
             onPress={onClose}>
             <Text
               style={[
                 styles(theme).buttonText,
-                {color: theme.colors.background},
+                {color: theme.colors['neutral-100']},
               ]}>
               Got it
             </Text>

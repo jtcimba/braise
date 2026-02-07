@@ -20,14 +20,9 @@ export default function CustomToggle({
 }: CustomToggleProps) {
   const theme = useTheme() as unknown as Theme;
 
-  const getOptionStyle = (isSelected: boolean) => [
-    styles(theme).option,
-    isSelected && styles(theme, textStyle).selectedOption,
-  ];
-
   const getTextStyle = (isSelected: boolean) => [
     styles(theme).baseText,
-    textStyle === 'header' ? theme.typography.h3 : theme.typography.h5,
+    textStyle === 'header' ? theme.typography.h2 : theme.typography.h4,
     isSelected
       ? styles(theme, textStyle).selectedText
       : styles(theme, textStyle).unselectedText,
@@ -36,12 +31,12 @@ export default function CustomToggle({
   return (
     <View style={styles(theme).container}>
       <TouchableOpacity
-        style={getOptionStyle(!value)}
+        style={styles(theme).option}
         onPress={() => onValueChange(false)}>
         <Text style={getTextStyle(!value)}>{leftLabel}</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={getOptionStyle(value)}
+        style={styles(theme).option}
         onPress={() => onValueChange(true)}>
         <Text style={getTextStyle(value)}>{rightLabel}</Text>
       </TouchableOpacity>
@@ -56,20 +51,19 @@ const styles = (theme: Theme, textStyle?: string) =>
     },
     option: {
       flex: 1,
-      paddingHorizontal: textStyle === 'body' ? 12 : 16,
+      paddingHorizontal: textStyle === 'body' ? 5 : 10,
       paddingVertical: textStyle === 'body' ? 0 : 5,
       alignItems: 'center',
       justifyContent: 'center',
     },
-    selectedOption: {},
     baseText: {
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     selectedText: {
-      color: theme.colors.text,
-      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
+      fontWeight: '600',
     },
     unselectedText: {
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-400'],
     },
   });

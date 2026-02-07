@@ -15,16 +15,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="320" verticalHuggingPriority="320" image="braise-logo" translatesAutoresizingMaskIntoConstraints="NO" id="GJd-Yh-RWb">
-                                <rect key="frame" x="87.5" y="283.5" width="200" height="100"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="320" verticalHuggingPriority="320" image="braise-launch-logo" translatesAutoresizingMaskIntoConstraints="NO" id="GJd-Yh-RWb">
+                                <rect key="frame" x="117.5" y="218.5" width="140" height="231"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="200" id="8fC-df-wgq"/>
-                                    <constraint firstAttribute="height" constant="100" id="v7f-dh-3Jc"/>
+                                    <constraint firstAttribute="width" constant="140" id="8fC-df-wgq"/>
+                                    <constraint firstAttribute="height" constant="231" id="v7f-dh-3Jc"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
-                        <color key="backgroundColor" red="1" green="0.98431372549019602" blue="0.95294117647058818" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.16078431372549021" green="0.11764705882352941" blue="0.050980392156862744" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="Bcu-3y-fUS" firstAttribute="centerX" secondItem="GJd-Yh-RWb" secondAttribute="centerX" id="Q3B-4B-g5h"/>
                             <constraint firstItem="GJd-Yh-RWb" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="moa-c2-u7t"/>
@@ -37,6 +37,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="braise-logo" width="1036" height="1036"/>
+        <image name="braise-launch-logo" width="594" height="982"/>
     </resources>
 </document>

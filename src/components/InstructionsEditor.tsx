@@ -57,11 +57,10 @@ export default function InstructionsEditor({
 
   const customCodeBlockCSS = `      
       body {
-        font-family: 'Crimson Text', sans-serif;
-        font-size: 1rem;
-        background-color: #FFFBF3;
-        color: #000000;
-        line-height: 1.5;
+        font-family: 'Source Serif 4', serif;
+        font-size: 16px;
+        background-color: ${theme.colors['neutral-100']};
+        color: ${theme.colors['neutral-800']};
       }
     `;
 
@@ -114,7 +113,7 @@ const styles = (theme: any) =>
   StyleSheet.create({
     keyboardAvoidingView: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
     },
     editor: {
       backgroundColor: 'transparent',
@@ -124,7 +123,7 @@ const styles = (theme: any) =>
     },
     safeAreaView: {
       flex: 1,
-      backgroundColor: theme.colors.background,
+      backgroundColor: theme.colors['neutral-100'],
       marginTop: 20,
       marginHorizontal: 30,
     },
@@ -147,7 +146,7 @@ const styles = (theme: any) =>
       marginBottom: 10,
     },
     headerText: {
-      color: theme.colors.subtext,
-      ...theme.typography.h2,
+      color: theme.colors['neutral-800'],
+      ...theme.typography['h2-emphasized'],
     },
   });

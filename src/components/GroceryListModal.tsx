@@ -243,13 +243,10 @@ export default function GroceryListModal() {
             },
           ]}>
           <View style={styles(theme).header}>
-            <Text style={styles(theme).title}>Add to Grocery List</Text>
+            <Text style={styles(theme).title}>Add to grocery list</Text>
           </View>
 
           <View style={styles(theme).ingredientsContainer}>
-            <Text style={styles(theme).subtitle}>
-              Select ingredients to add, or add all:
-            </Text>
             <FlatList
               data={parsedIngredients}
               renderItem={({item}) => renderIngredient({item})}
@@ -311,7 +308,7 @@ const styles = (theme: Theme) =>
     },
     modalContainer: {
       backgroundColor: theme.colors.background,
-      borderRadius: 20,
+      borderRadius: 16,
       padding: 20,
       width: '85%',
       maxWidth: 350,
@@ -321,7 +318,7 @@ const styles = (theme: Theme) =>
       marginBottom: 20,
     },
     title: {
-      ...theme.typography.h2,
+      ...theme.typography['h2-emphasized'],
       color: theme.colors.text,
     },
     subtitle: {
@@ -349,14 +346,14 @@ const styles = (theme: Theme) =>
       width: 24,
       height: 24,
       borderWidth: 2,
-      borderColor: theme.colors.primary,
+      borderColor: theme.colors['rust-600'],
       borderRadius: 4,
       marginRight: 16,
       justifyContent: 'center',
       alignItems: 'center',
     },
     checkmark: {
-      color: theme.colors.primary,
+      color: theme.colors['rust-600'],
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -368,7 +365,7 @@ const styles = (theme: Theme) =>
     },
     ingredientName: {
       ...theme.typography.h4,
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
       flex: 1,
       marginRight: 10,
       flexWrap: 'wrap',
@@ -387,9 +384,9 @@ const styles = (theme: Theme) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      borderRadius: 10,
+      borderRadius: 26,
       borderWidth: 1,
-      borderColor: theme.colors.border,
+      borderColor: theme.colors['neutral-300'],
       alignItems: 'center',
     },
     cancelButtonText: {
@@ -400,13 +397,13 @@ const styles = (theme: Theme) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      borderRadius: 10,
-      backgroundColor: theme.colors.primary,
+      borderRadius: 26,
+      backgroundColor: theme.colors['neutral-800'],
       alignItems: 'center',
     },
     confirmButtonText: {
       ...theme.typography.h4,
-      color: theme.colors.background,
+      color: theme.colors['neutral-100'],
       fontWeight: '500',
     },
   });

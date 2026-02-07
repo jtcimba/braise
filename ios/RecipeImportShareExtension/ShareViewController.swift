@@ -703,7 +703,7 @@ class ShareViewController: UIViewController {
             } else {
                 xImageView.image = UIImage(systemName: "xmark.circle.fill")
             }
-            xImageView.tintColor = .black
+            xImageView.tintColor = .label
             xImageView.contentMode = .scaleAspectFit
             containerView.addSubview(xImageView)
             
