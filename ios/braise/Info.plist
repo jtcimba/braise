@@ -56,11 +56,6 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
-		<string>Crimson-Text-Regular.ttf</string>
-		<string>Hanken-Grotesk.ttf</string>
-		<string>Erode-Variable.ttf</string>
-		<string>Mango-Grotesque.ttf</string>
-		<string>Satoshi-Variable.ttf</string>
 		<string>NotoSerif-Variable.ttf</string>
 		<string>SourceSerif4-Regular.ttf</string>
 		<string>Switzer-Variable.ttf</string>

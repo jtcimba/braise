@@ -13,6 +13,8 @@ import {
   Platform,
   Dimensions,
 } from 'react-native';
+import {SvgXml} from 'react-native-svg';
+import {braiseLogoSvg} from '../assets/images/braiseLogoSvg';
 import {supabase} from '../supabase-client';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
@@ -247,9 +249,12 @@ export default function Auth({
   const renderSignIn = () => (
     <>
       <View style={styles(theme).header}>
-        <Text style={[styles(theme).title, {color: theme.colors.text}]}>
-          Braise
-        </Text>
+        <SvgXml
+          xml={braiseLogoSvg}
+          width={150}
+          height={75}
+          style={styles(theme).logo}
+        />
       </View>
 
       <View style={styles(theme).verticallySpaced}>
@@ -314,7 +319,7 @@ export default function Auth({
         style={[
           styles(theme).button,
           loading && styles(theme).buttonDisabled,
-          {backgroundColor: theme.colors['rust-600']},
+          {backgroundColor: theme.colors['neutral-800']},
         ]}
         disabled={loading}
         onPress={signInWithEmail}>
@@ -644,7 +649,7 @@ const styles = (theme: any) =>
       alignSelf: 'center',
     },
     header: {
-      marginBottom: 32,
+      marginBottom: 16,
       alignItems: 'center',
     },
     title: {
@@ -652,6 +657,11 @@ const styles = (theme: any) =>
       fontWeight: 'bold',
       marginBottom: 8,
       ...theme.typography.h1,
+    },
+    logo: {
+      width: 200,
+      height: 100,
+      marginBottom: 8,
     },
     subtitle: {
       ...theme.typography.h3,

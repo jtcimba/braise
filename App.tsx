@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
-import {View, ActivityIndicator, StyleSheet, Linking} from 'react-native';
+import {View, StyleSheet, Linking} from 'react-native';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -222,12 +222,7 @@ export default function App({}: AppProps): React.JSX.Element {
   return (
     <ThemeProvider theme={LightTheme}>
       {isLoadingSession ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator
-            size="large"
-            color={LightTheme.colors['rust-600']}
-          />
-        </View>
+        <View style={styles.loadingContainer} />
       ) : authSession?.user && !isRecoverySession ? (
         <OnboardingProvider>
           <GroceryListModalProvider>
@@ -309,8 +304,6 @@ export default function App({}: AppProps): React.JSX.Element {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: LightTheme.colors['neutral-100'],
+    backgroundColor: LightTheme.colors['neutral-800'],
   },
 });

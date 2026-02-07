@@ -66,7 +66,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   }, []);
 
   useEffect(() => {
-    if (route.params?.refresh) {
+    if (route?.params?.refresh) {
       fetchRecipes();
     }
   }, [route, fetchRecipes]);

@@ -31,6 +31,16 @@
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
+- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge
+                          moduleName:(NSString *)moduleName
+                           initProps:(NSDictionary *)initProps
+{
+  UIView *rootView = [super createRootViewWithBridge:bridge moduleName:moduleName initProps:initProps];
+  // Match LaunchScreen neutral-800 background to avoid flash during handoff
+  rootView.backgroundColor = [UIColor colorWithRed:41.0/255.0 green:30.0/255.0 blue:13.0/255.0 alpha:1.0];
+  return rootView;
+}
+
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
