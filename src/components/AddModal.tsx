@@ -35,6 +35,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
   };
 
   const handleOpenBrowser = () => {
+    onClose();
     Linking.openURL('http://');
   };
 

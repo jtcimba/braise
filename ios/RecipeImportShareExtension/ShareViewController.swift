@@ -396,8 +396,40 @@ class ShareViewController: UIViewController {
             author = extractString("author", from: recipeObj)
         }
         
-        let categoriesArray = extractStringArray("recipeCategory", from: recipeObj)
-        let categories = categoriesArray.map { $0.lowercased() }.joined(separator: ",")
+        var categoriesArray = extractStringArray("recipeCategory", from: recipeObj)
+            .map { $0.lowercased() }
+            .filter { !$0.isEmpty }
+        
+        if categoriesArray.count < 2 {
+            let cuisineArray = extractStringArray("recipeCuisine", from: recipeObj)
+                .map { $0.lowercased() }
+                .filter { !$0.isEmpty }
+            for cuisine in cuisineArray where categoriesArray.count < 2 && !categoriesArray.contains(cuisine) {
+                categoriesArray.append(cuisine)
+            }
+        }
+        
+        if categoriesArray.count < 2 {
+            let keywordsStr = extractString("keywords", from: recipeObj)
+            let keywords = keywordsStr.components(separatedBy: ",")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+                .filter { !$0.isEmpty }
+            for keyword in keywords where categoriesArray.count < 2 && !categoriesArray.contains(keyword) {
+                categoriesArray.append(keyword)
+            }
+        }
+        
+        if categoriesArray.count < 2 && !title.isEmpty {
+            let stopWords: Set<String> = ["delicious", "easy", "quick", "best", "homemade", "perfect", "simple", "amazing", "the", "a", "an", "and", "or", "with", "for", "in", "to", "of", "my", "dish", "bowl", "recipe", "meal", "food"]
+            let titleWords = title.components(separatedBy: CharacterSet.alphanumerics.inverted)
+                .map { $0.lowercased() }
+                .filter { $0.count >= 3 && !stopWords.contains($0) }
+            for word in titleWords where categoriesArray.count < 2 && !categoriesArray.contains(word) {
+                categoriesArray.append(word)
+            }
+        }
+        
+        let categories = categoriesArray.joined(separator: ",")
         
         let image: String
         if let imageObj = recipeObj["image"] as? [String: Any] {
