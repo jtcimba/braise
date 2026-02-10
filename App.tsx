@@ -23,11 +23,6 @@ import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
 import {GroceryListModalProvider} from './src/context/GroceryListModalContext';
 import {Theme} from './theme/types';
-import {
-  OnboardingProvider,
-  useOnboarding,
-} from './src/context/OnboardingContext';
-import OnboardingModal from './src/components/OnboardingModal';
 import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
@@ -75,7 +70,6 @@ function AddComponent() {
 
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
-  const {showOnboardingModal, completeOnboarding} = useOnboarding();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const openAddModal = () => setIsAddModalVisible(true);
@@ -145,11 +139,6 @@ function TabNavigator({navigation}: {navigation: any}) {
       </Tab.Navigator>
 
       <AddModal visible={isAddModalVisible} onClose={closeAddModal} />
-
-      <OnboardingModal
-        visible={showOnboardingModal}
-        onClose={completeOnboarding}
-      />
     </>
   );
 }
@@ -224,8 +213,7 @@ export default function App({}: AppProps): React.JSX.Element {
       {isLoadingSession ? (
         <View style={styles.loadingContainer} />
       ) : authSession?.user && !isRecoverySession ? (
-        <OnboardingProvider>
-          <GroceryListModalProvider>
+        <GroceryListModalProvider>
             <NavigationContainer
               theme={LightTheme}
               ref={navigationRef}
@@ -287,7 +275,6 @@ export default function App({}: AppProps): React.JSX.Element {
               </Stack.Navigator>
             </NavigationContainer>
           </GroceryListModalProvider>
-        </OnboardingProvider>
       ) : (
         <Auth
           resetPasswordToken={resetPasswordToken}

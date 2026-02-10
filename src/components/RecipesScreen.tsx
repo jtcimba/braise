@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import ListItem from './ListItem';
@@ -14,6 +15,7 @@ import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import SearchAndFilters from './SearchAndFilters';
 import {recipeService} from '../services';
+import HowItWorksModal from './HowItWorksModal';
 
 type RecipesScreenProps = {
   route?: {params?: {refresh?: boolean}};
@@ -25,6 +27,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
   const theme = useTheme();
 
   const categories = useMemo(() => {
@@ -121,6 +124,10 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
 
   return (
     <View style={styles(theme).container}>
+      <HowItWorksModal
+        visible={showHowItWorks}
+        onClose={() => setShowHowItWorks(false)}
+      />
       <SearchAndFilters
         onSearch={handleSearch}
         onFiltersChange={handleFiltersChange}
@@ -134,6 +141,11 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           style={styles(theme).container}
+          contentContainerStyle={
+            filteredData.length === 0
+              ? styles(theme).listContentEmpty
+              : undefined
+          }
           data={filteredData}
           renderItem={({item}) => {
             return <ListItem item={item} navigation={navigation} />;
@@ -142,7 +154,20 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
           ListEmptyComponent={
             !refreshing ? (
               <View style={styles(theme).noRecipes}>
-                <Text style={styles(theme).subtext}>No recipes found</Text>
+                <Text style={styles(theme).emptyTitle}>
+                  Your recipe library is empty
+                </Text>
+                <Text style={styles(theme).emptyMessage}>
+                  Add recipes from the web using your browser’s share sheet—it
+                  only takes a few taps.
+                </Text>
+                <TouchableOpacity
+                  style={styles(theme).howItWorksButton}
+                  onPress={() => setShowHowItWorks(true)}>
+                  <Text style={styles(theme).howItWorksButtonText}>
+                    How it works
+                  </Text>
+                </TouchableOpacity>
               </View>
             ) : null
           }
@@ -158,11 +183,38 @@ const styles = (theme: any) =>
       flex: 1,
       backgroundColor: theme.colors['neutral-100'],
     },
+    listContentEmpty: {
+      flexGrow: 1,
+    },
     noRecipes: {
       flex: 1,
-      flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
+      paddingHorizontal: 32,
+    },
+    emptyTitle: {
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
+      textAlign: 'center',
+      marginBottom: 12,
+    },
+    emptyMessage: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-400'],
+      textAlign: 'center',
+      marginBottom: 24,
+      lineHeight: 22,
+    },
+    howItWorksButton: {
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 25,
+      borderWidth: 1,
+      borderColor: theme.colors['rust-600'],
+    },
+    howItWorksButtonText: {
+      ...theme.typography['h3-emphasized'],
+      color: theme.colors['rust-600'],
     },
     subtext: {
       color: theme.colors['neutral-800'],
