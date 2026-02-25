@@ -16,6 +16,13 @@ import {useTheme} from '../../theme/ThemeProvider';
 import SearchAndFilters from './SearchAndFilters';
 import {recipeService} from '../services';
 import HowItWorksModal from './HowItWorksModal';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const sortModes = [
+  {key: 'viewed_at', label: 'Last viewed'},
+  {key: 'modified_at', label: 'Last modified'},
+  {key: 'created_at', label: 'Last added'},
+];
 
 type RecipesScreenProps = {
   route?: {params?: {refresh?: boolean}};
@@ -28,7 +35,10 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
-  const theme = useTheme();
+  const [sortIndex, setSortIndex] = useState(0);
+  const theme = useTheme() as any;
+
+  const toggleSort = () => setSortIndex(i => (i + 1) % sortModes.length);
 
   const categories = useMemo(() => {
     if (!data.length) {
@@ -89,6 +99,15 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
     });
   }, [fetchRecipes, route]);
 
+  const sortedData = useMemo(() => {
+    const key = sortModes[sortIndex].key;
+    return [...filteredData].sort((a, b) => {
+      const dateA = a[key] ? new Date(a[key]).getTime() : 0;
+      const dateB = b[key] ? new Date(b[key]).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [filteredData, sortIndex]);
+
   const handleSearch = (query: string) => {
     if (!query.trim()) {
       setFilteredData(data);
@@ -106,7 +125,6 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       return;
     }
     const filteredResults = data.filter(recipe => {
-      // Get recipe categories as an array
       let recipeCategories: string[] = [];
       if (typeof recipe.categories === 'string') {
         recipeCategories = recipe.categories
@@ -115,12 +133,30 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       } else if (Array.isArray(recipe.categories)) {
         recipeCategories = recipe.categories;
       }
-
-      // Check if any of the recipe categories match any of the selected filters
       return filters.some(filter => recipeCategories.includes(filter));
     });
     setFilteredData(filteredResults);
   };
+
+  const listHeader = (
+    <View style={styles(theme).listHeader}>
+      <TouchableOpacity onPress={toggleSort} activeOpacity={0.5}>
+        <View style={styles(theme).listHeaderSort}>
+          <Text style={styles(theme).listHeaderSortLabel}>
+            {sortModes[sortIndex].label}
+          </Text>
+          <Ionicons
+            name="swap-vertical"
+            size={14}
+            color={theme.colors['neutral-400']}
+          />
+        </View>
+      </TouchableOpacity>
+      <Text style={styles(theme).listHeaderCount}>
+        {sortedData.length} recipes
+      </Text>
+    </View>
+  );
 
   return (
     <View style={styles(theme).container}>
@@ -137,19 +173,22 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
         <ActivityIndicator />
       ) : (
         <FlatList
+          ListHeaderComponent={listHeader}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           style={styles(theme).container}
           contentContainerStyle={
-            filteredData.length === 0
-              ? styles(theme).listContentEmpty
-              : undefined
+            sortedData.length === 0 ? styles(theme).listContentEmpty : undefined
           }
-          data={filteredData}
-          renderItem={({item}) => {
-            return <ListItem item={item} navigation={navigation} />;
-          }}
+          data={sortedData}
+          renderItem={({item, index}) => (
+            <ListItem
+              item={item}
+              navigation={navigation}
+              isFirst={index === 0}
+            />
+          )}
           keyExtractor={item => item.id}
           ListEmptyComponent={
             !refreshing ? (
@@ -158,7 +197,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
                   Your recipe library is empty
                 </Text>
                 <Text style={styles(theme).emptyMessage}>
-                  Add recipes from the web using your browser’s share sheet—it
+                  Add recipes from the web using your browser's share sheet—it
                   only takes a few taps.
                 </Text>
                 <TouchableOpacity
@@ -185,6 +224,26 @@ const styles = (theme: any) =>
     },
     listContentEmpty: {
       flexGrow: 1,
+    },
+    listHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingBottom: 8,
+    },
+    listHeaderCount: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-400'],
+    },
+    listHeaderSort: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    listHeaderSortLabel: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-400'],
     },
     noRecipes: {
       flex: 1,
@@ -215,9 +274,5 @@ const styles = (theme: any) =>
     howItWorksButtonText: {
       ...theme.typography['h3-emphasized'],
       color: theme.colors['rust-600'],
-    },
-    subtext: {
-      color: theme.colors['neutral-800'],
-      overflow: 'hidden',
     },
   });

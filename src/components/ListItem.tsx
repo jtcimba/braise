@@ -3,7 +3,7 @@ import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 
-export default function Item({item, navigation}: any) {
+export default function Item({item, navigation, isFirst}: any) {
   const theme = useTheme() as unknown as Theme;
   const [descriptionLines, setDescriptionLines] = useState(2);
 
@@ -17,7 +17,7 @@ export default function Item({item, navigation}: any) {
 
   return (
     <TouchableOpacity
-      style={styles(theme).item}
+      style={[styles(theme).item, isFirst && {paddingTop: 5}]}
       onPress={() => navigation.navigate('RecipeDetailsScreen', {item: item})}>
       <View>
         <Image
@@ -28,21 +28,19 @@ export default function Item({item, navigation}: any) {
         />
       </View>
       <View style={styles(theme).itemBody}>
-        <View>
-          <Text
-            style={styles(theme).title}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-            onTextLayout={onTitleTextLayout}>
-            {item.title}
-          </Text>
-          <View style={styles(theme).subtextContainer}>
-            {item.total_time && (
-              <Text style={styles(theme).time}>
-                {item.total_time} {item.total_time_unit || 'min'}
-              </Text>
-            )}
-          </View>
+        <Text
+          style={styles(theme).title}
+          numberOfLines={2}
+          ellipsizeMode="tail"
+          onTextLayout={onTitleTextLayout}>
+          {item.title}
+        </Text>
+        <View style={styles(theme).subtextContainer}>
+          {item.total_time && (
+            <Text style={styles(theme).time}>
+              {item.total_time} {item.total_time_unit || 'min'}
+            </Text>
+          )}
         </View>
         <Text
           style={styles(theme).description}
@@ -58,22 +56,23 @@ export default function Item({item, navigation}: any) {
 const styles = (theme: any) =>
   StyleSheet.create({
     item: {
+      flex: 1,
       flexDirection: 'row',
-      height: 118,
-      paddingVertical: 20,
+      justifyContent: 'center',
+      paddingVertical: 15,
       marginHorizontal: 20,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors['neutral-300'],
     },
     itemBody: {
       flex: 1,
-      justifyContent: 'space-between',
       minHeight: 0,
       overflow: 'hidden',
     },
     title: {
       ...theme.typography['h3-emphasized'],
       color: theme.colors['neutral-800'],
+      marginBottom: 3,
     },
     image: {
       width: 78,
@@ -86,6 +85,7 @@ const styles = (theme: any) =>
       overflow: 'hidden',
       ...theme.typography.h4,
       color: theme.colors['rust-600'],
+      marginBottom: 3,
     },
     subtextContainer: {
       flexDirection: 'row',

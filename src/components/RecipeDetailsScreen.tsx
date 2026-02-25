@@ -101,6 +101,13 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   }, [editingData.id, navigation]);
 
   useEffect(() => {
+    if (data.id) {
+      recipeService.updateViewedAt(data.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     setHandleSavePress(() => handleSavePress);
     setHandleDeletePress(() => handleDeletePress);
   }, [
