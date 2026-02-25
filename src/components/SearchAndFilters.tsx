@@ -77,19 +77,21 @@ export default function SearchAndFilters({
           </TouchableOpacity>
         )}
       </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles(theme).filtersContainer}>
-        {filterOptions.map(filter => (
-          <FilterChip
-            key={filter}
-            label={capitalizeFirstLetter(filter)}
-            selected={selectedFilters.includes(filter)}
-            onPress={() => toggleFilter(filter)}
-          />
-        ))}
-      </ScrollView>
+      {filterOptions.length > 0 && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles(theme).filtersContainer}>
+          {filterOptions.map(filter => (
+            <FilterChip
+              key={filter}
+              label={capitalizeFirstLetter(filter)}
+              selected={selectedFilters.includes(filter)}
+              onPress={() => toggleFilter(filter)}
+            />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -97,7 +99,7 @@ export default function SearchAndFilters({
 const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
-      paddingBottom: 10,
+      marginTop: 10,
     },
     searchInputContainer: {
       marginHorizontal: 15,
@@ -122,12 +124,10 @@ const styles = (theme: Theme) =>
       top: '50%',
       transform: [{translateY: -12}],
       padding: 2,
-      backgroundColor: theme.colors['neutral-100'],
+      backgroundColor: theme.colors['neutral-200'],
     },
     filtersContainer: {
-      flexDirection: 'row',
-      paddingStart: 15,
-      marginEnd: 25,
-      overflow: 'visible',
+      paddingHorizontal: 15,
+      marginBottom: 10,
     },
   });

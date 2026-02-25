@@ -118,6 +118,28 @@ export const recipeService = {
     }
   },
 
+  async updateViewedAt(recipeId: string) {
+    try {
+      const viewedAt = new Date().toISOString();
+      const {error} = await supabase
+        .from('recipes')
+        .update({viewed_at: viewedAt})
+        .eq('id', recipeId);
+
+      if (error) {
+        throw error;
+      }
+
+      const localRecipes = await Storage.loadRecipesFromLocal();
+      const updatedRecipes = localRecipes.map((r: any) =>
+        r.id === recipeId ? {...r, viewed_at: viewedAt} : r,
+      );
+      await Storage.saveRecipesToLocal(updatedRecipes);
+    } catch (error: any) {
+      console.error('Failed to update viewed_at:', error.message);
+    }
+  },
+
   async deleteRecipe(recipeId: string) {
     try {
       const {error} = await supabase
