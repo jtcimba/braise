@@ -18,6 +18,7 @@ import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenuHeader from './src/components/DetailsMenuHeader';
 import AddModal from './src/components/AddModal';
+import PaywallScreen from './src/components/PaywallScreen';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
@@ -27,15 +28,16 @@ import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
 import {NativeModules, Platform} from 'react-native';
+import Purchases, {LOG_LEVEL} from 'react-native-purchases';
 
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Store Supabase credentials in App Group for share extension
-async function storeSupabaseCredentials(session: Session) {
+async function storeSupabaseCredentials(session: Session): Promise<boolean> {
   if (Platform.OS !== 'ios' || !AppGroupStorage) {
-    return;
+    return false;
   }
 
   try {
@@ -51,6 +53,8 @@ async function storeSupabaseCredentials(session: Session) {
         session.access_token,
       );
       await AppGroupStorage.setItem('supabaseUserId', session.user.id);
+      const {customerInfo} = await Purchases.logIn(session.user.id);
+      const isPro = !!customerInfo.entitlements.active.pro;
 
       // Store API URL if provided
       if (recipeImportAPIURL) {
@@ -58,10 +62,12 @@ async function storeSupabaseCredentials(session: Session) {
       }
 
       console.log('Stored Supabase credentials in App Group');
+      return isPro;
     }
   } catch (error) {
     console.error('Failed to store Supabase credentials:', error);
   }
+  return false;
 }
 
 function AddComponent() {
@@ -154,8 +160,14 @@ export default function App({}: AppProps): React.JSX.Element {
   );
   const [isLoadingSession, setIsLoadingSession] = useState(true);
   const [isRecoverySession, setIsRecoverySession] = useState(false);
+  const [pendingPaywall, setPendingPaywall] = useState(false);
 
   useEffect(() => {
+    if (__DEV__) {
+      Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+    }
+    Purchases.configure({apiKey: process.env.REVENUECAT_API_KEY!});
+
     const checkInitialURL = async () => {
       const initialUrl = await Linking.getInitialURL();
       if (initialUrl?.includes('reset-password')) {
@@ -198,7 +210,10 @@ export default function App({}: AppProps): React.JSX.Element {
       }
       // Update Supabase credentials when session changes
       if (session) {
-        storeSupabaseCredentials(session);
+        const isPro = await storeSupabaseCredentials(session);
+        if (event === 'SIGNED_IN' && !isPro) {
+          setPendingPaywall(true);
+        }
       }
     });
 
@@ -208,73 +223,88 @@ export default function App({}: AppProps): React.JSX.Element {
     };
   }, []);
 
+  useEffect(() => {
+    if (pendingPaywall && navigationRef.current) {
+      (navigationRef.current as any).navigate('Paywall', {dismissible: false});
+      setPendingPaywall(false);
+    }
+  }, [pendingPaywall]);
+
   return (
     <ThemeProvider theme={LightTheme}>
       {isLoadingSession ? (
         <View style={styles.loadingContainer} />
       ) : authSession?.user && !isRecoverySession ? (
         <GroceryListModalProvider>
-            <NavigationContainer
-              theme={LightTheme}
-              ref={navigationRef}
-              onReady={() => {
-                navigationReadyRef.current = true;
-              }}>
-              <Stack.Navigator>
-                <Stack.Screen
-                  name="Home"
-                  component={TabNavigator}
-                  options={{
-                    headerShown: false,
-                  }}
-                />
-                <Stack.Screen
-                  name="RecipeDetailsScreen"
-                  component={RecipeDetailsScreen}
-                  options={({navigation}) => ({
-                    headerTransparent: true,
-                    headerShadowVisible: false,
-                    headerTitle: '',
-                    headerLeft: () =>
-                      BackIcon(navigation, 'RecipeDetailsScreen'),
-                    headerLeftContainerStyle: {
-                      paddingLeft: 15,
-                      marginBottom: 10,
-                    },
-                    headerRight: () => (
-                      <DetailsMenuHeader navigation={navigation} />
-                    ),
-                    headerRightContainerStyle: {
-                      paddingRight: 20,
-                      marginBottom: 10,
-                    },
-                  })}
-                />
-                <Stack.Screen
-                  name="Settings"
-                  component={SettingsScreen}
-                  options={({navigation}) => ({
-                    headerTitle: 'Settings',
-                    headerLeft: () => null,
-                    headerRight: () =>
-                      CloseIcon(navigation, 'Recipes', '#4A0B12'),
-                    presentation: 'modal',
-                    headerShadowVisible: false,
-                    headerRightContainerStyle: {paddingRight: 10},
-                    headerTitleStyle: {
-                      fontFamily: 'Noto Serif',
-                      fontSize: 22,
-                      fontWeight: '600',
-                      color: '#291E0D',
-                    },
-                    headerStyle: {
-                      backgroundColor: LightTheme.colors['neutral-100'],
-                    },
-                  })}
-                />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </GroceryListModalProvider>
+          <NavigationContainer
+            theme={LightTheme}
+            ref={navigationRef}
+            onReady={() => {
+              navigationReadyRef.current = true;
+            }}>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Home"
+                component={TabNavigator}
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="RecipeDetailsScreen"
+                component={RecipeDetailsScreen}
+                options={({navigation}) => ({
+                  headerTransparent: true,
+                  headerShadowVisible: false,
+                  headerTitle: '',
+                  headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
+                  headerLeftContainerStyle: {
+                    paddingLeft: 15,
+                    marginBottom: 10,
+                  },
+                  headerRight: () => (
+                    <DetailsMenuHeader navigation={navigation} />
+                  ),
+                  headerRightContainerStyle: {
+                    paddingRight: 20,
+                    marginBottom: 10,
+                  },
+                })}
+              />
+              <Stack.Screen
+                name="Settings"
+                component={SettingsScreen}
+                options={({navigation}) => ({
+                  headerTitle: 'Settings',
+                  headerLeft: () => null,
+                  headerRight: () =>
+                    CloseIcon(navigation, 'Recipes', '#4A0B12'),
+                  presentation: 'modal',
+                  headerShadowVisible: false,
+                  headerRightContainerStyle: {paddingRight: 10},
+                  headerTitleStyle: {
+                    fontFamily: 'Noto Serif',
+                    fontSize: 22,
+                    fontWeight: '600',
+                    color: '#291E0D',
+                  },
+                  headerStyle: {
+                    backgroundColor: LightTheme.colors['neutral-100'],
+                  },
+                })}
+              />
+              <Stack.Screen
+                name="Paywall"
+                component={PaywallScreen}
+                options={({route}: {route: any}) => ({
+                  presentation: 'modal',
+                  headerShown: false,
+                  gestureEnabled: route.params?.dismissible !== false,
+                })}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </GroceryListModalProvider>
       ) : (
         <Auth
           resetPasswordToken={resetPasswordToken}

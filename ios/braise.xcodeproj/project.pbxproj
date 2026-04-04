@@ -12,6 +12,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		231998A52EE0EF5B0099F221 /* RecipeImportShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2319989B2EE0EF5B0099F221 /* RecipeImportShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		231C688A2EE6870400F74D57 /* AppGroupStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 231C68892EE6870400F74D57 /* AppGroupStorage.m */; };
+		232B680B2F5F9CEB00734ABE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 232B680A2F5F9CEB00734ABE /* StoreKit.framework */; };
 		23C242EF2EE4B2F9004FC0D4 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 23C242ED2EE4B2F9004FC0D4 /* AppDelegate.mm */; };
 		23C242F22EE4B413004FC0D4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 23C242F12EE4B413004FC0D4 /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -64,6 +65,7 @@
 		231998AA2EE0F3EF0099F221 /* braise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = braise.entitlements; path = braise/braise.entitlements; sourceTree = "<group>"; };
 		231C68882EE6870400F74D57 /* AppGroupStorage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppGroupStorage.h; sourceTree = "<group>"; };
 		231C68892EE6870400F74D57 /* AppGroupStorage.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppGroupStorage.m; sourceTree = "<group>"; };
+		232B680A2F5F9CEB00734ABE /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		23C242EC2EE4B2F9004FC0D4 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = braise/AppDelegate.h; sourceTree = "<group>"; };
 		23C242ED2EE4B2F9004FC0D4 /* AppDelegate.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = braise/AppDelegate.mm; sourceTree = "<group>"; };
 		23C242F12EE4B413004FC0D4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = main.m; path = braise/main.m; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				854860AF9DAB314AB6D42182 /* libPods-braise.a in Frameworks */,
+				232B680B2F5F9CEB00734ABE /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +176,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				232B680A2F5F9CEB00734ABE /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				02C25174A8433DC540490E38 /* libPods-braise.a */,
 				76B36059A661030102DC73EC /* libPods-braise-braiseTests.a */,
@@ -603,7 +607,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = braise/braise.entitlements;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5HK264ADU8;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = braise/Info.plist;
@@ -632,7 +636,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = braise/braise.entitlements;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5HK264ADU8;
 				INFOPLIST_FILE = braise/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;

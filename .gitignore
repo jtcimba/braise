@@ -73,3 +73,5 @@ node_modules/
 **.sample
 
 .env
+supabase/.temp/
+.vscode/

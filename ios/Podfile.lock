@@ -72,6 +72,8 @@ PODS:
   - glog (0.3.5)
   - libevent (2.1.12)
   - OpenSSL-Universal (1.1.1100)
+  - PurchasesHybridCommon (17.41.1):
+    - RevenueCat (= 5.59.2)
   - RCT-Folly (2022.05.16.00):
     - boost
     - DoubleConversion
@@ -1090,6 +1092,7 @@ PODS:
     - React-jsi (= 0.73.6)
     - React-logger (= 0.73.6)
     - React-perflogger (= 0.73.6)
+  - RevenueCat (5.59.2)
   - RNCAsyncStorage (1.24.0):
     - React-Core
   - RNCPicker (2.11.1):
@@ -1097,6 +1100,9 @@ PODS:
   - RNGestureHandler (2.17.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
+    - React-Core
+  - RNPurchases (9.11.0):
+    - PurchasesHybridCommon (= 17.41.1)
     - React-Core
   - RNReanimated (3.16.0):
     - glog
@@ -1219,6 +1225,7 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -1240,6 +1247,8 @@ SPEC REPOS:
     - fmt
     - libevent
     - OpenSSL-Universal
+    - PurchasesHybridCommon
+    - RevenueCat
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -1353,6 +1362,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-picker/picker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNPurchases:
+    :path: "../node_modules/react-native-purchases"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -1385,6 +1396,7 @@ SPEC CHECKSUMS:
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
+  PurchasesHybridCommon: 8eb130ab98f8dab600dea932a2599dee79304bb5
   RCT-Folly: cd21f1661364f975ae76b3308167ad66b09f53f5
   RCTRequired: ca1d7414aba0b27efcfa2ccd37637edb1ab77d96
   RCTTypeSafety: 678e344fb976ff98343ca61dc62e151f3a042292
@@ -1431,9 +1443,11 @@ SPEC CHECKSUMS:
   React-runtimescheduler: d56a0860f964bd86756b89bc9883179f055f31ba
   React-utils: 288c9cb9a73bb150c273c84df7c2f8546f28e23f
   ReactCommon: 53a7c32268a2ec0779faa89d7af0392f4d8e8dca
+  RevenueCat: f352b3661288080bd8bf30bbb96e331940e73c88
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
   RNCPicker: da0f1c9411208c1ca52bc98383db54a06e0a3862
   RNGestureHandler: 5a5237e0ca63009caaf0b34050a2c337686361b3
+  RNPurchases: 73aa06c6d21f41a3a52b6a8f648118a6a9615d77
   RNReanimated: 1a98f269fddb4f586f692ee25799bde55f5920ef
   RNScreens: 321d9067091167f6255474ea0567f4b4ac09958a
   RNSVG: e2504b6ec16dfc262d1c93cfd934e194e79cd78d

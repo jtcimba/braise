@@ -4,12 +4,17 @@ import {
   StyleSheet,
   Text,
   TouchableHighlight,
+  TouchableOpacity,
   SafeAreaView,
+  Linking,
+  Alert,
 } from 'react-native';
+import Purchases, {CustomerInfo} from 'react-native-purchases';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {supabase} from '../supabase-client';
 import {User} from '@supabase/supabase-js';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SettingsScreen() {
   const theme = useTheme() as unknown as Theme;
@@ -31,6 +36,22 @@ export default function SettingsScreen() {
     await supabase.auth.signOut();
   };
 
+  const handleRestore = async () => {
+    try {
+      const customerInfo: CustomerInfo = await Purchases.restorePurchases();
+      if (customerInfo.entitlements.active.pro) {
+        Alert.alert('Success', 'Your purchases have been restored.');
+      } else {
+        Alert.alert(
+          'No purchases found',
+          'We could not find any previous purchases to restore.',
+        );
+      }
+    } catch (error) {
+      Alert.alert('Restore failed', 'Please try again later.');
+    }
+  };
+
   const formatDate = (date: string | undefined) => {
     if (!date) {
       return null;
@@ -50,6 +71,31 @@ export default function SettingsScreen() {
           <Text style={styles(theme).memberSince}>
             Member since {formatDate(user?.created_at)}
           </Text>
+        </View>
+        <View style={styles(theme).menuGroup}>
+          <TouchableOpacity
+            style={styles(theme).menuRow}
+            onPress={() =>
+              Linking.openURL('https://apps.apple.com/account/subscriptions')
+            }>
+            <Text style={styles(theme).menuRowText}>Manage Subscription</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={theme.colors['neutral-400']}
+            />
+          </TouchableOpacity>
+          <View style={styles(theme).menuDivider} />
+          <TouchableOpacity
+            style={styles(theme).menuRow}
+            onPress={handleRestore}>
+            <Text style={styles(theme).menuRowText}>Restore Purchases</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={theme.colors['neutral-400']}
+            />
+          </TouchableOpacity>
         </View>
         <TouchableHighlight
           onPress={handleSignOut}
@@ -102,6 +148,29 @@ const styles = (theme: Theme) =>
     memberSince: {
       color: theme.colors['neutral-400'],
       ...theme.typography.h4,
+    },
+    menuGroup: {
+      width: '100%',
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      marginBottom: 20,
+    },
+    menuRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 20,
+    },
+    menuRowText: {
+      color: theme.colors['neutral-800'],
+      ...theme.typography.h2,
+    },
+    menuDivider: {
+      height: 1,
+      backgroundColor: theme.colors['neutral-300'],
+      marginHorizontal: 20,
     },
     signOutText: {
       color: theme.colors['neutral-100'],
