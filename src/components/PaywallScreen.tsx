@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
-  ScrollView,
 } from 'react-native';
 import Purchases, {
   PurchasesPackage,
@@ -170,10 +169,7 @@ export default function PaywallScreen({
           <ActivityIndicator size="large" color={theme.colors['neutral-400']} />
         </View>
       ) : (
-        <ScrollView
-          contentContainerStyle={s.scrollContent}
-          bounces={false}
-          showsVerticalScrollIndicator={false}>
+        <View style={s.scrollContent}>
           <View style={s.topSection}>
             <Text style={s.logo}>braise</Text>
             <Text style={s.tagline}>Cooking. Made simple.</Text>
@@ -320,7 +316,7 @@ export default function PaywallScreen({
               <Text style={s.restoreText}>Restore purchases</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       )}
     </SafeAreaView>
   );
@@ -334,7 +330,7 @@ const styles = (theme: Theme) =>
     },
     closeButton: {
       position: 'absolute',
-      top: 56,
+      top: 20,
       right: 16,
       zIndex: 1,
       padding: 4,
@@ -345,13 +341,13 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     scrollContent: {
-      flexGrow: 1,
+      flex: 1,
       justifyContent: 'space-between',
       paddingHorizontal: 24,
     },
     topSection: {
       alignItems: 'center',
-      paddingTop: 32,
+      paddingTop: 16,
     },
     logo: {
       fontFamily: 'Noto Serif',
@@ -362,11 +358,11 @@ const styles = (theme: Theme) =>
     tagline: {
       ...theme.typography['h2-emphasized'],
       color: theme.colors['rust-600'],
-      marginBottom: 32,
+      marginBottom: 16,
     },
     features: {
       alignSelf: 'stretch',
-      gap: 24,
+      gap: 16,
     },
     featureBlock: {
       gap: 4,
@@ -381,22 +377,22 @@ const styles = (theme: Theme) =>
       lineHeight: 21,
     },
     bottomSection: {
-      paddingBottom: 16,
-      paddingTop: 16,
+      paddingBottom: 8,
+      paddingTop: 8,
     },
     divider: {
       borderBottomWidth: 1,
       borderBottomColor: theme.colors['neutral-300'],
       width: '40%',
       alignSelf: 'center',
-      marginBottom: 20,
+      marginBottom: 12,
     },
     trialText: {
       ...theme.typography.h3,
       color: theme.colors['neutral-400'],
       textAlign: 'center',
       lineHeight: 21,
-      marginBottom: 20,
+      marginBottom: 12,
     },
     trialBold: {
       ...theme.typography['h3-emphasized'],
@@ -404,7 +400,7 @@ const styles = (theme: Theme) =>
     },
     plans: {
       gap: 12,
-      marginBottom: 20,
+      marginBottom: 12,
     },
     planCard: {
       flexDirection: 'row',
@@ -474,7 +470,7 @@ const styles = (theme: Theme) =>
       paddingVertical: 16,
       borderRadius: 25,
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: 12,
     },
     ctaText: {
       fontFamily: 'Switzer',
@@ -494,7 +490,7 @@ const styles = (theme: Theme) =>
     },
     restoreButton: {
       alignSelf: 'center',
-      marginTop: 16,
+      marginTop: 8,
       padding: 4,
     },
     restoreText: {

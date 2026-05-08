@@ -29,6 +29,7 @@ import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
 import {NativeModules, Platform} from 'react-native';
 import Purchases, {LOG_LEVEL} from 'react-native-purchases';
+import {useSubscription} from './src/hooks/useSubscription';
 
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
@@ -76,9 +77,16 @@ function AddComponent() {
 
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
+  const {isPro, isLoading: isSubscriptionLoading} = useSubscription();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
-  const openAddModal = () => setIsAddModalVisible(true);
+  const openAddModal = () => {
+    if (!isSubscriptionLoading && !isPro) {
+      navigation.navigate('Paywall', {dismissible: true});
+      return;
+    }
+    setIsAddModalVisible(true);
+  };
   const closeAddModal = () => setIsAddModalVisible(false);
 
   return (
@@ -160,7 +168,6 @@ export default function App({}: AppProps): React.JSX.Element {
   );
   const [isLoadingSession, setIsLoadingSession] = useState(true);
   const [isRecoverySession, setIsRecoverySession] = useState(false);
-  const [pendingPaywall, setPendingPaywall] = useState(false);
 
   useEffect(() => {
     if (__DEV__) {
@@ -210,10 +217,7 @@ export default function App({}: AppProps): React.JSX.Element {
       }
       // Update Supabase credentials when session changes
       if (session) {
-        const isPro = await storeSupabaseCredentials(session);
-        if (event === 'SIGNED_IN' && !isPro) {
-          setPendingPaywall(true);
-        }
+        storeSupabaseCredentials(session);
       }
     });
 
@@ -222,13 +226,6 @@ export default function App({}: AppProps): React.JSX.Element {
       linkingSubscription.remove();
     };
   }, []);
-
-  useEffect(() => {
-    if (pendingPaywall && navigationRef.current) {
-      (navigationRef.current as any).navigate('Paywall', {dismissible: false});
-      setPendingPaywall(false);
-    }
-  }, [pendingPaywall]);
 
   return (
     <ThemeProvider theme={LightTheme}>
