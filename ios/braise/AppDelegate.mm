@@ -36,8 +36,7 @@
                            initProps:(NSDictionary *)initProps
 {
   UIView *rootView = [super createRootViewWithBridge:bridge moduleName:moduleName initProps:initProps];
-  // Match LaunchScreen neutral-800 background to avoid flash during handoff
-  rootView.backgroundColor = [UIColor colorWithRed:41.0/255.0 green:30.0/255.0 blue:13.0/255.0 alpha:1.0];
+  rootView.backgroundColor = [UIColor colorWithRed:245.0/255.0 green:194.0/255.0 blue:124.0/255.0 alpha:1.0];
   return rootView;
 }
 

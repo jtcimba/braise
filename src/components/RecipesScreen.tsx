@@ -40,25 +40,21 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
 
   const toggleSort = () => setSortIndex(i => (i + 1) % sortModes.length);
 
+  const getRecipeCategories = (recipe: any): string[] => {
+    if (typeof recipe.categories === 'string') {
+      return recipe.categories.split(',').map((cat: string) => cat.trim());
+    }
+    if (Array.isArray(recipe.categories)) {
+      return recipe.categories;
+    }
+    return [];
+  };
+
   const categories = useMemo(() => {
     if (!data.length) {
       return [];
     }
-
-    const allCategories = data
-      .map(recipe => {
-        if (typeof recipe.categories === 'string') {
-          return recipe.categories.split(',').map((cat: string) => cat.trim());
-        }
-        if (Array.isArray(recipe.categories)) {
-          return recipe.categories;
-        }
-        return [];
-      })
-      .flat()
-      .filter(Boolean);
-
-    return [...new Set(allCategories)];
+    return [...new Set(data.flatMap(getRecipeCategories).filter(Boolean))];
   }, [data]);
 
   const onRefresh = () => {
@@ -113,9 +109,18 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       setFilteredData(data);
       return;
     }
-    const searchResults = data.filter(recipe =>
-      recipe.title.toLowerCase().includes(query.toLowerCase()),
-    );
+    const q = query.toLowerCase();
+    const searchResults = data.filter(recipe => {
+      return [
+        recipe.title,
+        recipe.author,
+        recipe.about,
+        recipe.ingredients,
+        getRecipeCategories(recipe).join(' '),
+      ]
+        .filter(Boolean)
+        .some((field: string) => field.toLowerCase().includes(q));
+    });
     setFilteredData(searchResults);
   };
 
@@ -124,17 +129,9 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       setFilteredData(data);
       return;
     }
-    const filteredResults = data.filter(recipe => {
-      let recipeCategories: string[] = [];
-      if (typeof recipe.categories === 'string') {
-        recipeCategories = recipe.categories
-          .split(',')
-          .map((cat: string) => cat.trim());
-      } else if (Array.isArray(recipe.categories)) {
-        recipeCategories = recipe.categories;
-      }
-      return filters.some(filter => recipeCategories.includes(filter));
-    });
+    const filteredResults = data.filter(recipe =>
+      filters.some(filter => getRecipeCategories(recipe).includes(filter)),
+    );
     setFilteredData(filteredResults);
   };
 
@@ -148,13 +145,10 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
           <Ionicons
             name="swap-vertical"
             size={14}
-            color={theme.colors['neutral-400']}
+            color={theme.colors['toffee-400']}
           />
         </View>
       </TouchableOpacity>
-      <Text style={styles(theme).listHeaderCount}>
-        {sortedData.length} recipes
-      </Text>
     </View>
   );
 
@@ -234,7 +228,7 @@ const styles = (theme: any) =>
     },
     listHeaderCount: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     listHeaderSort: {
       flexDirection: 'row',
@@ -243,7 +237,7 @@ const styles = (theme: any) =>
     },
     listHeaderSortLabel: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     noRecipes: {
       flex: 1,
@@ -259,7 +253,7 @@ const styles = (theme: any) =>
     },
     emptyMessage: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       textAlign: 'center',
       marginBottom: 24,
       lineHeight: 22,
@@ -269,10 +263,10 @@ const styles = (theme: any) =>
       paddingHorizontal: 24,
       borderRadius: 25,
       borderWidth: 1,
-      borderColor: theme.colors['rust-600'],
+      borderColor: theme.colors['toffee-400'],
     },
     howItWorksButtonText: {
-      ...theme.typography['h3-emphasized'],
-      color: theme.colors['rust-600'],
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['toffee-400'],
     },
   });
