@@ -2,6 +2,8 @@ import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Linking} from 'react-native';
+import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
+import BraiseLogoLight from './src/assets/images/braise-logo-light.svg';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -29,7 +31,6 @@ import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
 import {NativeModules, Platform} from 'react-native';
 import Purchases, {LOG_LEVEL} from 'react-native-purchases';
-import {useSubscription} from './src/hooks/useSubscription';
 
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
@@ -77,14 +78,9 @@ function AddComponent() {
 
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
-  const {isPro, isLoading: isSubscriptionLoading} = useSubscription();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const openAddModal = () => {
-    if (!isSubscriptionLoading && !isPro) {
-      navigation.navigate('Paywall', {dismissible: true});
-      return;
-    }
     setIsAddModalVisible(true);
   };
   const closeAddModal = () => setIsAddModalVisible(false);
@@ -111,7 +107,7 @@ function TabNavigator({navigation}: {navigation: any}) {
             );
           },
           tabBarActiveTintColor: theme.colors['neutral-800'],
-          tabBarInactiveTintColor: theme.colors['neutral-400'],
+          tabBarInactiveTintColor: theme.colors['toffee-400'],
           tabBarShowLabel: false,
         })}>
         <Tab.Screen
@@ -230,7 +226,9 @@ export default function App({}: AppProps): React.JSX.Element {
   return (
     <ThemeProvider theme={LightTheme}>
       {isLoadingSession ? (
-        <View style={styles.loadingContainer} />
+        <View style={styles.loadingContainer}>
+          <BraiseLogoLight width={160} height={160} />
+        </View>
       ) : authSession?.user && !isRecoverySession ? (
         <GroceryListModalProvider>
           <NavigationContainer
@@ -253,7 +251,13 @@ export default function App({}: AppProps): React.JSX.Element {
                 options={({navigation}) => ({
                   headerTransparent: true,
                   headerShadowVisible: false,
-                  headerTitle: '',
+                  headerTitle: () => (
+                    <BraiseLogoDark
+                      width={80}
+                      height={40}
+                      style={{marginBottom: 10}}
+                    />
+                  ),
                   headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
                   headerLeftContainerStyle: {
                     paddingLeft: 15,
@@ -280,7 +284,7 @@ export default function App({}: AppProps): React.JSX.Element {
                   headerShadowVisible: false,
                   headerRightContainerStyle: {paddingRight: 10},
                   headerTitleStyle: {
-                    fontFamily: 'Noto Serif',
+                    fontFamily: 'TAYTommyTokyoRegular',
                     fontSize: 22,
                     fontWeight: '600',
                     color: '#291E0D',
@@ -318,6 +322,8 @@ export default function App({}: AppProps): React.JSX.Element {
 const styles = StyleSheet.create({
   loadingContainer: {
     flex: 1,
-    backgroundColor: LightTheme.colors['neutral-800'],
+    backgroundColor: LightTheme.colors['yellow-400'],
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -10,6 +10,7 @@ export interface Recipe {
   ingredients: string;
   instructions: string;
   categories: string;
+  original_url?: string;
   created_at?: string;
   modified_at?: string;
   viewed_at?: string;

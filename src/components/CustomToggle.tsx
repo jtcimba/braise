@@ -8,7 +8,6 @@ interface CustomToggleProps {
   onValueChange: (value: boolean) => void;
   leftLabel: string;
   rightLabel: string;
-  textStyle?: 'body' | 'header';
 }
 
 export default function CustomToggle({
@@ -16,54 +15,73 @@ export default function CustomToggle({
   onValueChange,
   leftLabel,
   rightLabel,
-  textStyle = 'body',
 }: CustomToggleProps) {
   const theme = useTheme() as unknown as Theme;
 
-  const getTextStyle = (isSelected: boolean) => [
-    styles(theme).baseText,
-    textStyle === 'header' ? theme.typography.h2 : theme.typography.h4,
-    isSelected
-      ? styles(theme, textStyle).selectedText
-      : styles(theme, textStyle).unselectedText,
-  ];
-
   return (
-    <View style={styles(theme).container}>
+    <View style={styles(theme).pillContainer}>
       <TouchableOpacity
-        style={styles(theme).option}
+        style={[
+          styles(theme).pillOption,
+          !value && styles(theme).pillOptionSelected,
+        ]}
         onPress={() => onValueChange(false)}>
-        <Text style={getTextStyle(!value)}>{leftLabel}</Text>
+        <Text
+          style={[
+            styles(theme).pillText,
+            !value
+              ? styles(theme).pillTextSelected
+              : styles(theme).pillTextUnselected,
+          ]}>
+          {leftLabel}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={styles(theme).option}
+        style={[
+          styles(theme).pillOption,
+          value && styles(theme).pillOptionSelected,
+        ]}
         onPress={() => onValueChange(true)}>
-        <Text style={getTextStyle(value)}>{rightLabel}</Text>
+        <Text
+          style={[
+            styles(theme).pillText,
+            value
+              ? styles(theme).pillTextSelected
+              : styles(theme).pillTextUnselected,
+          ]}>
+          {rightLabel}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-const styles = (theme: Theme, textStyle?: string) =>
+const styles = (theme: Theme) =>
   StyleSheet.create({
-    container: {
+    pillContainer: {
       flexDirection: 'row',
+      borderRadius: 25,
+      marginTop: 10,
     },
-    option: {
+    pillOption: {
       flex: 1,
-      paddingHorizontal: textStyle === 'body' ? 5 : 10,
-      paddingVertical: textStyle === 'body' ? 0 : 5,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
       alignItems: 'center',
       justifyContent: 'center',
+      borderRadius: 22,
     },
-    baseText: {
-      color: theme.colors['neutral-800'],
+    pillOptionSelected: {
+      backgroundColor: theme.colors['green-400'],
     },
-    selectedText: {
-      color: theme.colors['neutral-800'],
+    pillText: {
+      ...theme.typography['h2-emphasized'],
+    },
+    pillTextSelected: {
+      color: theme.colors['neutral-100'],
       fontWeight: '600',
     },
-    unselectedText: {
-      color: theme.colors['neutral-400'],
+    pillTextUnselected: {
+      color: theme.colors['toffee-400'],
     },
   });

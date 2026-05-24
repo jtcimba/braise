@@ -1,5 +1,13 @@
 import React, {useState} from 'react';
-import {TouchableOpacity, StyleSheet, View, Text, Alert} from 'react-native';
+import {
+  TouchableOpacity,
+  Pressable,
+  StyleSheet,
+  View,
+  Text,
+  Alert,
+  Linking,
+} from 'react-native';
 import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -96,11 +104,15 @@ export default function DetailsMenu({
               </Text>
             </TouchableOpacity>
           </View>
-          <View style={[styles(theme).container, styles(theme).saveContainer]}>
-            <TouchableOpacity onPress={onSavePress}>
-              <Text style={[styles(theme).text, styles(theme).save]}>Save</Text>
-            </TouchableOpacity>
-          </View>
+          <Pressable
+            style={({pressed}) => [
+              styles(theme).container,
+              styles(theme).saveContainer,
+              pressed && {backgroundColor: theme.colors['yellow-400']},
+            ]}
+            onPress={onSavePress}>
+            <Text style={[styles(theme).text, styles(theme).save]}>Save</Text>
+          </Pressable>
         </View>
       )}
       <Modal
@@ -134,6 +146,21 @@ export default function DetailsMenu({
             <Ionicons name="pencil" size={18} style={styles(theme).icon} />
             <Text style={styles(theme).editText}>Edit</Text>
           </TouchableOpacity>
+          {!!routeData?.original_url && (
+            <TouchableOpacity
+              style={styles(theme).modalItem}
+              onPress={() => {
+                setmodalVisible(false);
+                Linking.openURL(routeData.original_url);
+              }}>
+              <Ionicons
+                name="open-outline"
+                size={18}
+                style={styles(theme).icon}
+              />
+              <Text style={styles(theme).editText}>Open in browser</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[styles(theme).modalItem]}
             onPress={onDeletePress}>
@@ -174,10 +201,9 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
     },
     text: {
-      paddingTop: 2,
-      paddingLeft: 7,
+      paddingTop: 3,
+      paddingHorizontal: 7,
       paddingBottom: 2,
-      paddingRight: 7,
       textAlign: 'center',
       ...theme.typography.h4,
     },
@@ -229,11 +255,11 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
     },
     editText: {
-      ...theme.typography.h4,
+      ...theme.typography.h2,
       color: theme.colors['neutral-800'],
     },
     deleteText: {
-      ...theme.typography.h4,
+      ...theme.typography.h2,
       color: theme.colors.notification,
     },
     deleteIcon: {
