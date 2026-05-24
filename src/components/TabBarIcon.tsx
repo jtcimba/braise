@@ -72,7 +72,7 @@ const styles = (theme: Theme) =>
       marginTop: 20,
     },
     label: {
-      ...theme.typography.h6,
+      ...theme.typography.b1,
     },
   });
 

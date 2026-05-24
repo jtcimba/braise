@@ -58,7 +58,7 @@ export default function SearchAndFilters({
         <TextInput
           style={styles(theme).searchInput}
           placeholder="Search recipes..."
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           value={searchQuery}
           onChangeText={handleSearch}
           returnKeyType="search"
@@ -72,7 +72,7 @@ export default function SearchAndFilters({
             <Ionicons
               name="close-circle"
               size={20}
-              color={theme.colors['neutral-400']}
+              color={theme.colors['toffee-400']}
             />
           </TouchableOpacity>
         )}
@@ -113,7 +113,7 @@ const styles = (theme: Theme) =>
       borderRadius: 8,
       paddingHorizontal: 12,
       paddingRight: 40,
-      backgroundColor: theme.colors['neutral-200'],
+      backgroundColor: theme.colors['neutral-100'],
       textAlignVertical: 'center',
       includeFontPadding: false,
       ...theme.typography.h4,
@@ -124,7 +124,6 @@ const styles = (theme: Theme) =>
       top: '50%',
       transform: [{translateY: -12}],
       padding: 2,
-      backgroundColor: theme.colors['neutral-200'],
     },
     filtersContainer: {
       paddingHorizontal: 15,

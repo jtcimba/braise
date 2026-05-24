@@ -7,14 +7,14 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Pressable,
   ActivityIndicator,
   KeyboardAvoidingView,
   Keyboard,
   Platform,
   Dimensions,
 } from 'react-native';
-import {SvgXml} from 'react-native-svg';
-import {braiseLogoSvg} from '../assets/images/braiseLogoSvg';
+import BraiseLogoDark from '../assets/images/braise-logo-dark.svg';
 import {supabase} from '../supabase-client';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
@@ -249,12 +249,8 @@ export default function Auth({
   const renderSignIn = () => (
     <>
       <View style={styles(theme).header}>
-        <SvgXml
-          xml={braiseLogoSvg}
-          width={150}
-          height={75}
-          style={styles(theme).logo}
-        />
+        <BraiseLogoDark width={150} height={75} style={styles(theme).logo} />
+        <Text style={styles(theme).title}>BRAISE</Text>
       </View>
 
       <View style={styles(theme).verticallySpaced}>
@@ -265,7 +261,7 @@ export default function Auth({
           onChangeText={(text: string) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -291,7 +287,7 @@ export default function Auth({
             <Text
               style={[
                 styles(theme).linkText,
-                {color: theme.colors['neutral-400']},
+                {color: theme.colors['toffee-400']},
               ]}>
               Forgot password?
             </Text>
@@ -302,7 +298,7 @@ export default function Auth({
           value={password}
           secureTextEntry={true}
           placeholder="Password"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           autoComplete="password"
           style={[
@@ -315,11 +311,15 @@ export default function Auth({
           ]}
         />
       </View>
-      <TouchableOpacity
-        style={[
+      <Pressable
+        style={({pressed}) => [
           styles(theme).button,
           loading && styles(theme).buttonDisabled,
-          {backgroundColor: theme.colors['neutral-800']},
+          {
+            backgroundColor: pressed
+              ? theme.colors['yellow-400']
+              : theme.colors['neutral-800'],
+          },
         ]}
         disabled={loading}
         onPress={signInWithEmail}>
@@ -328,7 +328,7 @@ export default function Auth({
         ) : (
           <Text style={styles(theme).buttonText}>Sign In</Text>
         )}
-      </TouchableOpacity>
+      </Pressable>
 
       <View style={styles(theme).switchView}>
         <Text style={[styles(theme).switchText, {color: theme.colors.subtext}]}>
@@ -336,7 +336,10 @@ export default function Auth({
         </Text>
         <TouchableOpacity onPress={() => setView('signup')}>
           <Text
-            style={[styles(theme).linkText, {color: theme.colors['rust-600']}]}>
+            style={[
+              styles(theme).linkText,
+              {color: theme.colors['green-400']},
+            ]}>
             Sign Up
           </Text>
         </TouchableOpacity>
@@ -363,7 +366,7 @@ export default function Auth({
           onChangeText={(text: string) => setEmail(text)}
           value={email}
           placeholder="email@address.com"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           keyboardType="email-address"
           autoComplete="email"
@@ -387,7 +390,7 @@ export default function Auth({
           value={password}
           secureTextEntry={true}
           placeholder="Password (min. 6 characters)"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -410,7 +413,7 @@ export default function Auth({
           value={confirmPassword}
           secureTextEntry={true}
           placeholder="Confirm password"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -424,11 +427,15 @@ export default function Auth({
         />
       </View>
 
-      <TouchableOpacity
-        style={[
+      <Pressable
+        style={({pressed}) => [
           styles(theme).button,
-          {backgroundColor: theme.colors['rust-600']},
           loading && styles(theme).buttonDisabled,
+          {
+            backgroundColor: pressed
+              ? theme.colors['yellow-400']
+              : theme.colors['neutral-800'],
+          },
         ]}
         disabled={loading}
         onPress={signUpWithEmail}>
@@ -437,7 +444,7 @@ export default function Auth({
         ) : (
           <Text style={styles(theme).buttonText}>Sign Up</Text>
         )}
-      </TouchableOpacity>
+      </Pressable>
 
       <View style={styles(theme).switchView}>
         <Text style={[styles(theme).switchText, {color: theme.colors.subtext}]}>
@@ -445,7 +452,10 @@ export default function Auth({
         </Text>
         <TouchableOpacity onPress={() => setView('signin')}>
           <Text
-            style={[styles(theme).linkText, {color: theme.colors['rust-600']}]}>
+            style={[
+              styles(theme).linkText,
+              {color: theme.colors['green-400']},
+            ]}>
             Sign In
           </Text>
         </TouchableOpacity>
@@ -470,14 +480,14 @@ export default function Auth({
           <Text
             style={[
               styles(theme).successText,
-              {color: theme.colors['rust-600']},
+              {color: theme.colors['toffee-400']},
             ]}>
             Password reset email sent! Please check your inbox.
           </Text>
           <TouchableOpacity
             style={[
               styles(theme).button,
-              {backgroundColor: theme.colors['rust-600']},
+              {backgroundColor: theme.colors['toffee-400']},
               styles(theme).mt20,
             ]}
             onPress={() => {
@@ -498,7 +508,7 @@ export default function Auth({
               onChangeText={(text: string) => setEmail(text)}
               value={email}
               placeholder="email@address.com"
-              placeholderTextColor={theme.colors['neutral-400']}
+              placeholderTextColor={theme.colors['toffee-400']}
               autoCapitalize="none"
               keyboardType="email-address"
               autoComplete="email"
@@ -513,11 +523,15 @@ export default function Auth({
             />
           </View>
 
-          <TouchableOpacity
-            style={[
+          <Pressable
+            style={({pressed}) => [
               styles(theme).button,
-              {backgroundColor: theme.colors['rust-600']},
               loading && styles(theme).buttonDisabled,
+              {
+                backgroundColor: pressed
+                  ? theme.colors['yellow-400']
+                  : theme.colors['neutral-800'],
+              },
             ]}
             disabled={loading}
             onPress={resetPassword}>
@@ -526,14 +540,14 @@ export default function Auth({
             ) : (
               <Text style={styles(theme).buttonText}>Send Reset Link</Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
 
           <View style={styles(theme).switchView}>
             <TouchableOpacity onPress={() => setView('signin')}>
               <Text
                 style={[
                   styles(theme).linkText,
-                  {color: theme.colors['rust-600']},
+                  {color: theme.colors['green-400']},
                 ]}>
                 Back to Sign In
               </Text>
@@ -564,7 +578,7 @@ export default function Auth({
           value={newPassword}
           secureTextEntry={true}
           placeholder="New password (min. 6 characters)"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -587,7 +601,7 @@ export default function Auth({
           value={confirmNewPassword}
           secureTextEntry={true}
           placeholder="Confirm new password"
-          placeholderTextColor={theme.colors['neutral-400']}
+          placeholderTextColor={theme.colors['toffee-400']}
           autoCapitalize="none"
           autoComplete="password-new"
           style={[
@@ -601,8 +615,16 @@ export default function Auth({
         />
       </View>
 
-      <TouchableOpacity
-        style={[styles(theme).button, loading && styles(theme).buttonDisabled]}
+      <Pressable
+        style={({pressed}) => [
+          styles(theme).button,
+          loading && styles(theme).buttonDisabled,
+          {
+            backgroundColor: pressed
+              ? theme.colors['yellow-400']
+              : theme.colors['neutral-800'],
+          },
+        ]}
         disabled={loading}
         onPress={updatePassword}>
         {loading ? (
@@ -610,7 +632,7 @@ export default function Auth({
         ) : (
           <Text style={styles(theme).buttonText}>Update Password</Text>
         )}
-      </TouchableOpacity>
+      </Pressable>
     </>
   );
 
@@ -664,7 +686,7 @@ const styles = (theme: any) =>
       marginBottom: 8,
     },
     subtitle: {
-      ...theme.typography.h3,
+      ...theme.typography.h2,
       textAlign: 'center',
     },
     verticallySpaced: {
@@ -674,7 +696,7 @@ const styles = (theme: any) =>
       marginBottom: 16,
     },
     label: {
-      ...theme.typography.h3,
+      ...theme.typography.h2,
       fontWeight: '600',
       marginBottom: 8,
     },
@@ -682,7 +704,7 @@ const styles = (theme: any) =>
       borderWidth: 1,
       borderRadius: 8,
       padding: 14,
-      ...theme.typography.h3,
+      ...theme.typography.h2,
     },
     button: {
       backgroundColor: theme.colors['neutral-800'],
@@ -720,7 +742,7 @@ const styles = (theme: any) =>
       padding: 20,
     },
     successText: {
-      ...theme.typography.h3,
+      ...theme.typography.h2,
       textAlign: 'center',
       marginBottom: 16,
     },

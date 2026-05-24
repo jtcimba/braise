@@ -52,13 +52,16 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string/>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Ionicons.ttf</string>
 		<string>NotoSerif-Variable.ttf</string>
 		<string>SourceSerif4-Regular.ttf</string>
 		<string>Switzer-Variable.ttf</string>
+		<string>TAYTommyTokyo.otf</string>
+		<string>RobotoMono-VariableFont_wght.ttf</string>
+		<string>InclusiveSans-VariableFont_wght.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

@@ -1,1 +1,29 @@
-{"migIndex":1,"data":[{"path":"src/assets/fonts/NotoSerif-Variable.ttf","sha1":"35f023a37f126313403845ac2a8a733baac79f8c"},{"path":"src/assets/fonts/SourceSerif4-Regular.ttf","sha1":"59526d925dcdab0d4b5c7ded24a50f86493c2cb8"},{"path":"src/assets/fonts/Switzer-Variable.ttf","sha1":"3226e9d8bad0aebbbbbd85768da49677045b126e"}]}
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/InclusiveSans-VariableFont_wght.ttf",
+      "sha1": "7c3e44eb5d0cb356fc8b5389578564cc345a1cfa"
+    },
+    {
+      "path": "src/assets/fonts/NotoSerif-Variable.ttf",
+      "sha1": "35f023a37f126313403845ac2a8a733baac79f8c"
+    },
+    {
+      "path": "src/assets/fonts/RobotoMono-VariableFont_wght.ttf",
+      "sha1": "0e46521db539a8724baccee4da03c3fd2670ecc1"
+    },
+    {
+      "path": "src/assets/fonts/SourceSerif4-Regular.ttf",
+      "sha1": "59526d925dcdab0d4b5c7ded24a50f86493c2cb8"
+    },
+    {
+      "path": "src/assets/fonts/Switzer-Variable.ttf",
+      "sha1": "3226e9d8bad0aebbbbbd85768da49677045b126e"
+    },
+    {
+      "path": "src/assets/fonts/TAYTommyTokyo.otf",
+      "sha1": "10e7e6b83c229682dd0b5e2c58e3cc95e8e6a730"
+    }
+  ]
+}

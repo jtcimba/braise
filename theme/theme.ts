@@ -3,60 +3,34 @@ import {TextStyle} from 'react-native';
 
 export const typography = {
   h1: {
-    fontFamily: 'Noto Serif',
+    fontFamily: 'TAYTommyTokyoRegular',
     fontSize: 22,
-    fontWeight: '600',
+    fontWeight: '400',
   } as TextStyle,
   h2: {
-    fontFamily: 'Switzer',
+    fontFamily: 'Inclusive Sans',
     fontSize: 16,
     fontWeight: '400',
   } as TextStyle,
   'h2-emphasized': {
-    fontFamily: 'Switzer',
+    fontFamily: 'Inclusive Sans',
     fontSize: 16,
     fontWeight: '600',
   } as TextStyle,
-  h3: {
-    fontFamily: 'Switzer',
-    fontSize: 15,
-    fontWeight: '400',
-  } as TextStyle,
-  'h3-emphasized': {
-    fontFamily: 'Switzer',
-    fontSize: 15,
-    fontWeight: '600',
-  } as TextStyle,
   h4: {
-    fontFamily: 'Switzer',
+    fontFamily: 'Inclusive Sans',
     fontWeight: '400',
     fontSize: 14,
   } as TextStyle,
   'h4-emphasized': {
-    fontFamily: 'Switzer',
-    fontWeight: '500',
+    fontFamily: 'Inclusive Sans',
+    fontWeight: '600',
     fontSize: 14,
-  } as TextStyle,
-  h5: {
-    fontFamily: 'Switzer',
-    fontWeight: '400',
-    fontSize: 11,
-    letterSpacing: 1.5,
-  } as TextStyle,
-  h6: {
-    fontFamily: 'Switzer',
-    fontWeight: '400',
-    fontSize: 12,
   } as TextStyle,
   b1: {
-    fontFamily: 'Source Serif 4',
+    fontFamily: 'Switzer',
     fontWeight: '400',
-    fontSize: 14,
-  } as TextStyle,
-  b2: {
-    fontFamily: 'Source Serif 4',
-    fontWeight: '400',
-    fontSize: 13,
+    fontSize: 15,
   } as TextStyle,
 };
 
@@ -64,15 +38,14 @@ export const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    'neutral-100': '#F0ECE4',
-    'neutral-200': '#EEE9E0',
+    'neutral-100': '#F9F3E8',
     'neutral-300': '#D9D2C7',
-    'neutral-400': '#909090',
-    'neutral-800': '#291E0D',
-    'rust-200': '#F6D1A4',
-    'rust-600': '#B54B00',
-    background: '#F0ECE4',
-    card: '#F0ECE4',
+    'toffee-400': '#826B64',
+    'neutral-800': '#322924',
+    'yellow-400': '#F5C27C',
+    'green-400': '#4FA863',
+    background: '#F9F3E8',
+    card: '#F9F3E8',
   },
   typography,
 };

@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Pressable,
   StyleSheet,
   TouchableWithoutFeedback,
   Animated,
@@ -262,8 +263,11 @@ export default function GroceryListModal() {
               onPress={handleClose}>
               <Text style={styles(theme).cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles(theme).confirmButton}
+            <Pressable
+              style={({pressed}) => [
+                styles(theme).confirmButton,
+                pressed && {backgroundColor: theme.colors['yellow-400']},
+              ]}
               onPress={handleConfirm}>
               <Text
                 style={styles(theme).confirmButtonText}
@@ -273,9 +277,9 @@ export default function GroceryListModal() {
                 {selectedIngredients.size === parsedIngredients.length &&
                 parsedIngredients.length > 0
                   ? 'Add all'
-                  : `Add selected (${selectedIngredients.size})`}
+                  : `Add (${selectedIngredients.size})`}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </Animated.View>
       </View>
@@ -319,11 +323,11 @@ const styles = (theme: Theme) =>
     },
     title: {
       ...theme.typography['h2-emphasized'],
-      color: theme.colors.text,
+      color: theme.colors['neutral-800'],
     },
     subtitle: {
-      ...theme.typography.h4,
-      color: theme.colors.subtext,
+      ...theme.typography.b1,
+      color: theme.colors['toffee-400'],
       marginBottom: 15,
     },
     ingredientsContainer: {
@@ -346,14 +350,14 @@ const styles = (theme: Theme) =>
       width: 24,
       height: 24,
       borderWidth: 2,
-      borderColor: theme.colors['rust-600'],
+      borderColor: theme.colors['green-400'],
       borderRadius: 4,
       marginRight: 16,
       justifyContent: 'center',
       alignItems: 'center',
     },
     checkmark: {
-      color: theme.colors['rust-600'],
+      color: theme.colors['green-400'],
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -364,15 +368,15 @@ const styles = (theme: Theme) =>
       justifyContent: 'space-between',
     },
     ingredientName: {
-      ...theme.typography.h4,
+      ...theme.typography.b1,
       color: theme.colors['neutral-800'],
       flex: 1,
       marginRight: 10,
       flexWrap: 'wrap',
     },
     ingredientAmount: {
-      ...theme.typography.h5,
-      color: theme.colors.subtext,
+      ...theme.typography.h4,
+      color: theme.colors['toffee-400'],
       flexShrink: 0,
     },
     buttonContainer: {
@@ -390,7 +394,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     cancelButtonText: {
-      ...theme.typography.h4,
+      ...theme.typography.h2,
       color: theme.colors.subtext,
     },
     confirmButton: {
@@ -402,7 +406,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     confirmButtonText: {
-      ...theme.typography.h4,
+      ...theme.typography.h2,
       color: theme.colors['neutral-100'],
       fontWeight: '500',
     },

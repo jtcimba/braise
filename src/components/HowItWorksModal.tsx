@@ -5,6 +5,7 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   PanResponder,
 } from 'react-native';
 import Modal from 'react-native-modal';
@@ -29,7 +30,7 @@ interface HowItWorksModalProps {
 const STEPS = [
   {
     title: 'Open a recipe in your browser',
-    description: 'Visit any recipe website in Safari or your browser.',
+    description: 'Visit any recipe website in your browser.',
     icon: 'globe-outline' as const,
     screenshotPlaceholder: true,
   },
@@ -98,7 +99,7 @@ export default function HowItWorksModal({
           <Ionicons
             name="close-outline"
             size={24}
-            color={theme.colors['neutral-400']}
+            color={theme.colors['toffee-400']}
           />
         </TouchableOpacity>
         <Text style={styles(theme).modalTitle}>How to add recipes</Text>
@@ -136,10 +137,14 @@ export default function HowItWorksModal({
             />
           ))}
         </View>
-        <TouchableOpacity
-          style={[
+        <Pressable
+          style={({pressed}) => [
             styles(theme).gotItButton,
-            {backgroundColor: theme.colors['neutral-800']},
+            {
+              backgroundColor: pressed
+                ? theme.colors['yellow-400']
+                : theme.colors['neutral-800'],
+            },
           ]}
           onPress={onClose}>
           <Text
@@ -149,7 +154,7 @@ export default function HowItWorksModal({
             ]}>
             Got it
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </Modal>
   );
@@ -181,11 +186,11 @@ const styles = (theme: Theme) =>
       ...theme.typography.h1,
       color: theme.colors['neutral-800'],
       textAlign: 'center',
-      marginBottom: 8,
+      marginVertical: 8,
     },
     subtitle: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       textAlign: 'center',
       marginBottom: 24,
     },
@@ -221,7 +226,7 @@ const styles = (theme: Theme) =>
       backgroundColor: theme.colors['neutral-300'],
     },
     dotActive: {
-      backgroundColor: theme.colors['rust-600'],
+      backgroundColor: theme.colors['toffee-400'],
       width: 10,
       height: 10,
       borderRadius: 5,
@@ -235,7 +240,7 @@ const styles = (theme: Theme) =>
       width: 28,
       height: 28,
       borderRadius: 14,
-      backgroundColor: theme.colors['rust-600'],
+      backgroundColor: theme.colors['toffee-400'],
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -244,12 +249,12 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-100'],
     },
     stepTitle: {
-      ...theme.typography['h3-emphasized'],
+      ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
     },
     stepDescription: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     gotItButton: {
       padding: 16,

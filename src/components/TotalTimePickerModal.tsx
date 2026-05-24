@@ -175,14 +175,14 @@ const styles = (theme: Theme) =>
     },
     cancelButtonText: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     confirmButton: {
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
       borderRadius: 8,
-      backgroundColor: theme.colors['rust-600'],
+      backgroundColor: theme.colors['toffee-400'],
       alignItems: 'center',
     },
     confirmButtonText: {

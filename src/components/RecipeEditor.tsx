@@ -178,27 +178,6 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
         contentContainerStyle={styles(theme).scrollContentContainer}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
-            <View style={styles(theme).headerContainer}>
-              <TextInput
-                style={styles(theme).titleInput}
-                value={editingData.title}
-                placeholder="Recipe name"
-                placeholderTextColor={theme.colors['neutral-400']}
-                onChangeText={text =>
-                  onChangeEditingData({...editingData, title: text})
-                }
-                multiline
-              />
-              <TextInput
-                style={styles(theme).authorInput}
-                value={editingData.author}
-                placeholder="Author"
-                placeholderTextColor={theme.colors['neutral-400']}
-                onChangeText={text =>
-                  onChangeEditingData({...editingData, author: text})
-                }
-              />
-            </View>
             <TouchableOpacity
               style={styles(theme).imageContainer}
               onPress={handleImageSelection}
@@ -220,7 +199,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   <Ionicons
                     name="camera-outline"
                     size={40}
-                    color={theme.colors['neutral-400']}
+                    color={theme.colors['toffee-400']}
                   />
                   <Text style={styles(theme).placeholderText}>
                     Tap to add image
@@ -228,6 +207,27 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                 </View>
               )}
             </TouchableOpacity>
+            <View style={styles(theme).headerContainer}>
+              <TextInput
+                style={styles(theme).titleInput}
+                value={editingData.title}
+                placeholder="Recipe name"
+                placeholderTextColor={theme.colors['toffee-400']}
+                onChangeText={text =>
+                  onChangeEditingData({...editingData, title: text})
+                }
+                multiline
+              />
+              <TextInput
+                style={styles(theme).authorInput}
+                value={editingData.author}
+                placeholder="Author"
+                placeholderTextColor={theme.colors['toffee-400']}
+                onChangeText={text =>
+                  onChangeEditingData({...editingData, author: text})
+                }
+              />
+            </View>
             <View style={styles(theme).bodyContainer}>
               <View style={styles(theme).detailsContainer}>
                 <View style={styles(theme).detailsRow}>
@@ -290,7 +290,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   style={styles(theme).aboutInput}
                   value={editingData.about}
                   placeholder="Add a description or notes about this recipe..."
-                  placeholderTextColor={theme.colors['neutral-400']}
+                  placeholderTextColor={theme.colors['toffee-400']}
                   onChangeText={(text: any) => {
                     onChangeEditingData({
                       ...editingData,
@@ -315,7 +315,6 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   }}
                   leftLabel="Ingredients"
                   rightLabel="Directions"
-                  textStyle="header"
                 />
               </View>
               <View style={styles(theme).ingredientsContainer}>
@@ -323,7 +322,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   style={styles(theme).ingredientsInput}
                   value={editingData.ingredients}
                   placeholder="Enter ingredients, one per line..."
-                  placeholderTextColor={theme.colors['neutral-400']}
+                  placeholderTextColor={theme.colors['toffee-400']}
                   onChangeText={(text: any) => {
                     onChangeEditingData({
                       ...editingData,
@@ -375,21 +374,22 @@ const styles = (theme: Theme) =>
       paddingBottom: 40,
     },
     headerContainer: {
-      marginBottom: 10,
+      marginBottom: 0,
       paddingHorizontal: 20,
-      paddingTop: 5,
+      paddingTop: 0,
     },
     imageContainer: {
       height: 260,
       marginHorizontal: 20,
+      marginBottom: 14,
       backgroundColor: theme.colors['neutral-300'],
-      borderRadius: 8,
+      borderRadius: 15,
+      overflow: 'hidden',
     },
     image: {
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
-      borderRadius: 8,
     },
     uploadingOverlay: {
       position: 'absolute',
@@ -402,7 +402,7 @@ const styles = (theme: Theme) =>
       justifyContent: 'center',
     },
     uploadingText: {
-      ...theme.typography.h5,
+      ...theme.typography.h4,
       color: theme.colors['neutral-100'],
     },
     placeholderOverlay: {
@@ -413,8 +413,8 @@ const styles = (theme: Theme) =>
       justifyContent: 'center',
     },
     placeholderText: {
-      ...theme.typography.h5,
-      color: theme.colors['neutral-400'],
+      ...theme.typography.h4,
+      color: theme.colors['toffee-400'],
       marginTop: 10,
     },
     bodyContainer: {
@@ -443,12 +443,12 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     metadataText: {
-      ...theme.typography['h3-emphasized'],
+      ...theme.typography['h2'],
       color: theme.colors['neutral-800'],
       marginRight: 10,
     },
     metadataValue: {
-      ...theme.typography['h3-emphasized'],
+      ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
     },
     servingsToggleContainer: {
@@ -460,7 +460,7 @@ const styles = (theme: Theme) =>
       minWidth: 70,
     },
     servingsValue: {
-      ...theme.typography['h3-emphasized'],
+      ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
       minWidth: 28,
       textAlign: 'center',
@@ -479,15 +479,15 @@ const styles = (theme: Theme) =>
     },
     authorInput: {
       ...theme.typography.h2,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       marginBottom: 5,
       backgroundColor: 'transparent',
     },
     sectionTitle: {
-      ...theme.typography.h3,
+      ...theme.typography.h2,
       marginTop: 25,
       marginBottom: 10,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     tabBarContainer: {
       marginBottom: 10,
@@ -496,7 +496,7 @@ const styles = (theme: Theme) =>
     ingredientsContainer: {
       flex: 1,
       marginBottom: 20,
-      paddingHorizontal: 30,
+      paddingHorizontal: 20,
       paddingVertical: 5,
     },
     ingredientsInput: {
@@ -510,7 +510,7 @@ const styles = (theme: Theme) =>
       textAlignVertical: 'top',
     },
     aboutInput: {
-      ...theme.typography.b2,
+      ...theme.typography.b1,
       color: theme.colors['neutral-800'],
       marginBottom: 5,
     },
@@ -533,16 +533,16 @@ const styles = (theme: Theme) =>
     lineNumber: {
       ...theme.typography.b1,
       marginRight: 10,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     editInstructions: {
-      ...theme.typography.h5,
+      ...theme.typography.h4,
       flex: 1,
       color: theme.colors['neutral-800'],
     },
     placeholder: {
-      ...theme.typography.h5,
-      color: theme.colors['neutral-400'],
+      ...theme.typography.h4,
+      color: theme.colors['toffee-400'],
     },
     authorRow: {
       marginBottom: 10,

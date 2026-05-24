@@ -3,7 +3,7 @@ import {
   View,
   StyleSheet,
   Text,
-  TouchableHighlight,
+  Pressable,
   TouchableOpacity,
   SafeAreaView,
   Linking,
@@ -82,7 +82,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={theme.colors['neutral-400']}
+              color={theme.colors['toffee-400']}
             />
           </TouchableOpacity>
           <View style={styles(theme).menuDivider} />
@@ -93,15 +93,18 @@ export default function SettingsScreen() {
             <Ionicons
               name="chevron-forward"
               size={18}
-              color={theme.colors['neutral-400']}
+              color={theme.colors['toffee-400']}
             />
           </TouchableOpacity>
         </View>
-        <TouchableHighlight
+        <Pressable
           onPress={handleSignOut}
-          style={styles(theme).signOutButton}>
+          style={({pressed}) => [
+            styles(theme).signOutButton,
+            pressed && {backgroundColor: theme.colors['yellow-400']},
+          ]}>
           <Text style={styles(theme).signOutText}>Sign Out</Text>
-        </TouchableHighlight>
+        </Pressable>
       </SafeAreaView>
       <View>
         <Text style={styles(theme).version}>v1.0</Text>
@@ -136,7 +139,7 @@ const styles = (theme: Theme) =>
       width: '100%',
     },
     version: {
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       ...theme.typography.h4,
       paddingBottom: 20,
     },
@@ -146,7 +149,7 @@ const styles = (theme: Theme) =>
       marginBottom: 20,
     },
     memberSince: {
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       ...theme.typography.h4,
     },
     menuGroup: {

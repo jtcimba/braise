@@ -57,7 +57,7 @@ export default function InstructionsEditor({
 
   const customCodeBlockCSS = `      
       body {
-        font-family: 'Source Serif 4', serif;
+        font-family: 'Switzer';
         font-size: 16px;
         background-color: ${theme.colors['neutral-100']};
         color: ${theme.colors['neutral-800']};

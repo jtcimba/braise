@@ -73,7 +73,7 @@ export default function CategoryEditor({
             ref={inputRef}
             style={styles(theme).input}
             placeholder="Add a tag..."
-            placeholderTextColor={theme.colors['neutral-400']}
+            placeholderTextColor={theme.colors['toffee-400']}
             value={newCategory}
             onChangeText={setNewCategory}
             onSubmitEditing={handleSubmitEditing}

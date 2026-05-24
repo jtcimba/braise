@@ -20,5 +20,11 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>TAYTommyTokyo.otf</string>
+		<string>RobotoMono-VariableFont_wght.ttf</string>
+		<string>InclusiveSans-VariableFont_wght.ttf</string>
+	</array>
 </dict>
 </plist>

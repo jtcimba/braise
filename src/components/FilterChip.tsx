@@ -32,15 +32,15 @@ const styles = (theme: Theme) =>
   StyleSheet.create({
     chip: {
       paddingHorizontal: 15,
-      paddingVertical: 4,
+      paddingTop: 5,
+      paddingBottom: 6,
       borderRadius: 15,
       marginRight: 6,
       borderColor: theme.colors['neutral-300'],
-      borderWidth: 1,
     },
     selectedChip: {
-      backgroundColor: theme.colors['neutral-800'],
-      borderColor: theme.colors['neutral-800'],
+      backgroundColor: theme.colors['green-400'],
+      borderColor: theme.colors['neutral-100'],
     },
     label: {
       ...theme.typography.h4,

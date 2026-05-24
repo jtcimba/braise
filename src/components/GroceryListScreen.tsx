@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Pressable,
   TextInput,
   Modal,
   KeyboardAvoidingView,
@@ -302,7 +303,7 @@ export default function GroceryListScreen() {
                 <Ionicons
                   name="close"
                   size={20}
-                  color={theme.colors['neutral-400']}
+                  color={theme.colors['toffee-400']}
                   style={styles(theme).deleteIcon}
                 />
               </TouchableOpacity>
@@ -352,7 +353,7 @@ export default function GroceryListScreen() {
                     <TextInput
                       style={styles(theme).textInput}
                       placeholder="Item name"
-                      placeholderTextColor={theme.colors['neutral-400']}
+                      placeholderTextColor={theme.colors['toffee-400']}
                       value={newItemName}
                       onChangeText={setNewItemName}
                       autoFocus
@@ -360,7 +361,7 @@ export default function GroceryListScreen() {
                     <TextInput
                       style={styles(theme).textInput}
                       placeholder="Amount (e.g., 2 lbs, 1 dozen)"
-                      placeholderTextColor={theme.colors['neutral-400']}
+                      placeholderTextColor={theme.colors['toffee-400']}
                       value={newItemAmount}
                       onChangeText={setNewItemAmount}
                     />
@@ -398,15 +399,20 @@ export default function GroceryListScreen() {
                       onPress={onCancel}>
                       <Text style={styles(theme).cancelButtonText}>Cancel</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles(theme).confirmButton}
+                    <Pressable
+                      style={({pressed}) => [
+                        styles(theme).confirmButton,
+                        pressed && {
+                          backgroundColor: theme.colors['yellow-400'],
+                        },
+                      ]}
                       onPress={onSave}>
                       <Text
                         style={styles(theme).confirmButtonText}
                         numberOfLines={1}>
                         {buttonText}
                       </Text>
-                    </TouchableOpacity>
+                    </Pressable>
                   </View>
                 </View>
               </TouchableWithoutFeedback>
@@ -489,7 +495,7 @@ const styles = (theme: any) =>
       position: 'absolute',
       bottom: 15,
       right: 15,
-      backgroundColor: theme.colors['rust-600'],
+      backgroundColor: theme.colors['green-400'],
       width: 56,
       height: 56,
       borderRadius: 28,
@@ -527,7 +533,7 @@ const styles = (theme: any) =>
     },
     clearButtonText: {
       ...theme.typography.h4,
-      color: theme.colors['rust-600'],
+      color: theme.colors['toffee-400'],
     },
     sortPillsContainer: {
       flexDirection: 'row',
@@ -554,17 +560,17 @@ const styles = (theme: any) =>
       justifyContent: 'space-between',
     },
     checkbox: {
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       borderWidth: 2,
-      borderColor: theme.colors['rust-600'],
-      borderRadius: 4,
+      borderColor: theme.colors['green-400'],
+      borderRadius: 14,
       marginRight: 12,
       justifyContent: 'center',
       alignItems: 'center',
     },
     checkmark: {
-      color: theme.colors['rust-600'],
+      color: theme.colors['green-400'],
       fontSize: 16,
       fontWeight: 'bold',
     },
@@ -579,7 +585,7 @@ const styles = (theme: any) =>
     },
     amountText: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       marginLeft: 8,
     },
     deleteButton: {
@@ -591,7 +597,7 @@ const styles = (theme: any) =>
     },
     completedText: {
       textDecorationLine: 'line-through',
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     emptyState: {
       flex: 1,
@@ -607,7 +613,7 @@ const styles = (theme: any) =>
     },
     emptySubtext: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       textAlign: 'center',
     },
     modalOverlay: {
@@ -671,8 +677,8 @@ const styles = (theme: any) =>
       borderColor: theme.colors['neutral-300'],
     },
     selectedCategoryButton: {
-      backgroundColor: theme.colors['rust-600'],
-      borderColor: theme.colors['rust-600'],
+      backgroundColor: theme.colors['green-400'],
+      borderColor: theme.colors['green-400'],
     },
     categoryButtonText: {
       ...theme.typography.h4,

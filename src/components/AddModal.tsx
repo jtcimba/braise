@@ -47,12 +47,11 @@ export default function AddModal({visible, onClose}: AddModalProps) {
       swipeDirection={['down']}
       style={styles(theme).modalOverlay}>
       <View style={styles(theme).modalContainer}>
-        {/* <View style={styles(theme).modalHandle} /> */}
         <TouchableOpacity style={styles(theme).closeButton} onPress={onClose}>
           <Ionicons
             name="close-outline"
             size={24}
-            color={theme.colors['neutral-400']}
+            color={theme.colors['toffee-400']}
           />
         </TouchableOpacity>
         <Text style={styles(theme).modalTitle}>Add Recipe</Text>
@@ -156,17 +155,18 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
       textAlign: 'center',
       marginBottom: 20,
+      marginTop: 8,
     },
     modalButtonTextContainer: {
       flex: 1,
     },
     modalButtonText: {
-      ...theme.typography['h3-emphasized'],
+      ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
     },
     modalButtonSubtext: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     closeButton: {
       position: 'absolute',

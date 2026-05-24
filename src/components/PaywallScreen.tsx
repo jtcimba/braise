@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
   SafeAreaView,
   ActivityIndicator,
   Linking,
@@ -16,6 +17,7 @@ import Purchases, {
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import BraiseLogoDark from '../assets/images/braise-logo-dark.svg';
 
 const FEATURES = [
   {
@@ -35,8 +37,9 @@ const FEATURES = [
 ];
 
 const PRO_ENTITLEMENT = 'pro';
-const TERMS_URL = 'https://example.com/terms';
-const PRIVACY_URL = 'https://example.com/privacy';
+const TERMS_URL =
+  'https://jtcimba.github.io/braise-pages/terms-and-conditions/';
+const PRIVACY_URL = 'https://jtcimba.github.io/braise-pages/privacy-policy/';
 
 type PlanType = 'monthly' | 'annual';
 
@@ -166,14 +169,13 @@ export default function PaywallScreen({
 
       {isLoading ? (
         <View style={s.loadingContainer}>
-          <ActivityIndicator size="large" color={theme.colors['neutral-400']} />
+          <ActivityIndicator size="large" color={theme.colors['toffee-400']} />
         </View>
       ) : (
         <View style={s.scrollContent}>
           <View style={s.topSection}>
+            <BraiseLogoDark width={120} height={60} style={{marginBottom: 8}} />
             <Text style={s.logo}>braise</Text>
-            <Text style={s.tagline}>Cooking. Made simple.</Text>
-
             <View style={s.features}>
               {FEATURES.map(feature => (
                 <View key={feature.title} style={s.featureBlock}>
@@ -185,19 +187,18 @@ export default function PaywallScreen({
               ))}
             </View>
           </View>
-
           <View style={s.bottomSection}>
-            <View style={s.divider} />
-
             {!hasUsedTrial && (
-              <Text style={s.trialText}>
-                <Text style={s.trialBold}>7 days free</Text>
-                {
-                  " \u2014 cancel anytime before your trial ends and you won't be charged"
-                }
-              </Text>
+              <View>
+                <View style={s.divider} />
+                <Text style={s.trialText}>
+                  <Text style={s.trialBold}>7 days free</Text>
+                  {
+                    " \u2014 cancel anytime before your trial ends and you won't be charged"
+                  }
+                </Text>
+              </View>
             )}
-
             <View style={s.plans}>
               {monthlyPackage && (
                 <TouchableOpacity
@@ -283,11 +284,13 @@ export default function PaywallScreen({
               )}
             </View>
 
-            <TouchableOpacity
-              style={s.ctaButton}
+            <Pressable
+              style={({pressed}) => [
+                s.ctaButton,
+                pressed && {backgroundColor: theme.colors['yellow-400']},
+              ]}
               onPress={handlePurchase}
-              disabled={isPurchasing}
-              activeOpacity={0.8}>
+              disabled={isPurchasing}>
               {isPurchasing ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
@@ -295,20 +298,20 @@ export default function PaywallScreen({
                   {hasUsedTrial ? 'Subscribe' : 'Start Free Trial'}
                 </Text>
               )}
-            </TouchableOpacity>
+            </Pressable>
 
             <Text style={s.legalText}>
               {'By subscribing you agree to our '}
               <Text
                 style={s.legalLink}
                 onPress={() => Linking.openURL(TERMS_URL)}>
-                Terms and service
+                terms and service
               </Text>
               {' and '}
               <Text
                 style={s.legalLink}
                 onPress={() => Linking.openURL(PRIVACY_URL)}>
-                Privacy Policy
+                privacy policy
               </Text>
             </Text>
 
@@ -346,19 +349,16 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 24,
     },
     topSection: {
+      paddingTop: 40,
       alignItems: 'center',
-      paddingTop: 16,
+      justifyContent: 'center',
     },
     logo: {
-      fontFamily: 'Noto Serif',
-      fontSize: 52,
+      fontFamily: 'TAYTommyTokyoRegular',
+      fontSize: 22,
       fontWeight: '400',
       color: theme.colors['neutral-800'],
-    },
-    tagline: {
-      ...theme.typography['h2-emphasized'],
-      color: theme.colors['rust-600'],
-      marginBottom: 16,
+      marginBottom: 20,
     },
     features: {
       alignSelf: 'stretch',
@@ -372,8 +372,8 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
     },
     featureDescription: {
-      ...theme.typography.h3,
-      color: theme.colors['neutral-400'],
+      ...theme.typography.h2,
+      color: theme.colors['toffee-400'],
       lineHeight: 21,
     },
     bottomSection: {
@@ -385,18 +385,18 @@ const styles = (theme: Theme) =>
       borderBottomColor: theme.colors['neutral-300'],
       width: '40%',
       alignSelf: 'center',
-      marginBottom: 12,
+      marginBottom: 20,
     },
     trialText: {
-      ...theme.typography.h3,
-      color: theme.colors['neutral-400'],
+      ...theme.typography.h2,
+      color: theme.colors['neutral-800'],
       textAlign: 'center',
       lineHeight: 21,
       marginBottom: 12,
     },
     trialBold: {
-      ...theme.typography['h3-emphasized'],
-      color: theme.colors['rust-600'],
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['green-400'],
     },
     plans: {
       gap: 12,
@@ -413,7 +413,7 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 16,
     },
     planCardSelected: {
-      borderColor: theme.colors['rust-600'],
+      borderColor: theme.colors['neutral-800'],
       borderWidth: 2,
     },
     planTitleRow: {
@@ -423,13 +423,13 @@ const styles = (theme: Theme) =>
     },
     planTitle: {
       ...theme.typography['h2-emphasized'],
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     planTitleSelected: {
       color: theme.colors['neutral-800'],
     },
     saveBadge: {
-      backgroundColor: theme.colors['rust-200'],
+      backgroundColor: theme.colors['yellow-400'],
       paddingHorizontal: 8,
       paddingVertical: 3,
       borderRadius: 4,
@@ -448,21 +448,21 @@ const styles = (theme: Theme) =>
       fontFamily: 'Switzer',
       fontSize: 20,
       fontWeight: '600',
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
     },
     planPriceBoldSelected: {
       color: theme.colors['neutral-800'],
     },
     planPriceUnit: {
-      ...theme.typography.h3,
-      color: theme.colors['neutral-400'],
+      ...theme.typography.h2,
+      color: theme.colors['toffee-400'],
     },
     planPriceUnitSelected: {
       color: theme.colors['neutral-800'],
     },
     planSubtitle: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       marginTop: 2,
     },
     ctaButton: {
@@ -480,13 +480,13 @@ const styles = (theme: Theme) =>
     },
     legalText: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       textAlign: 'center',
       lineHeight: 20,
     },
     legalLink: {
       ...theme.typography['h4-emphasized'],
-      color: theme.colors['rust-600'],
+      color: theme.colors['toffee-400'],
     },
     restoreButton: {
       alignSelf: 'center',
@@ -495,7 +495,7 @@ const styles = (theme: Theme) =>
     },
     restoreText: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-400'],
+      color: theme.colors['toffee-400'],
       textDecorationLine: 'underline',
     },
   });

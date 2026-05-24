@@ -157,7 +157,7 @@ const styles = (theme: Theme) =>
       paddingVertical: 12,
       paddingHorizontal: 20,
       borderRadius: 8,
-      backgroundColor: theme.colors['rust-600'],
+      backgroundColor: theme.colors['toffee-400'],
       alignItems: 'center',
     },
     confirmButtonText: {

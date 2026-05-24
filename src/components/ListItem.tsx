@@ -17,16 +17,14 @@ export default function Item({item, navigation, isFirst}: any) {
 
   return (
     <TouchableOpacity
-      style={[styles(theme).item, isFirst && {paddingTop: 5}]}
+      style={[styles(theme).item, isFirst && {paddingTop: 8}]}
       onPress={() => navigation.navigate('RecipeDetailsScreen', {item: item})}>
-      <View>
-        <Image
-          style={styles(theme).image}
-          source={{
-            uri: item.image ? item.image : null,
-          }}
-        />
-      </View>
+      <Image
+        style={styles(theme).image}
+        source={{
+          uri: item.image ? item.image : null,
+        }}
+      />
       <View style={styles(theme).itemBody}>
         <Text
           style={styles(theme).title}
@@ -35,13 +33,13 @@ export default function Item({item, navigation, isFirst}: any) {
           onTextLayout={onTitleTextLayout}>
           {item.title}
         </Text>
-        <View style={styles(theme).subtextContainer}>
-          {item.total_time && (
+        {item.total_time && (
+          <View style={styles(theme).timeContainer}>
             <Text style={styles(theme).time}>
-              {item.total_time} {item.total_time_unit || 'min'}
+              {item.total_time} {item.total_time_unit.toUpperCase() || 'MIN'}
             </Text>
-          )}
-        </View>
+          </View>
+        )}
         <Text
           style={styles(theme).description}
           numberOfLines={descriptionLines}
@@ -53,46 +51,43 @@ export default function Item({item, navigation, isFirst}: any) {
   );
 }
 
-const styles = (theme: any) =>
+const styles = (theme: Theme) =>
   StyleSheet.create({
     item: {
-      flex: 1,
       flexDirection: 'row',
-      justifyContent: 'center',
-      paddingVertical: 15,
+      paddingVertical: 20,
+      paddingTop: 20,
       marginHorizontal: 20,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors['neutral-300'],
+      gap: 14,
     },
     itemBody: {
       flex: 1,
-      minHeight: 0,
+      gap: 5,
       overflow: 'hidden',
     },
     title: {
-      ...theme.typography['h3-emphasized'],
+      ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
-      marginBottom: 3,
     },
     image: {
-      width: 78,
-      height: 78,
-      marginRight: 12,
+      width: 90,
+      height: 90,
       backgroundColor: theme.colors['neutral-300'],
-      borderRadius: 8,
+      borderRadius: 12,
+      flexShrink: 0,
     },
     time: {
-      overflow: 'hidden',
       ...theme.typography.h4,
-      color: theme.colors['rust-600'],
-      marginBottom: 3,
+      color: theme.colors['green-400'],
     },
-    subtextContainer: {
-      flexDirection: 'row',
-      gap: 10,
+    timeContainer: {
+      alignSelf: 'flex-start',
+      borderRadius: 40,
     },
     description: {
-      ...theme.typography.b2,
-      color: theme.colors['neutral-400'],
+      ...theme.typography.b1,
+      color: theme.colors['toffee-400'],
     },
   });
