@@ -31,6 +31,7 @@ import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
 import {NativeModules, Platform} from 'react-native';
 import Purchases, {LOG_LEVEL} from 'react-native-purchases';
+import {useSubscription} from './src/hooks/useSubscription';
 
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
@@ -78,9 +79,14 @@ function AddComponent() {
 
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
+  const {isPro, isLoading: isSubscriptionLoading} = useSubscription();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const openAddModal = () => {
+    if (!isSubscriptionLoading && !isPro) {
+      navigation.navigate('Paywall', {dismissible: true});
+      return;
+    }
     setIsAddModalVisible(true);
   };
   const closeAddModal = () => setIsAddModalVisible(false);
