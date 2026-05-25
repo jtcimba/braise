@@ -57,7 +57,7 @@ export const recipeService = {
         throw new Error('User not authenticated');
       }
 
-      const recipeForSave = processForSave(recipe);
+      const {id: _id, ...recipeForSave} = processForSave(recipe);
       const {data: newRecipe, error} = await supabase
         .from('recipes')
         .insert({

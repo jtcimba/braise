@@ -3,7 +3,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Linking} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
-import BraiseLogoLight from './src/assets/images/braise-logo-light.svg';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -233,7 +232,7 @@ export default function App({}: AppProps): React.JSX.Element {
     <ThemeProvider theme={LightTheme}>
       {isLoadingSession ? (
         <View style={styles.loadingContainer}>
-          <BraiseLogoLight width={160} height={160} />
+          <BraiseLogoDark width={160} height={160} />
         </View>
       ) : authSession?.user && !isRecoverySession ? (
         <GroceryListModalProvider>
