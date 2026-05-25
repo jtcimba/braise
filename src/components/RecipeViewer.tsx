@@ -15,6 +15,7 @@ import {parseIngredient, scaleIngredients} from '../services';
 
 import {useGroceryListModal} from '../context/GroceryListModalContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
 
 export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   const theme = useTheme() as unknown as Theme;
@@ -106,10 +107,13 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles(theme).scrollContentContainer}>
         <View style={styles(theme).imageContainer}>
-          <Image
-            style={styles(theme).image}
-            source={{uri: data.image ? data.image : null}}
-          />
+          {data.image ? (
+            <Image style={styles(theme).image} source={{uri: data.image}} />
+          ) : (
+            <View style={styles(theme).imagePlaceholder}>
+              <BraiseLogoLight width={100} height={100} />
+            </View>
+          )}
         </View>
         <View style={styles(theme).headerContainer}>
           <Text style={styles(theme).title}>{data.title}</Text>
@@ -288,6 +292,13 @@ const styles = (theme: any) =>
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
+    },
+    imagePlaceholder: {
+      width: '100%',
+      height: '100%',
+      backgroundColor: theme.colors['toffee-400'],
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     bodyContainer: {
       flex: 1,
