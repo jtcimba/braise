@@ -22,7 +22,10 @@ Deno.serve(async req => {
   try {
     const body = await req.json();
     images = body.images;
-    console.log('Received images count:', Array.isArray(images) ? images.length : typeof images);
+    console.log(
+      'Received images count:',
+      Array.isArray(images) ? images.length : typeof images,
+    );
     if (!Array.isArray(images) || images.length === 0 || images.length > 3) {
       console.error('Invalid images field:', images);
       return new Response(
@@ -49,7 +52,10 @@ Deno.serve(async req => {
         );
       }
     }
-    console.log('Image sizes (chars):', images.map(img => img.length));
+    console.log(
+      'Image sizes (chars):',
+      images.map(img => img.length),
+    );
   } catch (err) {
     console.error('Failed to parse request body:', err);
     return new Response(JSON.stringify({error: 'Invalid JSON body'}), {
@@ -97,7 +103,11 @@ Return ONLY the JSON object, no markdown, no explanation, no code fences.`;
     text: 'Extract the recipe from these photos.',
   });
 
-  console.log('Sending request to Claude with', messageContent.length, 'content blocks');
+  console.log(
+    'Sending request to Claude with',
+    messageContent.length,
+    'content blocks',
+  );
   try {
     const claudeResponse = await fetch(
       'https://api.anthropic.com/v1/messages',
