@@ -209,7 +209,9 @@ class ShareViewController: UIViewController {
         let categories = extractCategories(from: recipeObj, title: title)
         let image = extractImage(from: recipeObj)
         let ingredientsArray = extractStringArray("recipeIngredient", from: recipeObj)
-        let ingredients = ingredientsArray.joined(separator: "\\n")
+        let ingredients = ingredientsArray
+            .map { cleanIngredient($0) }
+            .joined(separator: "\\n")
         let instructions = extractInstructions(from: recipeObj)
         let (totalTime, totalTimeUnit) = extractTime(from: recipeObj)
         let servings = extractServings(from: recipeObj)
@@ -234,18 +236,23 @@ class ShareViewController: UIViewController {
         return formatted
     }
 
+    private func isRecipeType(_ obj: [String: Any]) -> Bool {
+        if let type = obj["@type"] as? String { return type == "Recipe" }
+        if let types = obj["@type"] as? [String] { return types.contains("Recipe") }
+        return false
+    }
+
     private func findRecipeObject(in jsonAny: Any) -> [String: Any]? {
         if let jsonArray = jsonAny as? [[String: Any]] {
-            return jsonArray.first { ($0["@type"] as? String) == "Recipe" }
+            return jsonArray.first { isRecipeType($0) }
         } else if let jsonObject = jsonAny as? [String: Any] {
-            if let type = jsonObject["@type"] as? String, type == "Recipe" {
+            if isRecipeType(jsonObject) {
                 return jsonObject
             } else if let graph = jsonObject["@graph"] as? [[String: Any]] {
-                return graph.first { ($0["@type"] as? String) == "Recipe" }
+                return graph.first { isRecipeType($0) }
             } else if let items = jsonObject["itemListElement"] as? [[String: Any]] {
                 for item in items {
-                    if let itemObj = item["item"] as? [String: Any],
-                       let type = itemObj["@type"] as? String, type == "Recipe" {
+                    if let itemObj = item["item"] as? [String: Any], isRecipeType(itemObj) {
                         return itemObj
                     }
                 }
@@ -312,6 +319,7 @@ class ShareViewController: UIViewController {
     }
 
     private func extractInstructions(from recipeObj: [String: Any]) -> String {
+        let joined: String
         if let instructionsObj = recipeObj["recipeInstructions"] as? [[String: Any]] {
             let steps = instructionsObj.compactMap { obj -> String? in
                 if let text = obj["text"] as? String {
@@ -323,13 +331,41 @@ class ShareViewController: UIViewController {
                 }
                 return nil
             }
-            return steps.joined(separator: "\\n")
+            joined = steps.joined(separator: "\\n")
         } else if let instructionsArray = recipeObj["recipeInstructions"] as? [String] {
-            return instructionsArray.joined(separator: "\\n")
+            joined = instructionsArray.joined(separator: "\\n")
         } else if let instructionsString = recipeObj["recipeInstructions"] as? String {
-            return instructionsString
+            joined = instructionsString
+        } else {
+            return ""
         }
-        return ""
+        return splitNumberedSteps(joined)
+    }
+
+    private static let stepSplitRegex = try? NSRegularExpression(
+        pattern: #"(?<=[.!?])\s*(?=\d+\.\s)"#
+    )
+
+    private func splitNumberedSteps(_ text: String) -> String {
+        guard !text.contains("\\n"), text.hasPrefix("1.") else { return text }
+        guard let regex = Self.stepSplitRegex else { return text }
+        let ns = text as NSString
+        let matches = regex.matches(in: text, range: NSRange(location: 0, length: ns.length))
+        guard !matches.isEmpty else { return text }
+        var parts: [String] = []
+        var lastEnd = 0
+        for match in matches {
+            let raw = ns.substring(with: NSRange(location: lastEnd, length: match.range.location - lastEnd))
+                .trimmingCharacters(in: .whitespaces)
+            let part = raw.replacingOccurrences(of: #"^\d+\.\s*"#, with: "", options: .regularExpression)
+            if !part.isEmpty { parts.append(part) }
+            lastEnd = match.range.location + match.range.length
+        }
+        let tail = ns.substring(from: lastEnd)
+            .trimmingCharacters(in: .whitespaces)
+            .replacingOccurrences(of: #"^\d+\.\s*"#, with: "", options: .regularExpression)
+        if !tail.isEmpty { parts.append(tail) }
+        return parts.count > 1 ? parts.joined(separator: "\\n") : text
     }
 
     private func extractTime(from recipeObj: [String: Any]) -> (String, String) {
@@ -386,6 +422,25 @@ class ShareViewController: UIViewController {
     }
 
     // MARK: - Parsing Helpers
+
+    private static let ingredientNoteRegex = try? NSRegularExpression(
+        pattern: #"\(,\s*((?:[^()]*|\([^()]*\))*)\)"#
+    )
+
+    private func cleanIngredient(_ ingredient: String) -> String {
+        var result = ingredient
+        if let regex = Self.ingredientNoteRegex {
+            let ns = result as NSString
+            result = regex.stringByReplacingMatches(
+                in: result,
+                range: NSRange(location: 0, length: ns.length),
+                withTemplate: ", $1"
+            )
+        }
+        result = result.replacingOccurrences(of: "((", with: "(")
+        result = result.replacingOccurrences(of: "))", with: ")")
+        return result
+    }
 
     private func extractString(_ key: String, from dict: [String: Any]) -> String {
         if let value = dict[key] as? String {

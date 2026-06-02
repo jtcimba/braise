@@ -1,4 +1,5 @@
 import '@supabase/functions-js/edge-runtime.d.ts';
+import {cleanIngredients, splitNumberedInstructions} from '../_shared/recipeUtils.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -80,8 +81,8 @@ Deno.serve(async req => {
 - "title": string (recipe title)
 - "author": string (recipe author, empty string if not found)
 - "categories": string (comma-separated categories, e.g. "dinner,italian")
-- "ingredients": string (each ingredient on its own line, separated by \\n)
-- "instructions": string (each step on its own line, separated by \\n)
+- "ingredients": string (each ingredient on its own line, separated by \\n; preserve the original text exactly — do not add, remove, or duplicate parentheses)
+- "instructions": string (each distinct step on its own line, separated by \\n; if the source has numbered steps split them into separate lines, never combine multiple steps into one)
 - "total_time": string (numeric string of total time, e.g. "30", empty string if not found)
 - "total_time_unit": string ("min" or "hr", empty string if not found)
 - "servings": string (numeric string, e.g. "4", empty string if not found)
@@ -180,8 +181,8 @@ Return ONLY the JSON object, no markdown, no explanation, no code fences.`;
       host_name: '',
       categories: recipe.categories || '',
       image: '',
-      ingredients: recipe.ingredients || '',
-      instructions: recipe.instructions || '',
+      ingredients: cleanIngredients(recipe.ingredients || ''),
+      instructions: splitNumberedInstructions(recipe.instructions || ''),
       total_time: recipe.total_time || '',
       total_time_unit: recipe.total_time_unit || '',
       servings: recipe.servings || '',

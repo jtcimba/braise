@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
-import {View, StyleSheet, Linking} from 'react-native';
+import {View, Text, StyleSheet, Linking} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
 import {
   NavigationContainer,
@@ -257,11 +257,7 @@ export default function App({}: AppProps): React.JSX.Element {
                   headerTransparent: true,
                   headerShadowVisible: false,
                   headerTitle: () => (
-                    <BraiseLogoDark
-                      width={80}
-                      height={40}
-                      style={{marginBottom: 10}}
-                    />
+                    <Text style={styles.headerTitle}>Braise</Text>
                   ),
                   headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
                   headerLeftContainerStyle: {
@@ -330,5 +326,10 @@ const styles = StyleSheet.create({
     backgroundColor: LightTheme.colors['yellow-400'],
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerTitle: {
+    ...LightTheme.typography.h1,
+    color: LightTheme.colors['neutral-800'],
+    marginBottom: 10,
   },
 });

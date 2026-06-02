@@ -533,7 +533,7 @@ const styles = (theme: any) =>
     },
     clearButtonText: {
       ...theme.typography.h4,
-      color: theme.colors['toffee-400'],
+      color: '#c0392b',
     },
     sortPillsContainer: {
       flexDirection: 'row',
