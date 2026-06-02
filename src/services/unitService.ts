@@ -183,7 +183,7 @@ export interface ParsedIngredient {
 
 export const parseIngredient = (ingredient: string): ParsedIngredient => {
   const quantityMatch = ingredient.match(
-    /^(\d+\s*\d*\/\d+|\d+\.\d+|\d+|[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞])?/,
+    /^(\d+\s*\d*\/\d+|\d+\.\d+|\d+[-–]\d+|\d+|[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅐⅛⅜⅝⅞])?/,
   );
   const quantity = quantityMatch
     ? convertUnicodeFraction(quantityMatch[1]?.trim() || '')
