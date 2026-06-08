@@ -37,8 +37,8 @@ export default function InstructionsEditor({
       return '<ol><li></li></ol>';
     }
     let html = '<ol>';
-    i.split('\n').forEach(i => {
-      html += `<li>${i}</li>`;
+    i.split('\n').forEach(line => {
+      html += `<li>${line}</li>`;
     });
     html += '</ol>';
     return html;

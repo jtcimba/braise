@@ -57,6 +57,7 @@ export const recipeService = {
         throw new Error('User not authenticated');
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const {id: _id, ...recipeForSave} = processForSave(recipe);
       const {data: newRecipe, error} = await supabase
         .from('recipes')

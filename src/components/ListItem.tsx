@@ -58,13 +58,13 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
       paddingVertical: 20,
       paddingTop: 20,
-    },
-    itemFirst: {
-      paddingTop: 8,
       marginHorizontal: 20,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors['neutral-300'],
       gap: 14,
+    },
+    itemFirst: {
+      paddingTop: 8,
     },
     itemBody: {
       flex: 1,
