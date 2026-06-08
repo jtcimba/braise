@@ -12,8 +12,9 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Platform,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
+import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 import BraiseLogoDark from '../assets/images/braise-logo-dark.svg';
 import {supabase} from '../supabase-client';
 import {useTheme} from '../../theme/ThemeProvider';
@@ -31,9 +32,10 @@ export default function Auth({
   onPasswordResetComplete,
 }: AuthProps = {}) {
   const theme = useTheme() as unknown as Theme;
-  const screenHeight = Dimensions.get('window').height;
-  const paddingTop = Math.max(40, screenHeight * 0.07);
-  const paddingBottom = Math.max(80, screenHeight * 0.15);
+  const {height: screenHeight} = useWindowDimensions();
+  const tablet = isTablet();
+  const paddingTop = tablet ? 60 : Math.max(40, screenHeight * 0.07);
+  const paddingBottom = tablet ? 60 : Math.max(80, screenHeight * 0.15);
   const [view, setView] = useState<AuthView>(
     resetPasswordToken ? 'newpassword' : 'signin',
   );
@@ -666,7 +668,7 @@ const styles = (theme: any) =>
     },
     content: {
       padding: 24,
-      maxWidth: 400,
+      maxWidth: isTablet() ? MODAL_MAX_WIDTH : 400,
       width: '100%',
       alignSelf: 'center',
     },

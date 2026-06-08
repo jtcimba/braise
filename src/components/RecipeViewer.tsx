@@ -8,8 +8,10 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
+import {isTablet, MAX_CONTENT_WIDTH} from '../hooks/useTablet';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {useHeaderHeight} from '@react-navigation/elements';
 import CustomToggle from './CustomToggle';
 import {parseIngredient, scaleIngredients} from '../services';
 
@@ -100,143 +102,122 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
     // If data.servings is null, don't reset currentServings - allow user scaling to persist
   }, [data.servings]);
 
+  const tablet = isTablet();
+  const headerHeight = useHeaderHeight();
+
   return (
     <View style={styles(theme).container}>
       <ScrollView
-        style={styles(theme).contentContainer}
+        style={[styles(theme).contentContainer, {marginTop: headerHeight}]}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles(theme).scrollContentContainer}>
-        <View style={styles(theme).imageContainer}>
-          {data.image ? (
-            <Image style={styles(theme).image} source={{uri: data.image}} />
-          ) : (
-            <View style={styles(theme).imagePlaceholder}>
-              <BraiseLogoLight width={100} height={100} />
-            </View>
-          )}
-        </View>
-        <View style={styles(theme).headerContainer}>
-          <Text style={styles(theme).title}>{data.title}</Text>
-          {data.author && (
-            <Text style={styles(theme).author}>{data.author}</Text>
-          )}
-        </View>
-        <View style={styles(theme).divider} />
-        <View style={styles(theme).bodyContainer}>
-          <View style={styles(theme).metadataCard}>
-            <View style={styles(theme).detailsRow}>
-              <View style={styles(theme).metadataServingsContainer}>
-                <Text style={styles(theme).metadataText}>Servings</Text>
-                <View style={styles(theme).servingsToggleContainer}>
-                  <TouchableOpacity
-                    style={styles(theme).servingsToggleButton}
-                    onPress={handleDecreaseServings}>
-                    <Ionicons
-                      name="remove-outline"
-                      size={16}
-                      color={theme.colors['neutral-800']}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles(theme).servingsValue}>
-                    {currentServings}
-                  </Text>
-                  <TouchableOpacity
-                    style={styles(theme).servingsToggleButton}
-                    onPress={handleIncreaseServings}>
-                    <Ionicons
-                      name="add-outline"
-                      size={16}
-                      color={theme.colors['neutral-800']}
-                    />
-                  </TouchableOpacity>
-                </View>
+        <View style={tablet ? styles(theme).tabletContentWrapper : undefined}>
+          <View style={styles(theme).imageContainer}>
+            {data.image ? (
+              <Image style={styles(theme).image} source={{uri: data.image}} />
+            ) : (
+              <View style={styles(theme).imagePlaceholder}>
+                <BraiseLogoLight width={100} height={100} />
               </View>
-              <View style={styles(theme).metadataTimeContainer}>
-                <Text style={styles(theme).metadataText}>Total Time</Text>
-                <Text style={styles(theme).metadataValue}>
-                  {data.total_time
-                    ? data.total_time + ' ' + (data.total_time_unit || 'min')
-                    : '-'}
-                </Text>
-              </View>
-            </View>
+            )}
           </View>
-          {data.about && (
-            <Text style={styles(theme).aboutText}>{data.about}</Text>
-          )}
-          {data.categories && (
-            <View style={styles(theme).tagsRow}>
-              {data.categories.split(',').map((cat: string, idx: number) => {
-                return (
-                  <View key={idx} style={styles(theme).tagPill}>
-                    <Text style={styles(theme).tagPillText}>
-                      {cat.trim().toLocaleLowerCase()}
+          <View style={styles(theme).headerContainer}>
+            <Text style={styles(theme).title}>{data.title}</Text>
+            {data.author && (
+              <Text style={styles(theme).author}>{data.author}</Text>
+            )}
+          </View>
+          <View style={styles(theme).divider} />
+          <View style={styles(theme).bodyContainer}>
+            <View style={styles(theme).metadataCard}>
+              <View style={styles(theme).detailsRow}>
+                <View style={styles(theme).metadataServingsContainer}>
+                  <Text style={styles(theme).metadataText}>Servings</Text>
+                  <View style={styles(theme).servingsToggleContainer}>
+                    <TouchableOpacity
+                      style={styles(theme).servingsToggleButton}
+                      onPress={handleDecreaseServings}>
+                      <Ionicons
+                        name="remove-outline"
+                        size={16}
+                        color={theme.colors['neutral-800']}
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles(theme).servingsValue}>
+                      {currentServings}
                     </Text>
+                    <TouchableOpacity
+                      style={styles(theme).servingsToggleButton}
+                      onPress={handleIncreaseServings}>
+                      <Ionicons
+                        name="add-outline"
+                        size={16}
+                        color={theme.colors['neutral-800']}
+                      />
+                    </TouchableOpacity>
                   </View>
-                );
-              })}
-            </View>
-          )}
-          <View style={styles(theme).tabBarContainer}>
-            <CustomToggle
-              value={tab === 'directions'}
-              onValueChange={v => setTab(v ? 'directions' : 'ingredients')}
-              leftLabel="Ingredients"
-              rightLabel="Directions"
-            />
-          </View>
-          {tab === 'ingredients' && (
-            <View style={styles(theme).ingredientsContainer}>
-              {scaledIngredients ? (
-                scaledIngredients
-                  .split('\n')
-                  .map((ingredient: string, index: number, arr: string[]) => {
-                    const {quantity, unit, text} = parseIngredient(ingredient);
-                    return (
-                      <View
-                        style={[
-                          styles(theme).ingredientLine,
-                          index !== arr.length - 1 &&
-                            styles(theme).ingredientDivider,
-                        ]}
-                        key={index}>
-                        <View style={styles(theme).quantityContainer}>
-                          {quantity ? (
-                            <Text style={styles(theme).quantity}>
-                              {quantity} {unit}
-                            </Text>
-                          ) : (
-                            <View style={styles(theme).emptyQuantity} />
-                          )}
-                        </View>
-                        <Text style={styles(theme).ingredientText}>{text}</Text>
-                      </View>
-                    );
-                  })
-              ) : (
-                <View style={styles(theme).emptyStateContainer}>
-                  <Text style={styles(theme).emptyStateText}>
-                    No ingredients found. Add them in edit mode or view the
-                    original recipe.
+                </View>
+                <View style={styles(theme).metadataTimeContainer}>
+                  <Text style={styles(theme).metadataText}>Total Time</Text>
+                  <Text style={styles(theme).metadataValue}>
+                    {data.total_time
+                      ? data.total_time + ' ' + (data.total_time_unit || 'min')
+                      : '-'}
                   </Text>
                 </View>
-              )}
+              </View>
             </View>
-          )}
-          {tab === 'directions' && (
-            <>
-              <View style={styles(theme).instructionsContainer}>
-                {data.instructions ? (
-                  data.instructions
+            {data.about && (
+              <Text style={styles(theme).aboutText}>{data.about}</Text>
+            )}
+            {data.categories && (
+              <View style={styles(theme).tagsRow}>
+                {data.categories.split(',').map((cat: string, idx: number) => {
+                  return (
+                    <View key={idx} style={styles(theme).tagPill}>
+                      <Text style={styles(theme).tagPillText}>
+                        {cat.trim().toLocaleLowerCase()}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+            <View style={styles(theme).tabBarContainer}>
+              <CustomToggle
+                value={tab === 'directions'}
+                onValueChange={v => setTab(v ? 'directions' : 'ingredients')}
+                leftLabel="Ingredients"
+                rightLabel="Directions"
+              />
+            </View>
+            {tab === 'ingredients' && (
+              <View style={styles(theme).ingredientsContainer}>
+                {scaledIngredients ? (
+                  scaledIngredients
                     .split('\n')
-                    .map((instruction: any, index: any) => {
+                    .map((ingredient: string, index: number, arr: string[]) => {
+                      const {quantity, unit, text} =
+                        parseIngredient(ingredient);
                       return (
-                        <View style={styles(theme).lineContainer} key={index}>
-                          <Text style={styles(theme).lineNumber}>
-                            {index + 1}.
-                          </Text>
-                          <Text style={styles(theme).lineText}>
-                            {instruction}
+                        <View
+                          style={[
+                            styles(theme).ingredientLine,
+                            index !== arr.length - 1 &&
+                              styles(theme).ingredientDivider,
+                          ]}
+                          key={index}>
+                          <View style={styles(theme).quantityContainer}>
+                            {quantity ? (
+                              <Text style={styles(theme).quantity}>
+                                {quantity} {unit}
+                              </Text>
+                            ) : (
+                              <View style={styles(theme).emptyQuantity} />
+                            )}
+                          </View>
+                          <Text style={styles(theme).ingredientText}>
+                            {text}
                           </Text>
                         </View>
                       );
@@ -244,30 +225,59 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
                 ) : (
                   <View style={styles(theme).emptyStateContainer}>
                     <Text style={styles(theme).emptyStateText}>
-                      No directions found. Add them in edit mode or view the
+                      No ingredients found. Add them in edit mode or view the
                       original recipe.
                     </Text>
                   </View>
                 )}
               </View>
-            </>
-          )}
-          <Pressable
-            style={({pressed}) => [
-              styles(theme).addToShoppingListButton,
-              pressed && {backgroundColor: theme.colors['yellow-400']},
-            ]}
-            onPress={onAddToShoppingListPress}>
-            <Ionicons
-              name="list-outline"
-              size={20}
-              color={theme.colors['neutral-100']}
-              style={styles(theme).addToShoppingListIcon}
-            />
-            <Text style={styles(theme).addToShoppingListText}>
-              Add to grocery list
-            </Text>
-          </Pressable>
+            )}
+            {tab === 'directions' && (
+              <>
+                <View style={styles(theme).instructionsContainer}>
+                  {data.instructions ? (
+                    data.instructions
+                      .split('\n')
+                      .map((instruction: any, index: any) => {
+                        return (
+                          <View style={styles(theme).lineContainer} key={index}>
+                            <Text style={styles(theme).lineNumber}>
+                              {index + 1}.
+                            </Text>
+                            <Text style={styles(theme).lineText}>
+                              {instruction}
+                            </Text>
+                          </View>
+                        );
+                      })
+                  ) : (
+                    <View style={styles(theme).emptyStateContainer}>
+                      <Text style={styles(theme).emptyStateText}>
+                        No directions found. Add them in edit mode or view the
+                        original recipe.
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </>
+            )}
+            <Pressable
+              style={({pressed}) => [
+                styles(theme).addToShoppingListButton,
+                pressed && {backgroundColor: theme.colors['yellow-400']},
+              ]}
+              onPress={onAddToShoppingListPress}>
+              <Ionicons
+                name="list-outline"
+                size={20}
+                color={theme.colors['neutral-100']}
+                style={styles(theme).addToShoppingListIcon}
+              />
+              <Text style={styles(theme).addToShoppingListText}>
+                Add to grocery list
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -301,11 +311,15 @@ const styles = (theme: any) =>
       justifyContent: 'center',
     },
     bodyContainer: {
-      flex: 1,
       paddingHorizontal: 20,
       paddingTop: 10,
+      paddingBottom: 20,
       backgroundColor: theme.colors['neutral-100'],
-      minHeight: '100%',
+    },
+    tabletContentWrapper: {
+      maxWidth: MAX_CONTENT_WIDTH,
+      alignSelf: 'center',
+      width: '100%',
     },
     metadataCard: {
       borderRadius: 12,
@@ -386,7 +400,6 @@ const styles = (theme: any) =>
     },
     contentContainer: {
       flex: 1,
-      marginTop: 105,
     },
     scrollContentContainer: {
       paddingBottom: 10,

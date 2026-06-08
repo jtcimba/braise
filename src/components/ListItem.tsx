@@ -2,6 +2,7 @@ import React, {useState, useCallback} from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {isTablet} from '../hooks/useTablet';
 
 export default function Item({item, navigation, isFirst}: any) {
   const theme = useTheme() as unknown as Theme;
@@ -17,7 +18,7 @@ export default function Item({item, navigation, isFirst}: any) {
 
   return (
     <TouchableOpacity
-      style={[styles(theme).item, isFirst && {paddingTop: 8}]}
+      style={[styles(theme).item, isFirst && styles(theme).itemFirst]}
       onPress={() => navigation.navigate('RecipeDetailsScreen', {item: item})}>
       <Image
         style={styles(theme).image}
@@ -57,6 +58,9 @@ const styles = (theme: Theme) =>
       flexDirection: 'row',
       paddingVertical: 20,
       paddingTop: 20,
+    },
+    itemFirst: {
+      paddingTop: 8,
       marginHorizontal: 20,
       borderBottomWidth: 1,
       borderBottomColor: theme.colors['neutral-300'],
@@ -72,8 +76,8 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
     },
     image: {
-      width: 90,
-      height: 90,
+      width: isTablet() ? 110 : 90,
+      height: isTablet() ? 110 : 90,
       backgroundColor: theme.colors['neutral-300'],
       borderRadius: 12,
       flexShrink: 0,
