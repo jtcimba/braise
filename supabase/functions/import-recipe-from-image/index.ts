@@ -1,5 +1,8 @@
 import '@supabase/functions-js/edge-runtime.d.ts';
-import {cleanIngredients, splitNumberedInstructions} from '../_shared/recipeUtils.ts';
+import {
+  cleanIngredients,
+  splitNumberedInstructions,
+} from '../_shared/recipeUtils.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',

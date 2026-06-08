@@ -174,7 +174,7 @@ export default function PaywallScreen({
       ) : (
         <View style={s.scrollContent}>
           <View style={s.topSection}>
-            <BraiseLogoDark width={120} height={60} style={{marginBottom: 8}} />
+            <BraiseLogoDark width={120} height={60} style={s.logoImage} />
             <Text style={s.logo}>braise</Text>
             <View style={s.features}>
               {FEATURES.map(feature => (
@@ -352,6 +352,9 @@ const styles = (theme: Theme) =>
       paddingTop: 40,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    logoImage: {
+      marginBottom: 8,
     },
     logo: {
       fontFamily: 'TAYTommyTokyoRegular',

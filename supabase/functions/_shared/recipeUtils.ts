@@ -6,8 +6,12 @@ export function cleanIngredients(ingredients: string): string {
 }
 
 export function splitNumberedInstructions(instructions: string): string {
-  if (instructions.includes('\n')) return instructions;
-  if (!/^\s*1\.\s/.test(instructions)) return instructions;
+  if (instructions.includes('\n')) {
+    return instructions;
+  }
+  if (!/^\s*1\.\s/.test(instructions)) {
+    return instructions;
+  }
   const parts = instructions
     .split(/(?<=[.!?])\s*(?=\d+\.\s)/)
     .map(s => s.replace(/^\d+\.\s*/, '').trim())
