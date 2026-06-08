@@ -11,6 +11,7 @@ import {
 import {Picker} from '@react-native-picker/picker';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
 interface TotalTimePickerModalProps {
   visible: boolean;
@@ -138,7 +139,7 @@ const styles = (theme: Theme) =>
       borderRadius: 16,
       padding: 20,
       width: '90%',
-      maxWidth: 400,
+      maxWidth: isTablet() ? MODAL_MAX_WIDTH : 400,
     },
     header: {
       alignItems: 'center',
@@ -168,7 +169,7 @@ const styles = (theme: Theme) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      borderRadius: 8,
+      borderRadius: 40,
       borderWidth: 1,
       borderColor: theme.colors['neutral-300'],
       alignItems: 'center',
@@ -181,8 +182,8 @@ const styles = (theme: Theme) =>
       flex: 1,
       paddingVertical: 12,
       paddingHorizontal: 20,
-      borderRadius: 8,
-      backgroundColor: theme.colors['toffee-400'],
+      borderRadius: 40,
+      backgroundColor: theme.colors['neutral-800'],
       alignItems: 'center',
     },
     confirmButtonText: {

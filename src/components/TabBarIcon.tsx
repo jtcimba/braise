@@ -57,7 +57,12 @@ const TabBarIcon = forwardRef<any, TabBarIconProps>(
           ref={ref}
           style={[styles(theme).container, {transform: [{scale}]}]}>
           <Ionicons name={icons[name]} size={size} color={color} />
-          <Text style={[styles(theme).label, {color}]}>{labels[name]}</Text>
+          <Text
+            style={[styles(theme).label, {color}]}
+            numberOfLines={1}
+            adjustsFontSizeToFit>
+            {labels[name]}
+          </Text>
         </Animated.View>
       </TouchableWithoutFeedback>
     );
@@ -70,9 +75,11 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
       justifyContent: 'center',
       marginTop: 20,
+      width: '100%',
     },
     label: {
       ...theme.typography.b1,
+      marginTop: 2,
     },
   });
 

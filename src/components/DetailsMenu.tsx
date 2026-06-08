@@ -219,15 +219,12 @@ const styles = (theme: Theme) =>
     },
     modal: {
       width: '100%',
-      height: '100%',
       backgroundColor: theme.colors['neutral-100'],
-      position: 'absolute',
-      top: 450,
-      zIndex: 12000,
       borderRadius: 25,
       paddingStart: 25,
       paddingEnd: 20,
       paddingTop: 10,
+      paddingBottom: 40,
     },
     optionsView: {
       flexDirection: 'row',

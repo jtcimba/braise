@@ -13,6 +13,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import {isTablet, MAX_CONTENT_WIDTH} from '../hooks/useTablet';
 import {
   launchImageLibrary,
   ImagePickerResponse,
@@ -25,6 +26,7 @@ import CustomToggle from './CustomToggle';
 import TotalTimePickerModal from './TotalTimePickerModal';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {useHeaderHeight} from '@react-navigation/elements';
 import {supabase} from '../supabase-client';
 
 export default function RecipeEditor({editingData, onChangeEditingData}: any) {
@@ -168,16 +170,20 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     ? editingData.categories?.split(',').filter((cat: string) => cat.trim())
     : [];
 
+  const tablet = isTablet();
+  const headerHeight = useHeaderHeight();
+
   return (
     <KeyboardAvoidingView
       style={styles(theme).container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={tablet ? 0 : undefined}>
       <ScrollView
-        style={styles(theme).contentContainer}
+        style={[styles(theme).contentContainer, {marginTop: headerHeight}]}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles(theme).scrollContentContainer}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
+          <View style={tablet ? styles(theme).tabletContentWrapper : undefined}>
             <TouchableOpacity
               style={styles(theme).imageContainer}
               onPress={handleImageSelection}
@@ -368,7 +374,6 @@ const styles = (theme: Theme) =>
     },
     contentContainer: {
       flex: 1,
-      marginTop: 105,
     },
     scrollContentContainer: {
       paddingBottom: 40,
@@ -418,11 +423,15 @@ const styles = (theme: Theme) =>
       marginTop: 10,
     },
     bodyContainer: {
-      flex: 1,
       paddingHorizontal: 20,
       paddingTop: 18,
+      paddingBottom: 20,
       backgroundColor: theme.colors['neutral-100'],
-      minHeight: '100%',
+    },
+    tabletContentWrapper: {
+      maxWidth: MAX_CONTENT_WIDTH,
+      alignSelf: 'center',
+      width: '100%',
     },
     detailsContainer: {
       marginBottom: 10,
@@ -443,7 +452,7 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
     },
     metadataText: {
-      ...theme.typography['h2'],
+      ...theme.typography.h2,
       color: theme.colors['neutral-800'],
       marginRight: 10,
     },

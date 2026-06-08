@@ -18,6 +18,7 @@ import {
   combineAmounts,
   categorizeIngredient,
 } from '../services';
+import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
 interface Ingredient {
   id: string;
@@ -315,7 +316,7 @@ const styles = (theme: Theme) =>
       borderRadius: 16,
       padding: 20,
       width: '85%',
-      maxWidth: 350,
+      maxWidth: isTablet() ? MODAL_MAX_WIDTH : 350,
     },
     header: {
       alignItems: 'center',
@@ -334,7 +335,7 @@ const styles = (theme: Theme) =>
       marginBottom: 20,
     },
     ingredientsList: {
-      maxHeight: 300,
+      maxHeight: isTablet() ? 450 : 300,
     },
     ingredientItem: {
       paddingVertical: 12,

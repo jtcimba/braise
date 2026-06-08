@@ -20,6 +20,7 @@ import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {categorizeIngredient} from '../services';
 import FilterChip from './FilterChip';
+import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
 interface GroceryItem {
   id: string;
@@ -339,10 +340,16 @@ export default function GroceryListScreen() {
           <View style={styles(theme).modalOverlay}>
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? -50 : -30}
+              keyboardVerticalOffset={
+                Platform.OS === 'ios' ? (isTablet() ? 0 : -50) : -30
+              }
               style={styles(theme).keyboardAvoidingContainer}>
               <TouchableWithoutFeedback onPress={() => {}}>
-                <View style={styles(theme).modalContainer}>
+                <View
+                  style={[
+                    styles(theme).modalContainer,
+                    isTablet() && styles(theme).modalContainerTablet,
+                  ]}>
                   <View style={styles(theme).header}>
                     <Text style={styles(theme).modalTitle}>{title}</Text>
                   </View>
@@ -535,9 +542,6 @@ const styles = (theme: any) =>
       ...theme.typography.h4,
       color: '#c0392b',
     },
-    sortPillsContainer: {
-      flexDirection: 'row',
-    },
     categoryHeader: {
       ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
@@ -634,6 +638,9 @@ const styles = (theme: any) =>
       padding: 20,
       width: '85%',
       maxWidth: 350,
+    },
+    modalContainerTablet: {
+      maxWidth: MODAL_MAX_WIDTH,
     },
     header: {
       alignItems: 'center',

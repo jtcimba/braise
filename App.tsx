@@ -1,7 +1,7 @@
 import 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
-import {View, Text, StyleSheet, Linking} from 'react-native';
+import {View, StyleSheet, Linking} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
 import {
   NavigationContainer,
@@ -20,6 +20,7 @@ import CloseIcon from './src/components/CloseIcon';
 import DetailsMenuHeader from './src/components/DetailsMenuHeader';
 import AddModal from './src/components/AddModal';
 import PaywallScreen from './src/components/PaywallScreen';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ThemeProvider} from './theme/ThemeProvider';
 import {LightTheme} from './theme/theme';
 import {useTheme} from './theme/ThemeProvider';
@@ -31,6 +32,7 @@ import Auth from './src/components/Auth';
 import {NativeModules, Platform} from 'react-native';
 import Purchases, {LOG_LEVEL} from 'react-native-purchases';
 import {useSubscription} from './src/hooks/useSubscription';
+import {isTablet, useHeaderStatusBarHeight} from './src/hooks/useTablet';
 
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
@@ -79,6 +81,7 @@ function AddComponent() {
 function TabNavigator({navigation}: {navigation: any}) {
   const theme = useTheme() as unknown as Theme;
   const {isPro, isLoading: isSubscriptionLoading} = useSubscription();
+  const headerStatusBarHeight = useHeaderStatusBarHeight();
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
   const openAddModal = () => {
@@ -114,6 +117,9 @@ function TabNavigator({navigation}: {navigation: any}) {
           tabBarActiveTintColor: theme.colors['neutral-800'],
           tabBarInactiveTintColor: theme.colors['toffee-400'],
           tabBarShowLabel: false,
+          tabBarStyle: isTablet()
+            ? {height: 90, maxWidth: 600, alignSelf: 'center', width: '100%'}
+            : undefined,
         })}>
         <Tab.Screen
           name="Recipes"
@@ -123,6 +129,7 @@ function TabNavigator({navigation}: {navigation: any}) {
             headerRight: () => SettingsIcon(navigation),
             headerRightContainerStyle: {paddingRight: 15},
             headerShadowVisible: false,
+            headerStatusBarHeight,
             headerTitleStyle: {
               ...theme?.typography.h1,
               color: theme.colors['neutral-800'],
@@ -145,6 +152,7 @@ function TabNavigator({navigation}: {navigation: any}) {
           options={{
             headerTitleAlign: 'left',
             headerShadowVisible: false,
+            headerStatusBarHeight,
             headerTitleStyle: {
               ...theme?.typography.h1,
               color: theme.colors['neutral-800'],
@@ -155,6 +163,86 @@ function TabNavigator({navigation}: {navigation: any}) {
 
       <AddModal visible={isAddModalVisible} onClose={closeAddModal} />
     </>
+  );
+}
+
+function NavigationStack({
+  navigationRef,
+  navigationReadyRef,
+}: {
+  navigationRef: React.RefObject<NavigationContainerRef<ParamListBase>>;
+  navigationReadyRef: React.MutableRefObject<boolean>;
+}) {
+  const headerStatusBarHeight = useHeaderStatusBarHeight();
+
+  return (
+    <NavigationContainer
+      theme={LightTheme}
+      ref={navigationRef}
+      onReady={() => {
+        navigationReadyRef.current = true;
+      }}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Home"
+          component={TabNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="RecipeDetailsScreen"
+          component={RecipeDetailsScreen}
+          options={({navigation: nav}) => ({
+            headerTransparent: true,
+            headerShadowVisible: false,
+            headerStatusBarHeight,
+            headerTitle: () => null,
+            headerLeft: () => BackIcon(nav, 'RecipeDetailsScreen'),
+            headerLeftContainerStyle: {
+              paddingLeft: 15,
+              marginBottom: 10,
+            },
+            // eslint-disable-next-line react/no-unstable-nested-components
+            headerRight: () => <DetailsMenuHeader navigation={nav} />,
+            headerRightContainerStyle: {
+              paddingRight: 20,
+              marginBottom: 10,
+            },
+          })}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={({navigation: nav}) => ({
+            headerTitle: 'Settings',
+            headerLeft: () => null,
+            headerRight: () => CloseIcon(nav, 'Recipes', '#4A0B12'),
+            presentation: 'modal',
+            headerShadowVisible: false,
+            headerRightContainerStyle: {paddingRight: 10},
+            headerTitleStyle: {
+              fontFamily: 'TAYTommyTokyoRegular',
+              fontSize: 22,
+              fontWeight: '600',
+              color: '#291E0D',
+            },
+            headerStyle: {
+              backgroundColor: LightTheme.colors['neutral-100'],
+            },
+          })}
+        />
+        <Stack.Screen
+          name="Paywall"
+          component={PaywallScreen}
+          options={({route}: {route: any}) => ({
+            presentation: 'modal',
+            headerShown: false,
+            gestureEnabled: route.params?.dismissible !== false,
+          })}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
@@ -229,94 +317,30 @@ export default function App({}: AppProps): React.JSX.Element {
   }, []);
 
   return (
-    <ThemeProvider theme={LightTheme}>
-      {isLoadingSession ? (
-        <View style={styles.loadingContainer}>
-          <BraiseLogoDark width={160} height={160} />
-        </View>
-      ) : authSession?.user && !isRecoverySession ? (
-        <GroceryListModalProvider>
-          <NavigationContainer
-            theme={LightTheme}
-            ref={navigationRef}
-            onReady={() => {
-              navigationReadyRef.current = true;
-            }}>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Home"
-                component={TabNavigator}
-                options={{
-                  headerShown: false,
-                }}
-              />
-              <Stack.Screen
-                name="RecipeDetailsScreen"
-                component={RecipeDetailsScreen}
-                options={({navigation}) => ({
-                  headerTransparent: true,
-                  headerShadowVisible: false,
-                  headerTitle: () => (
-                    <Text style={styles.headerTitle}>Braise</Text>
-                  ),
-                  headerLeft: () => BackIcon(navigation, 'RecipeDetailsScreen'),
-                  headerLeftContainerStyle: {
-                    paddingLeft: 15,
-                    marginBottom: 10,
-                  },
-                  headerRight: () => (
-                    <DetailsMenuHeader navigation={navigation} />
-                  ),
-                  headerRightContainerStyle: {
-                    paddingRight: 20,
-                    marginBottom: 10,
-                  },
-                })}
-              />
-              <Stack.Screen
-                name="Settings"
-                component={SettingsScreen}
-                options={({navigation}) => ({
-                  headerTitle: 'Settings',
-                  headerLeft: () => null,
-                  headerRight: () =>
-                    CloseIcon(navigation, 'Recipes', '#4A0B12'),
-                  presentation: 'modal',
-                  headerShadowVisible: false,
-                  headerRightContainerStyle: {paddingRight: 10},
-                  headerTitleStyle: {
-                    fontFamily: 'TAYTommyTokyoRegular',
-                    fontSize: 22,
-                    fontWeight: '600',
-                    color: '#291E0D',
-                  },
-                  headerStyle: {
-                    backgroundColor: LightTheme.colors['neutral-100'],
-                  },
-                })}
-              />
-              <Stack.Screen
-                name="Paywall"
-                component={PaywallScreen}
-                options={({route}: {route: any}) => ({
-                  presentation: 'modal',
-                  headerShown: false,
-                  gestureEnabled: route.params?.dismissible !== false,
-                })}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        </GroceryListModalProvider>
-      ) : (
-        <Auth
-          resetPasswordToken={resetPasswordToken}
-          onPasswordResetComplete={() => {
-            setResetPasswordToken(null);
-            setIsRecoverySession(false);
-          }}
-        />
-      )}
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider theme={LightTheme}>
+        {isLoadingSession ? (
+          <View style={styles.loadingContainer}>
+            <BraiseLogoDark width={160} height={160} />
+          </View>
+        ) : authSession?.user && !isRecoverySession ? (
+          <GroceryListModalProvider>
+            <NavigationStack
+              navigationRef={navigationRef}
+              navigationReadyRef={navigationReadyRef}
+            />
+          </GroceryListModalProvider>
+        ) : (
+          <Auth
+            resetPasswordToken={resetPasswordToken}
+            onPasswordResetComplete={() => {
+              setResetPasswordToken(null);
+              setIsRecoverySession(false);
+            }}
+          />
+        )}
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 
@@ -326,10 +350,5 @@ const styles = StyleSheet.create({
     backgroundColor: LightTheme.colors['yellow-400'],
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  headerTitle: {
-    ...LightTheme.typography.h1,
-    color: LightTheme.colors['neutral-800'],
-    marginBottom: 10,
   },
 });

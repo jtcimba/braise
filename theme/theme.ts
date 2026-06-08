@@ -28,7 +28,7 @@ export const typography = {
     fontSize: 14,
   } as TextStyle,
   b1: {
-    fontFamily: 'Switzer',
+    fontFamily: 'Inclusive Sans',
     fontWeight: '400',
     fontSize: 15,
   } as TextStyle,

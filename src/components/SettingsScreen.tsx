@@ -20,6 +20,7 @@ import {User} from '@supabase/supabase-js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSubscription} from '../hooks/useSubscription';
 import {useNavigation} from '@react-navigation/native';
+import {isTablet, MAX_CONTENT_WIDTH, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
 export default function SettingsScreen() {
   const theme = useTheme() as unknown as Theme;
@@ -164,7 +165,7 @@ export default function SettingsScreen() {
         )}
       </SafeAreaView>
       <View>
-        <Text style={styles(theme).version}>v1.0</Text>
+        <Text style={styles(theme).version}>v1.0.5</Text>
       </View>
       <Modal
         visible={showDeleteModal}
@@ -234,6 +235,9 @@ const styles = (theme: Theme) =>
       alignItems: 'center',
       backgroundColor: theme.colors['neutral-100'],
       paddingHorizontal: 20,
+      maxWidth: isTablet() ? MAX_CONTENT_WIDTH : undefined,
+      alignSelf: 'center',
+      width: '100%',
     },
     settings: {
       flex: 1,
@@ -310,6 +314,7 @@ const styles = (theme: Theme) =>
       borderRadius: 16,
       padding: 24,
       width: '100%',
+      maxWidth: isTablet() ? MODAL_MAX_WIDTH : undefined,
     },
     modalTitle: {
       color: theme.colors['neutral-800'],

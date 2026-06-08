@@ -11,6 +11,7 @@ import {
 import {Picker} from '@react-native-picker/picker';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
+import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
 interface ServingsPickerModalProps {
   visible: boolean;
@@ -118,7 +119,7 @@ const styles = (theme: Theme) =>
       borderRadius: 16,
       padding: 20,
       width: '80%',
-      maxWidth: 300,
+      maxWidth: isTablet() ? MODAL_MAX_WIDTH : 300,
     },
     header: {
       alignItems: 'center',
@@ -157,7 +158,7 @@ const styles = (theme: Theme) =>
       paddingVertical: 12,
       paddingHorizontal: 20,
       borderRadius: 8,
-      backgroundColor: theme.colors['toffee-400'],
+      backgroundColor: theme.colors['neutral-800'],
       alignItems: 'center',
     },
     confirmButtonText: {

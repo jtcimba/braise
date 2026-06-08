@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Screenshot 2026-05-24 at 1.57.59 PM.png",
+      "filename" : "Screenshot 2026-05-24 at 1.57.59 PM.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
@@ -47,6 +47,60 @@
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
+    },
+    {
+      "filename" : "ipad-icon-20@1x.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "ipad-icon-20@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "20x20"
+    },
+    {
+      "filename" : "ipad-icon-29@1x.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "ipad-icon-29@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "29x29"
+    },
+    {
+      "filename" : "ipad-icon-40@1x.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "ipad-icon-40@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "40x40"
+    },
+    {
+      "filename" : "ipad-icon-76@1x.png",
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "size" : "76x76"
+    },
+    {
+      "filename" : "ipad-icon-76@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "76x76"
+    },
+    {
+      "filename" : "ipad-icon-83.5@2x.png",
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "size" : "83.5x83.5"
     },
     {
       "filename" : "braise-app-icon.png",
