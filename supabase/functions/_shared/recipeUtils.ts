@@ -62,7 +62,9 @@ export function formatRecipeFromJsonLd(
   }
 
   const recipeObj = findRecipeObject(jsonAny);
-  if (!recipeObj) return null;
+  if (!recipeObj) {
+    return null;
+  }
 
   let originalUrl = sourceUrl;
   let hostUrl = '';
@@ -107,8 +109,12 @@ type JsonObject = Record<string, unknown>;
 
 function isRecipeType(obj: JsonObject): boolean {
   const type = obj['@type'];
-  if (typeof type === 'string') return type === 'Recipe';
-  if (Array.isArray(type)) return (type as string[]).includes('Recipe');
+  if (typeof type === 'string') {
+    return type === 'Recipe';
+  }
+  if (Array.isArray(type)) {
+    return (type as string[]).includes('Recipe');
+  }
   return false;
 }
 
@@ -118,16 +124,20 @@ function findRecipeObject(json: unknown): JsonObject | null {
   }
   if (json && typeof json === 'object') {
     const obj = json as JsonObject;
-    if (isRecipeType(obj)) return obj;
+    if (isRecipeType(obj)) {
+      return obj;
+    }
     const graph = obj['@graph'];
     if (Array.isArray(graph)) {
       return (graph as JsonObject[]).find(isRecipeType) ?? null;
     }
-    const items = obj['itemListElement'];
+    const items = obj.itemListElement;
     if (Array.isArray(items)) {
       for (const item of items as JsonObject[]) {
-        const inner = item['item'] as JsonObject | undefined;
-        if (inner && isRecipeType(inner)) return inner;
+        const inner = item.item as JsonObject | undefined;
+        if (inner && isRecipeType(inner)) {
+          return inner;
+        }
       }
     }
   }
@@ -136,8 +146,12 @@ function findRecipeObject(json: unknown): JsonObject | null {
 
 function extractString(key: string, obj: JsonObject): string {
   const val = obj[key];
-  if (typeof val === 'string') return val;
-  if (Array.isArray(val) && typeof val[0] === 'string') return val[0];
+  if (typeof val === 'string') {
+    return val;
+  }
+  if (Array.isArray(val) && typeof val[0] === 'string') {
+    return val[0];
+  }
   return '';
 }
 
@@ -146,21 +160,25 @@ function extractStringArray(key: string, obj: JsonObject): string[] {
   if (Array.isArray(val)) {
     return (val as unknown[])
       .map(v => {
-        if (typeof v === 'string') return v;
+        if (typeof v === 'string') {
+          return v;
+        }
         if (v && typeof v === 'object') {
           const o = v as JsonObject;
-          return (o['@value'] ?? o['name'] ?? '') as string;
+          return (o['@value'] ?? o.name ?? '') as string;
         }
         return '';
       })
       .filter(s => s.length > 0);
   }
-  if (typeof val === 'string') return [val];
+  if (typeof val === 'string') {
+    return [val];
+  }
   return [];
 }
 
 function extractAuthor(obj: JsonObject): string {
-  const author = obj['author'];
+  const author = obj.author;
   if (Array.isArray(author) && author.length > 0) {
     return extractString('name', author[0] as JsonObject);
   }
@@ -174,11 +192,15 @@ function extractCategories(obj: JsonObject, title: string): string {
   const cats: string[] = [];
 
   for (const key of ['recipeCategory', 'recipeCuisine']) {
-    if (cats.length >= 2) break;
+    if (cats.length >= 2) {
+      break;
+    }
     for (const val of extractStringArray(key, obj).map(s => s.toLowerCase())) {
       if (val && !cats.includes(val)) {
         cats.push(val);
-        if (cats.length >= 2) break;
+        if (cats.length >= 2) {
+          break;
+        }
       }
     }
   }
@@ -189,8 +211,12 @@ function extractCategories(obj: JsonObject, title: string): string {
       .map(s => s.trim().toLowerCase())
       .filter(s => s.length > 0);
     for (const kw of keywords) {
-      if (cats.length >= 2) break;
-      if (!cats.includes(kw)) cats.push(kw);
+      if (cats.length >= 2) {
+        break;
+      }
+      if (!cats.includes(kw)) {
+        cats.push(kw);
+      }
     }
   }
 
@@ -226,8 +252,12 @@ function extractCategories(obj: JsonObject, title: string): string {
       .map(w => w.toLowerCase())
       .filter(w => w.length >= 3 && !stopWords.has(w));
     for (const word of words) {
-      if (cats.length >= 2) break;
-      if (!cats.includes(word)) cats.push(word);
+      if (cats.length >= 2) {
+        break;
+      }
+      if (!cats.includes(word)) {
+        cats.push(word);
+      }
     }
   }
 
@@ -235,11 +265,15 @@ function extractCategories(obj: JsonObject, title: string): string {
 }
 
 function extractImage(obj: JsonObject): string {
-  const image = obj['image'];
-  if (typeof image === 'string') return image;
+  const image = obj.image;
+  if (typeof image === 'string') {
+    return image;
+  }
   if (Array.isArray(image)) {
     const first = image[0];
-    if (typeof first === 'string') return first;
+    if (typeof first === 'string') {
+      return first;
+    }
     if (first && typeof first === 'object') {
       return extractString('url', first as JsonObject);
     }
@@ -251,22 +285,24 @@ function extractImage(obj: JsonObject): string {
 }
 
 function extractInstructions(obj: JsonObject): string {
-  const raw = obj['recipeInstructions'];
+  const raw = obj.recipeInstructions;
   let joined: string;
 
   if (Array.isArray(raw)) {
     const steps = (raw as unknown[])
       .flatMap(step => {
-        if (typeof step === 'string') return [step];
+        if (typeof step === 'string') {
+          return [step];
+        }
         if (step && typeof step === 'object') {
           const s = step as JsonObject;
           // HowToSection — recurse into itemListElement
-          if (Array.isArray(s['itemListElement'])) {
-            return (s['itemListElement'] as JsonObject[])
-              .map(sub => (sub['text'] ?? sub['name'] ?? '') as string)
+          if (Array.isArray(s.itemListElement)) {
+            return (s.itemListElement as JsonObject[])
+              .map(sub => (sub.text ?? sub.name ?? '') as string)
               .filter(t => t.length > 0);
           }
-          return [(s['text'] ?? s['@value'] ?? s['name'] ?? '') as string];
+          return [(s.text ?? s['@value'] ?? s.name ?? '') as string];
         }
         return [''];
       })
@@ -287,7 +323,9 @@ function parseISO8601Duration(
   const match = duration.match(
     /P(?:\d+Y)?(?:\d+M)?(?:\d+D)?T(?:(\d+)H)?(?:(\d+)M)?(?:\d+(?:\.\d+)?S)?/,
   );
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
   const hours = parseInt(match[1] ?? '0', 10) || 0;
   const minutes = parseInt(match[2] ?? '0', 10) || 0;
   const total = hours * 60 + minutes;
@@ -300,10 +338,12 @@ function extractFirstNumber(s: string): number | null {
 }
 
 function extractTime(obj: JsonObject): [string, string] {
-  const totalTime = obj['totalTime'];
+  const totalTime = obj.totalTime;
   if (typeof totalTime === 'string') {
     const parsed = parseISO8601Duration(totalTime);
-    if (parsed) return [String(parsed.minutes), parsed.unit];
+    if (parsed) {
+      return [String(parsed.minutes), parsed.unit];
+    }
     if (!totalTime.startsWith('P')) {
       const num = totalTime.replace(/\D/g, '');
       if (num) {
@@ -313,8 +353,8 @@ function extractTime(obj: JsonObject): [string, string] {
     }
   }
 
-  const prepTime = obj['prepTime'];
-  const cookTime = obj['cookTime'];
+  const prepTime = obj.prepTime;
+  const cookTime = obj.cookTime;
   if (typeof prepTime === 'string' && typeof cookTime === 'string') {
     const prepMins = parseISO8601Duration(prepTime)?.minutes ?? 0;
     const cookMins = parseISO8601Duration(cookTime)?.minutes ?? 0;
@@ -333,15 +373,19 @@ function extractTime(obj: JsonObject): [string, string] {
 }
 
 function extractServings(obj: JsonObject): string {
-  const raw = obj['recipeYield'];
+  const raw = obj.recipeYield;
   if (typeof raw === 'string') {
     const n = extractFirstNumber(raw);
     return n !== null ? String(n) : '';
   }
-  if (typeof raw === 'number') return String(Math.round(raw));
+  if (typeof raw === 'number') {
+    return String(Math.round(raw));
+  }
   if (Array.isArray(raw) && raw.length > 0) {
     const first = raw[0];
-    if (typeof first === 'number') return String(Math.round(first));
+    if (typeof first === 'number') {
+      return String(Math.round(first));
+    }
     if (typeof first === 'string') {
       const n = extractFirstNumber(first);
       return n !== null ? String(n) : '';
