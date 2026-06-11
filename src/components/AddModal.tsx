@@ -4,10 +4,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  Linking,
   ActionSheetIOS,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -36,6 +36,8 @@ export default function AddModal({visible, onClose}: AddModalProps) {
   const theme = useTheme() as unknown as Theme;
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
   const [isImporting, setIsImporting] = useState(false);
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [recipeUrl, setRecipeUrl] = useState('');
 
   const newRecipe: Recipe = {
     id: '',
@@ -52,9 +54,10 @@ export default function AddModal({visible, onClose}: AddModalProps) {
     categories: '',
   };
 
-  const handleOpenBrowser = () => {
+  const handleClose = () => {
+    setShowUrlInput(false);
+    setRecipeUrl('');
     onClose();
-    Linking.openURL('http://');
   };
 
   const handleImagesSelected = async (response: ImagePickerResponse) => {
@@ -100,7 +103,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         about: data.about || '',
       };
 
-      onClose();
+      handleClose();
       dispatch(changeViewMode('edit'));
       navigation.navigate('RecipeDetailsScreen', {item: importedRecipe});
     } catch (err: any) {
@@ -145,104 +148,228 @@ export default function AddModal({visible, onClose}: AddModalProps) {
     );
   };
 
+  const handleUrlImport = async () => {
+    const trimmed = recipeUrl.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      let html: string;
+      try {
+        const pageResponse = await fetch(trimmed, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+          },
+        });
+        if (!pageResponse.ok) {
+          throw new Error(`HTTP ${pageResponse.status}`);
+        }
+        html = await pageResponse.text();
+      } catch (fetchErr: any) {
+        throw new Error(`Could not load that page: ${fetchErr.message}`);
+      }
+
+      const {data, error} = await supabase.functions.invoke('import-recipe', {
+        body: {html, url: trimmed},
+      });
+
+      if (error || !data) {
+        throw new Error(error?.message || 'Failed to extract recipe');
+      }
+
+      const importedRecipe: Recipe = {
+        id: '',
+        title: data.title || '',
+        author: data.author || '',
+        host_url: data.host_url || '',
+        host_name: data.host_name || '',
+        image: data.image || '',
+        total_time: data.total_time || '',
+        total_time_unit: data.total_time_unit || '',
+        servings: data.servings || '',
+        ingredients: data.ingredients || '',
+        instructions: data.instructions || '',
+        categories: data.categories || '',
+        about: data.about || '',
+      };
+
+      handleClose();
+      dispatch(changeViewMode('edit'));
+      navigation.navigate('RecipeDetailsScreen', {item: importedRecipe});
+    } catch (err: any) {
+      console.error('URL import error:', err.message);
+      Alert.alert(
+        'Import Failed',
+        "We couldn't import a recipe from that link. Make sure it's a recipe page and try again.",
+        [{text: 'Try Again', style: 'cancel'}],
+      );
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
     <Modal
       isVisible={visible}
-      onBackdropPress={onClose}
-      onSwipeComplete={onClose}
+      onBackdropPress={handleClose}
+      onSwipeComplete={handleClose}
       swipeDirection={['down']}
+      avoidKeyboard
       style={styles(theme).modalOverlay}>
       <View style={styles(theme).modalContainer}>
-        <TouchableOpacity style={styles(theme).closeButton} onPress={onClose}>
+        <TouchableOpacity
+          style={styles(theme).closeButton}
+          onPress={handleClose}>
           <Ionicons
             name="close-outline"
             size={24}
             color={theme.colors['toffee-400']}
           />
         </TouchableOpacity>
-        <Text style={styles(theme).modalTitle}>Add Recipe</Text>
-        <TouchableOpacity
-          style={styles(theme).modalButtonContainer}
-          onPress={handleOpenBrowser}>
-          <View style={styles(theme).modalButtonIcon}>
-            <Ionicons
-              name="globe-outline"
-              size={24}
-              color={theme.colors['neutral-800']}
-            />
-          </View>
-          <View style={styles(theme).modalButtonTextContainer}>
-            <Text style={styles(theme).modalButtonText}>Open browser</Text>
-            <Text style={styles(theme).modalButtonSubtext}>
-              Import recipes from your browser via share sheet
-            </Text>
-          </View>
-          <Ionicons
-            name="arrow-forward-outline"
-            size={24}
-            color={theme.colors['neutral-800']}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles(theme).modalButtonContainer}
-          onPress={handleSnapPhoto}
-          disabled={isImporting}>
-          <View style={styles(theme).modalButtonIcon}>
-            {isImporting ? (
-              <ActivityIndicator
-                size="small"
-                color={theme.colors['neutral-800']}
-              />
-            ) : (
+
+        {showUrlInput ? (
+          <>
+            <TouchableOpacity
+              style={styles(theme).backButton}
+              onPress={() => {
+                setShowUrlInput(false);
+                setRecipeUrl('');
+              }}>
               <Ionicons
-                name="camera-outline"
+                name="arrow-back-outline"
+                size={20}
+                color={theme.colors['toffee-400']}
+              />
+            </TouchableOpacity>
+            <Text style={styles(theme).modalTitle}>Paste a link</Text>
+            <View style={styles(theme).urlInputContainer}>
+              <TextInput
+                style={styles(theme).urlInput}
+                placeholder="https://..."
+                placeholderTextColor={theme.colors['toffee-400']}
+                value={recipeUrl}
+                onChangeText={setRecipeUrl}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="url"
+                returnKeyType="go"
+                onSubmitEditing={handleUrlImport}
+                autoFocus
+              />
+              <TouchableOpacity
+                style={[
+                  styles(theme).importButton,
+                  (!recipeUrl.trim() || isImporting) &&
+                    styles(theme).importButtonDisabled,
+                ]}
+                onPress={handleUrlImport}
+                disabled={!recipeUrl.trim() || isImporting}>
+                {isImporting ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors['neutral-100']}
+                  />
+                ) : (
+                  <Text style={styles(theme).importButtonText}>Import</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <>
+            <Text style={styles(theme).modalTitle}>Add Recipe</Text>
+            <TouchableOpacity
+              style={styles(theme).modalButtonContainer}
+              onPress={() => setShowUrlInput(true)}>
+              <View style={styles(theme).modalButtonIcon}>
+                <Ionicons
+                  name="link-outline"
+                  size={24}
+                  color={theme.colors['neutral-800']}
+                />
+              </View>
+              <View style={styles(theme).modalButtonTextContainer}>
+                <Text style={styles(theme).modalButtonText}>Paste a link</Text>
+                <Text style={styles(theme).modalButtonSubtext}>
+                  Import a recipe by pasting its URL
+                </Text>
+              </View>
+              <Ionicons
+                name="arrow-forward-outline"
                 size={24}
                 color={theme.colors['neutral-800']}
               />
-            )}
-          </View>
-          <View style={styles(theme).modalButtonTextContainer}>
-            <Text style={styles(theme).modalButtonText}>Snap a photo</Text>
-            <Text style={styles(theme).modalButtonSubtext}>
-              Turn recipe cards and cookbook pages into digital recipes
-            </Text>
-          </View>
-          {isImporting ? null : (
-            <Ionicons
-              name="arrow-forward-outline"
-              size={24}
-              color={theme.colors['neutral-800']}
-            />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles(theme).modalButtonContainer}
-          onPress={() => {
-            onClose();
-            dispatch(changeViewMode('edit'));
-            navigation.navigate('RecipeDetailsScreen', {
-              item: newRecipe,
-            });
-          }}>
-          <View style={styles(theme).modalButtonIcon}>
-            <Ionicons
-              name="pencil-outline"
-              size={24}
-              color={theme.colors['neutral-800']}
-            />
-          </View>
-          <View style={styles(theme).modalButtonTextContainer}>
-            <Text style={styles(theme).modalButtonText}>Write your own</Text>
-            <Text style={styles(theme).modalButtonSubtext}>
-              Add custom ingredients and cooking steps from scratch
-            </Text>
-          </View>
-          <Ionicons
-            name="arrow-forward-outline"
-            size={24}
-            color={theme.colors['neutral-800']}
-          />
-        </TouchableOpacity>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles(theme).modalButtonContainer}
+              onPress={handleSnapPhoto}
+              disabled={isImporting}>
+              <View style={styles(theme).modalButtonIcon}>
+                {isImporting ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors['neutral-800']}
+                  />
+                ) : (
+                  <Ionicons
+                    name="camera-outline"
+                    size={24}
+                    color={theme.colors['neutral-800']}
+                  />
+                )}
+              </View>
+              <View style={styles(theme).modalButtonTextContainer}>
+                <Text style={styles(theme).modalButtonText}>Snap a photo</Text>
+                <Text style={styles(theme).modalButtonSubtext}>
+                  Turn recipe cards and cookbook pages into digital recipes
+                </Text>
+              </View>
+              {isImporting ? null : (
+                <Ionicons
+                  name="arrow-forward-outline"
+                  size={24}
+                  color={theme.colors['neutral-800']}
+                />
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles(theme).modalButtonContainer}
+              onPress={() => {
+                handleClose();
+                dispatch(changeViewMode('edit'));
+                navigation.navigate('RecipeDetailsScreen', {
+                  item: newRecipe,
+                });
+              }}>
+              <View style={styles(theme).modalButtonIcon}>
+                <Ionicons
+                  name="pencil-outline"
+                  size={24}
+                  color={theme.colors['neutral-800']}
+                />
+              </View>
+              <View style={styles(theme).modalButtonTextContainer}>
+                <Text style={styles(theme).modalButtonText}>
+                  Write your own
+                </Text>
+                <Text style={styles(theme).modalButtonSubtext}>
+                  Add custom ingredients and cooking steps from scratch
+                </Text>
+              </View>
+              <Ionicons
+                name="arrow-forward-outline"
+                size={24}
+                color={theme.colors['neutral-800']}
+              />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </Modal>
   );
@@ -312,5 +439,40 @@ const styles = (theme: Theme) =>
       top: 10,
       padding: 6,
       zIndex: 1,
+    },
+    backButton: {
+      position: 'absolute',
+      left: 12,
+      top: 10,
+      padding: 6,
+      zIndex: 1,
+    },
+    urlInputContainer: {
+      marginHorizontal: 30,
+      marginBottom: 30,
+      gap: 12,
+    },
+    urlInput: {
+      ...theme.typography.h3,
+      color: theme.colors['neutral-800'],
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      backgroundColor: theme.colors['neutral-100'],
+    },
+    importButton: {
+      backgroundColor: theme.colors['neutral-800'],
+      borderRadius: 12,
+      paddingVertical: 14,
+      alignItems: 'center',
+    },
+    importButtonDisabled: {
+      opacity: 0.4,
+    },
+    importButtonText: {
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-100'],
     },
   });

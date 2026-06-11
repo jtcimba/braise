@@ -2,6 +2,8 @@ import '@supabase/functions-js/edge-runtime.d.ts';
 import {
   cleanIngredients,
   splitNumberedInstructions,
+  extractJsonLd,
+  formatRecipeFromJsonLd,
 } from '../_shared/recipeUtils.ts';
 
 const CORS_HEADERS = {
@@ -9,6 +11,9 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
+
+const USER_AGENT =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 
 function stripNonContentHTML(html: string): string {
   let cleaned = html;
@@ -37,6 +42,56 @@ function stripNonContentHTML(html: string): string {
   return cleaned;
 }
 
+function assertPublicUrl(urlString: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    throw new Error('Invalid URL');
+  }
+
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error('Only http and https URLs are allowed');
+  }
+
+  const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, '');
+
+  if (host === 'localhost' || host === '::1' || host === '0.0.0.0') {
+    throw new Error('Private URLs are not allowed');
+  }
+
+  if (host.startsWith('fe80')) {
+    throw new Error('Private URLs are not allowed');
+  }
+
+  const ipv4 = host.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+  if (ipv4) {
+    const [a, b] = [Number(ipv4[1]), Number(ipv4[2])];
+    if (
+      a === 127 ||
+      a === 10 ||
+      a === 0 ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) ||
+      (a === 169 && b === 254)
+    ) {
+      throw new Error('Private URLs are not allowed');
+    }
+  }
+}
+
+async function fetchHtmlFromUrl(url: string): Promise<string> {
+  assertPublicUrl(url);
+  const response = await fetch(url, {
+    headers: {'User-Agent': USER_AGENT},
+    signal: AbortSignal.timeout(15_000),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch URL: HTTP ${response.status}`);
+  }
+  return response.text();
+}
+
 Deno.serve(async req => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -51,12 +106,35 @@ Deno.serve(async req => {
   }
 
   let html: string;
+  let sourceUrl = '';
+
   try {
     const body = await req.json();
-    html = body.html;
-    if (!html || typeof html !== 'string') {
+
+    if (body.html && typeof body.html === 'string') {
+      html = body.html;
+      if (body.url && typeof body.url === 'string') {
+        sourceUrl = body.url;
+      }
+    } else if (body.url && typeof body.url === 'string') {
+      // Server-side fetch — kept for backwards compatibility with share extension fallback
+      sourceUrl = body.url;
+      try {
+        html = await fetchHtmlFromUrl(sourceUrl);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        console.error('Failed to fetch URL:', message);
+        return new Response(
+          JSON.stringify({error: `Failed to fetch recipe page: ${message}`}),
+          {
+            status: 422,
+            headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+          },
+        );
+      }
+    } else {
       return new Response(
-        JSON.stringify({error: "Missing or invalid 'html' field"}),
+        JSON.stringify({error: "Request body must include 'html' or 'url'"}),
         {
           status: 400,
           headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
@@ -70,6 +148,19 @@ Deno.serve(async req => {
     });
   }
 
+  // Fast path: JSON-LD extraction (no AI call needed)
+  const jsonld = extractJsonLd(html);
+  if (jsonld) {
+    const recipe = formatRecipeFromJsonLd(jsonld, sourceUrl);
+    if (recipe) {
+      return new Response(JSON.stringify(recipe), {
+        status: 200,
+        headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+      });
+    }
+  }
+
+  // Fallback: Claude AI extraction
   const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
   if (!ANTHROPIC_API_KEY) {
     return new Response(
@@ -166,13 +257,25 @@ Return ONLY the JSON object, no markdown, no explanation, no code fences.`;
       );
     }
 
-    // Ensure all expected fields exist with defaults
+    // Derive URL fields if a source URL was provided
+    let hostUrl = '';
+    let hostName = '';
+    if (sourceUrl) {
+      try {
+        const parsed = new URL(sourceUrl);
+        hostUrl = `${parsed.protocol}//${parsed.host}`;
+        hostName = parsed.hostname;
+      } catch {
+        // invalid URL — leave blank
+      }
+    }
+
     const result = {
       title: recipe.title || '',
       author: recipe.author || '',
-      original_url: '',
-      host_url: '',
-      host_name: '',
+      original_url: sourceUrl,
+      host_url: hostUrl,
+      host_name: hostName,
       categories: recipe.categories || '',
       image: recipe.image || '',
       ingredients: cleanIngredients(recipe.ingredients || ''),
