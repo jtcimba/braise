@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,11 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert,
 } from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
 import {isTablet, MAX_CONTENT_WIDTH} from '../hooks/useTablet';
 import {
   launchImageLibrary,
@@ -21,6 +21,7 @@ import {
 } from 'react-native-image-picker';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import InstructionsEditor from './InstructionsEditor';
+import IngredientEditor from './IngredientEditor';
 import CategoryEditor from './CategoryEditor';
 import CustomToggle from './CustomToggle';
 import TotalTimePickerModal from './TotalTimePickerModal';
@@ -34,6 +35,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
   const [totalTimeModalVisible, setTotalTimeModalVisible] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const theme = useTheme() as unknown as Theme;
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleInstructionUpdate = useCallback(
     (newInstructions: string) => {
@@ -166,9 +168,13 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
     });
   }, [editingData.image, onChangeEditingData]);
 
-  const categoriesArray = editingData.categories
-    ? editingData.categories?.split(',').filter((cat: string) => cat.trim())
-    : [];
+  const categoriesArray = useMemo(
+    () =>
+      editingData.categories
+        ? editingData.categories.split(',').filter((cat: string) => cat.trim())
+        : [],
+    [editingData.categories],
+  );
 
   const tablet = isTablet();
   const headerHeight = useHeaderHeight();
@@ -179,6 +185,7 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={tablet ? 0 : undefined}>
       <ScrollView
+        ref={scrollViewRef}
         style={[styles(theme).contentContainer, {marginTop: headerHeight}]}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles(theme).scrollContentContainer}>
@@ -323,22 +330,16 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
                   rightLabel="Directions"
                 />
               </View>
-              <View style={styles(theme).ingredientsContainer}>
-                <TextInput
-                  style={styles(theme).ingredientsInput}
-                  value={editingData.ingredients}
-                  placeholder="Enter ingredients, one per line..."
-                  placeholderTextColor={theme.colors['toffee-400']}
-                  onChangeText={(text: any) => {
-                    onChangeEditingData({
-                      ...editingData,
-                      ingredients: text,
-                    });
-                  }}
-                  multiline
-                  scrollEnabled={false}
-                />
-              </View>
+              <IngredientEditor
+                ingredients={editingData.ingredients}
+                onChange={(value: string) =>
+                  onChangeEditingData((prev: any) => ({
+                    ...prev,
+                    ingredients: value,
+                  }))
+                }
+                scrollViewRef={scrollViewRef}
+              />
 
               <InstructionsEditor
                 instructions={editingData.instructions}
@@ -501,22 +502,6 @@ const styles = (theme: Theme) =>
     tabBarContainer: {
       marginBottom: 10,
       width: '100%',
-    },
-    ingredientsContainer: {
-      flex: 1,
-      marginBottom: 20,
-      paddingHorizontal: 20,
-      paddingVertical: 5,
-    },
-    ingredientsInput: {
-      ...theme.typography.b1,
-      color: theme.colors['neutral-800'],
-      borderWidth: 1,
-      borderColor: theme.colors['neutral-300'],
-      borderRadius: 8,
-      padding: 15,
-      minHeight: 120,
-      textAlignVertical: 'top',
     },
     aboutInput: {
       ...theme.typography.b1,
