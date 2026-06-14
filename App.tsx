@@ -1,4 +1,4 @@
-import 'react-native-gesture-handler';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Linking} from 'react-native';
@@ -317,34 +317,39 @@ export default function App({}: AppProps): React.JSX.Element {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <ThemeProvider theme={LightTheme}>
-        {isLoadingSession ? (
-          <View style={styles.loadingContainer}>
-            <BraiseLogoDark width={160} height={160} />
-          </View>
-        ) : authSession?.user && !isRecoverySession ? (
-          <GroceryListModalProvider>
-            <NavigationStack
-              navigationRef={navigationRef}
-              navigationReadyRef={navigationReadyRef}
+    <GestureHandlerRootView style={styles.flex}>
+      <SafeAreaProvider>
+        <ThemeProvider theme={LightTheme}>
+          {isLoadingSession ? (
+            <View style={styles.loadingContainer}>
+              <BraiseLogoDark width={160} height={160} />
+            </View>
+          ) : authSession?.user && !isRecoverySession ? (
+            <GroceryListModalProvider>
+              <NavigationStack
+                navigationRef={navigationRef}
+                navigationReadyRef={navigationReadyRef}
+              />
+            </GroceryListModalProvider>
+          ) : (
+            <Auth
+              resetPasswordToken={resetPasswordToken}
+              onPasswordResetComplete={() => {
+                setResetPasswordToken(null);
+                setIsRecoverySession(false);
+              }}
             />
-          </GroceryListModalProvider>
-        ) : (
-          <Auth
-            resetPasswordToken={resetPasswordToken}
-            onPasswordResetComplete={() => {
-              setResetPasswordToken(null);
-              setIsRecoverySession(false);
-            }}
-          />
-        )}
-      </ThemeProvider>
-    </SafeAreaProvider>
+          )}
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     backgroundColor: LightTheme.colors['yellow-400'],

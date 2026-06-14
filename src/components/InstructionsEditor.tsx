@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -55,14 +55,40 @@ export default function InstructionsEditor({
       .trimEnd();
   };
 
-  const customCodeBlockCSS = `      
+  const customCodeBlockCSS = useMemo(
+    () => `
       body {
-        font-family: 'Switzer';
-        font-size: 16px;
+        font-family: 'Inclusive Sans', -apple-system, sans-serif;
         background-color: ${theme.colors['neutral-100']};
         color: ${theme.colors['neutral-800']};
+        margin: 0;
+        padding: 0;
       }
-    `;
+      ol {
+        margin: 0;
+        padding-left: 28px;
+      }
+      li {
+        font-size: ${theme.typography.b1.fontSize}px;
+        font-weight: ${theme.typography.b1.fontWeight};
+        line-height: 1.5;
+        padding: 6px 0;
+        margin: 0;
+        color: ${theme.colors['neutral-800']};
+      }
+      li p {
+        margin: 0;
+        padding: 0;
+      }
+      li::marker {
+        font-size: ${theme.typography['h2-emphasized'].fontSize}px;
+        font-weight: ${theme.typography['h2-emphasized'].fontWeight};
+        color: ${theme.colors['neutral-800']};
+      }
+    `,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const editor = useEditorBridge({
     avoidIosKeyboard: true,
