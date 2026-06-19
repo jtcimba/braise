@@ -3,6 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Linking} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
+import BraiseLogoLight from './src/assets/images/braise-logo-light.svg';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -21,9 +22,8 @@ import DetailsMenuHeader from './src/components/DetailsMenuHeader';
 import AddModal from './src/components/AddModal';
 import PaywallScreen from './src/components/PaywallScreen';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {ThemeProvider} from './theme/ThemeProvider';
-import {LightTheme} from './theme/theme';
-import {useTheme} from './theme/ThemeProvider';
+import {ThemeProvider, useTheme, useAppearance} from './theme/ThemeProvider';
+import {LightTheme, DarkTheme} from './theme/theme';
 import {GroceryListModalProvider} from './src/context/GroceryListModalContext';
 import {Theme} from './theme/types';
 import {supabase} from './src/supabase-client';
@@ -76,6 +76,25 @@ async function storeSupabaseCredentials(session: Session): Promise<boolean> {
 
 function AddComponent() {
   return null;
+}
+
+function LoadingScreen() {
+  const {isDark} = useAppearance();
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: LightTheme.colors['yellow-400'],
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      {isDark ? (
+        <BraiseLogoLight width={160} height={160} />
+      ) : (
+        <BraiseLogoDark width={160} height={160} />
+      )}
+    </View>
+  );
 }
 
 function TabNavigator({navigation}: {navigation: any}) {
@@ -174,10 +193,12 @@ function NavigationStack({
   navigationReadyRef: React.MutableRefObject<boolean>;
 }) {
   const headerStatusBarHeight = useHeaderStatusBarHeight();
+  const {isDark} = useAppearance();
+  const navTheme = isDark ? DarkTheme : LightTheme;
 
   return (
     <NavigationContainer
-      theme={LightTheme}
+      theme={navTheme}
       ref={navigationRef}
       onReady={() => {
         navigationReadyRef.current = true;
@@ -217,7 +238,8 @@ function NavigationStack({
           options={({navigation: nav}) => ({
             headerTitle: 'Settings',
             headerLeft: () => null,
-            headerRight: () => CloseIcon(nav, 'Recipes', '#4A0B12'),
+            headerRight: () =>
+              CloseIcon(nav, 'Recipes', navTheme.colors['neutral-800']),
             presentation: 'modal',
             headerShadowVisible: false,
             headerRightContainerStyle: {paddingRight: 10},
@@ -225,10 +247,10 @@ function NavigationStack({
               fontFamily: 'TAYTommyTokyoRegular',
               fontSize: 22,
               fontWeight: '600',
-              color: '#291E0D',
+              color: navTheme.colors['neutral-800'],
             },
             headerStyle: {
-              backgroundColor: LightTheme.colors['neutral-100'],
+              backgroundColor: navTheme.colors['neutral-100'],
             },
           })}
         />
@@ -319,11 +341,9 @@ export default function App({}: AppProps): React.JSX.Element {
   return (
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaProvider>
-        <ThemeProvider theme={LightTheme}>
+        <ThemeProvider>
           {isLoadingSession ? (
-            <View style={styles.loadingContainer}>
-              <BraiseLogoDark width={160} height={160} />
-            </View>
+            <LoadingScreen />
           ) : authSession?.user && !isRecoverySession ? (
             <GroceryListModalProvider>
               <NavigationStack
@@ -349,11 +369,5 @@ export default function App({}: AppProps): React.JSX.Element {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
-  },
-  loadingContainer: {
-    flex: 1,
-    backgroundColor: LightTheme.colors['yellow-400'],
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

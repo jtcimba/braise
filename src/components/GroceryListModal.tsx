@@ -396,7 +396,7 @@ const styles = (theme: Theme) =>
     },
     cancelButtonText: {
       ...theme.typography.h2,
-      color: theme.colors.subtext,
+      color: theme.colors['neutral-800'],
     },
     confirmButton: {
       flex: 1,

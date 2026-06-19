@@ -1,4 +1,7 @@
-import {DefaultTheme} from '@react-navigation/native';
+import {
+  DefaultTheme,
+  DarkTheme as NavDarkTheme,
+} from '@react-navigation/native';
 import {TextStyle} from 'react-native';
 
 export const typography = {
@@ -46,6 +49,22 @@ export const LightTheme = {
     'green-400': '#4FA863',
     background: '#F9F3E8',
     card: '#F9F3E8',
+  },
+  typography,
+};
+
+export const DarkTheme = {
+  ...NavDarkTheme,
+  colors: {
+    ...NavDarkTheme.colors,
+    'neutral-100': '#131110',
+    'neutral-300': '#3D3630',
+    'toffee-400': '#9E8880',
+    'neutral-800': '#F0E9DF',
+    'yellow-400': '#F9D070',
+    'green-400': '#F9D070',
+    background: '#131110',
+    card: '#131110',
   },
   typography,
 };
