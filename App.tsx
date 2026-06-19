@@ -81,13 +81,7 @@ function AddComponent() {
 function LoadingScreen() {
   const {isDark} = useAppearance();
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: LightTheme.colors['yellow-400'],
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+    <View style={styles.loadingContainer}>
       {isDark ? (
         <BraiseLogoLight width={160} height={160} />
       ) : (
@@ -369,5 +363,11 @@ export default function App({}: AppProps): React.JSX.Element {
 const styles = StyleSheet.create({
   flex: {
     flex: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: LightTheme.colors['yellow-400'],
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
