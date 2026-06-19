@@ -14,10 +14,11 @@ import Purchases, {
   PurchasesPackage,
   CustomerInfo,
 } from 'react-native-purchases';
-import {useTheme} from '../../theme/ThemeProvider';
+import {useTheme, useAppearance} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BraiseLogoDark from '../assets/images/braise-logo-dark.svg';
+import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
 
 const FEATURES = [
   {
@@ -51,6 +52,7 @@ export default function PaywallScreen({
   route: any;
 }) {
   const theme = useTheme() as unknown as Theme;
+  const {isDark} = useAppearance();
   const dismissible = route.params?.dismissible ?? true;
   const [selectedPlan, setSelectedPlan] = useState<PlanType>('annual');
   const [monthlyPackage, setMonthlyPackage] = useState<PurchasesPackage | null>(
@@ -174,7 +176,11 @@ export default function PaywallScreen({
       ) : (
         <View style={s.scrollContent}>
           <View style={s.topSection}>
-            <BraiseLogoDark width={120} height={60} style={s.logoImage} />
+            {isDark ? (
+              <BraiseLogoLight width={120} height={60} style={s.logoImage} />
+            ) : (
+              <BraiseLogoDark width={120} height={60} style={s.logoImage} />
+            )}
             <Text style={s.logo}>braise</Text>
             <View style={s.features}>
               {FEATURES.map(feature => (

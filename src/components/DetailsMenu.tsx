@@ -111,7 +111,7 @@ export default function DetailsMenu({
               pressed && {backgroundColor: theme.colors['yellow-400']},
             ]}
             onPress={onSavePress}>
-            <Text style={[styles(theme).text, styles(theme).save]}>Save</Text>
+            <Text style={[styles(theme).save, styles(theme).text]}>Save</Text>
           </Pressable>
         </View>
       )}
@@ -209,6 +209,7 @@ const styles = (theme: Theme) =>
     },
     cancel: {
       color: theme.colors['neutral-800'],
+      paddingBottom: 3,
     },
     save: {
       color: theme.colors['neutral-100'],

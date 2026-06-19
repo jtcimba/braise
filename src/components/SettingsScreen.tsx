@@ -11,9 +11,14 @@ import {
   Platform,
   Modal,
   ActivityIndicator,
+  ActionSheetIOS,
 } from 'react-native';
 import Purchases, {CustomerInfo} from 'react-native-purchases';
-import {useTheme} from '../../theme/ThemeProvider';
+import {
+  useTheme,
+  useAppearance,
+  AppearancePreference,
+} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {supabase} from '../supabase-client';
 import {User} from '@supabase/supabase-js';
@@ -22,8 +27,15 @@ import {useSubscription} from '../hooks/useSubscription';
 import {useNavigation} from '@react-navigation/native';
 import {isTablet, MAX_CONTENT_WIDTH, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
+const APPEARANCE_LABELS: Record<AppearancePreference, string> = {
+  system: 'System',
+  light: 'Light',
+  dark: 'Dark',
+};
+
 export default function SettingsScreen() {
   const theme = useTheme() as unknown as Theme;
+  const {appearance, setAppearance} = useAppearance();
   const [user, setUser] = useState<User | null>(null);
   const {isPro, isLoading: isSubscriptionLoading} = useSubscription();
   const navigation = useNavigation<any>();
@@ -82,6 +94,24 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleAppearance = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'System', 'Light', 'Dark'],
+        cancelButtonIndex: 0,
+      },
+      index => {
+        if (index === 1) {
+          setAppearance('system');
+        } else if (index === 2) {
+          setAppearance('light');
+        } else if (index === 3) {
+          setAppearance('dark');
+        }
+      },
+    );
+  };
+
   const formatDate = (date: string | undefined) => {
     if (!date) {
       return null;
@@ -101,6 +131,34 @@ export default function SettingsScreen() {
           <Text style={styles(theme).memberSince}>
             Member since {formatDate(user?.created_at)}
           </Text>
+        </View>
+        <View style={styles(theme).menuGroup}>
+          <TouchableOpacity
+            style={styles(theme).menuRow}
+            onPress={handleAppearance}>
+            <Text style={styles(theme).menuRowText}>Appearance</Text>
+            <View style={styles(theme).menuRowRight}>
+              <Text style={styles(theme).menuRowSubtext}>
+                {APPEARANCE_LABELS[appearance]}
+              </Text>
+              <Ionicons
+                name="chevron-forward"
+                size={18}
+                color={theme.colors['toffee-400']}
+              />
+            </View>
+          </TouchableOpacity>
+          <View style={styles(theme).menuDivider} />
+          <TouchableOpacity
+            style={styles(theme).menuRow}
+            onPress={() => Linking.openURL('app-settings:')}>
+            <Text style={styles(theme).menuRowText}>Text Size</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={theme.colors['toffee-400']}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles(theme).menuGroup}>
           {isPro ? (
@@ -165,7 +223,7 @@ export default function SettingsScreen() {
         )}
       </SafeAreaView>
       <View>
-        <Text style={styles(theme).version}>v1.0.5</Text>
+        <Text style={styles(theme).version}>v1.1.0</Text>
       </View>
       <Modal
         visible={showDeleteModal}
@@ -275,6 +333,15 @@ const styles = (theme: Theme) =>
     menuRowText: {
       color: theme.colors['neutral-800'],
       ...theme.typography.h2,
+    },
+    menuRowRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    menuRowSubtext: {
+      color: theme.colors['toffee-400'],
+      ...theme.typography.h4,
     },
     menuDivider: {
       height: 1,

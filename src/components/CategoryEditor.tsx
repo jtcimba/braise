@@ -101,10 +101,11 @@ const styles = (theme: Theme) =>
       borderWidth: 1,
       borderColor: theme.colors.border,
       borderRadius: 15,
-      paddingVertical: 6,
+      paddingTop: 5,
+      paddingBottom: 6,
       paddingHorizontal: 10,
       marginRight: 10,
-      marginBottom: 5,
+      marginBottom: 10,
     },
     chipText: {
       color: theme.colors.text,

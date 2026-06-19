@@ -16,8 +16,9 @@ import {
 } from 'react-native';
 import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 import BraiseLogoDark from '../assets/images/braise-logo-dark.svg';
+import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
 import {supabase} from '../supabase-client';
-import {useTheme} from '../../theme/ThemeProvider';
+import {useTheme, useAppearance} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 
 type AuthView = 'signin' | 'signup' | 'reset' | 'newpassword';
@@ -32,6 +33,7 @@ export default function Auth({
   onPasswordResetComplete,
 }: AuthProps = {}) {
   const theme = useTheme() as unknown as Theme;
+  const {isDark} = useAppearance();
   const {height: screenHeight} = useWindowDimensions();
   const tablet = isTablet();
   const paddingTop = tablet ? 60 : Math.max(40, screenHeight * 0.07);
@@ -251,7 +253,11 @@ export default function Auth({
   const renderSignIn = () => (
     <>
       <View style={styles(theme).header}>
-        <BraiseLogoDark width={150} height={75} style={styles(theme).logo} />
+        {isDark ? (
+          <BraiseLogoLight width={150} height={75} style={styles(theme).logo} />
+        ) : (
+          <BraiseLogoDark width={150} height={75} style={styles(theme).logo} />
+        )}
         <Text style={styles(theme).title}>BRAISE</Text>
       </View>
 
