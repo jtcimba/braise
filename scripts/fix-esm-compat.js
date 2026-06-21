@@ -32,7 +32,9 @@ const patches = [
 
 for (const {file, replacements} of patches) {
   const filePath = path.join(__dirname, '..', file);
-  if (!fs.existsSync(filePath)) continue;
+  if (!fs.existsSync(filePath)) {
+    continue;
+  }
   const original = fs.readFileSync(filePath, 'utf8');
   let patched = original;
   for (const [pattern, replacement] of replacements) {
