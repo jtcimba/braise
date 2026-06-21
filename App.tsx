@@ -3,7 +3,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Linking} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
-import BraiseLogoLight from './src/assets/images/braise-logo-light.svg';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -79,14 +78,9 @@ function AddComponent() {
 }
 
 function LoadingScreen() {
-  const {isDark} = useAppearance();
   return (
     <View style={styles.loadingContainer}>
-      {isDark ? (
-        <BraiseLogoLight width={160} height={160} />
-      ) : (
-        <BraiseLogoDark width={160} height={160} />
-      )}
+      <BraiseLogoDark width={160} height={160} />
     </View>
   );
 }
@@ -280,33 +274,44 @@ export default function App({}: AppProps): React.JSX.Element {
     }
     Purchases.configure({apiKey: process.env.REVENUECAT_API_KEY!});
 
+    const handleResetPasswordUrl = async (url: string) => {
+      if (!url.includes('reset-password')) {
+        return;
+      }
+      setIsRecoverySession(true);
+      setResetPasswordToken('recovery');
+
+      // Extract tokens from URL hash (implicit flow) and establish Supabase
+      // recovery session so onAuthStateChange fires PASSWORD_RECOVERY
+      const hash = url.split('#')[1] ?? '';
+      const params = new URLSearchParams(hash);
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      if (accessToken && refreshToken) {
+        await supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+      }
+    };
+
     const checkInitialURL = async () => {
       const initialUrl = await Linking.getInitialURL();
-      if (initialUrl?.includes('reset-password')) {
-        setIsRecoverySession(true);
-        setResetPasswordToken('recovery');
+      if (initialUrl) {
+        await handleResetPasswordUrl(initialUrl);
       }
     };
     checkInitialURL();
 
     // Listen for deep links while app is running
     const linkingSubscription = Linking.addEventListener('url', ({url}) => {
-      if (url.includes('reset-password')) {
-        setIsRecoverySession(true);
-        setResetPasswordToken('recovery');
-      }
+      handleResetPasswordUrl(url);
     });
 
     supabase.auth.getSession().then(({data: {session}}) => {
       setAuthSession(session);
       setIsLoadingSession(false);
       if (session) {
-        Linking.getInitialURL().then(url => {
-          if (url?.includes('reset-password')) {
-            setIsRecoverySession(true);
-            setResetPasswordToken('recovery');
-          }
-        });
         // Store Supabase credentials and auth token in App Group for share extension
         storeSupabaseCredentials(session);
       }

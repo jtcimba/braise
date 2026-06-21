@@ -258,7 +258,10 @@ export default function Auth({
         ) : (
           <BraiseLogoDark width={150} height={75} style={styles(theme).logo} />
         )}
-        <Text style={styles(theme).title}>BRAISE</Text>
+        <Text
+          style={[styles(theme).title, {color: theme.colors['neutral-800']}]}>
+          BRAISE
+        </Text>
       </View>
 
       <View style={styles(theme).verticallySpaced}>
@@ -339,7 +342,11 @@ export default function Auth({
       </Pressable>
 
       <View style={styles(theme).switchView}>
-        <Text style={[styles(theme).switchText, {color: theme.colors.subtext}]}>
+        <Text
+          style={[
+            styles(theme).switchText,
+            {color: theme.colors['toffee-400']},
+          ]}>
           Don't have an account?{' '}
         </Text>
         <TouchableOpacity onPress={() => setView('signup')}>
@@ -455,7 +462,11 @@ export default function Auth({
       </Pressable>
 
       <View style={styles(theme).switchView}>
-        <Text style={[styles(theme).switchText, {color: theme.colors.subtext}]}>
+        <Text
+          style={[
+            styles(theme).switchText,
+            {color: theme.colors['toffee-400']},
+          ]}>
           Already have an account?{' '}
         </Text>
         <TouchableOpacity onPress={() => setView('signin')}>
@@ -477,7 +488,8 @@ export default function Auth({
         <Text style={[styles(theme).title, {color: theme.colors.text}]}>
           Reset Password
         </Text>
-        <Text style={[styles(theme).subtitle, {color: theme.colors.subtext}]}>
+        <Text
+          style={[styles(theme).subtitle, {color: theme.colors['toffee-400']}]}>
           Enter your email address and we'll send you a link to reset your
           password
         </Text>

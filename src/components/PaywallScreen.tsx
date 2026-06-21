@@ -153,7 +153,7 @@ export default function PaywallScreen({
     return `${symbol}${Math.round(monthly)}`;
   };
 
-  const s = styles(theme);
+  const s = styles(theme, isDark);
 
   return (
     <SafeAreaView style={s.container}>
@@ -291,10 +291,7 @@ export default function PaywallScreen({
             </View>
 
             <Pressable
-              style={({pressed}) => [
-                s.ctaButton,
-                pressed && {backgroundColor: theme.colors['yellow-400']},
-              ]}
+              style={({pressed}) => [s.ctaButton, pressed && {opacity: 0.85}]}
               onPress={handlePurchase}
               disabled={isPurchasing}>
               {isPurchasing ? (
@@ -331,7 +328,7 @@ export default function PaywallScreen({
   );
 }
 
-const styles = (theme: Theme) =>
+const styles = (theme: Theme, isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -398,14 +395,14 @@ const styles = (theme: Theme) =>
     },
     trialText: {
       ...theme.typography.h2,
-      color: theme.colors['neutral-800'],
+      color: isDark ? theme.colors['neutral-100'] : theme.colors['neutral-800'],
       textAlign: 'center',
       lineHeight: 21,
       marginBottom: 12,
     },
     trialBold: {
       ...theme.typography['h2-emphasized'],
-      color: theme.colors['green-400'],
+      color: isDark ? theme.colors['yellow-400'] : theme.colors['green-400'],
     },
     plans: {
       gap: 12,
@@ -422,8 +419,13 @@ const styles = (theme: Theme) =>
       paddingHorizontal: 16,
     },
     planCardSelected: {
-      borderColor: theme.colors['neutral-800'],
+      borderColor: isDark
+        ? theme.colors['yellow-400']
+        : theme.colors['green-400'],
       borderWidth: 2,
+      backgroundColor: isDark
+        ? 'rgba(249, 208, 112, 0.12)'
+        : 'rgba(79, 168, 99, 0.1)',
     },
     planTitleRow: {
       flexDirection: 'row',
@@ -438,7 +440,9 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
     },
     saveBadge: {
-      backgroundColor: theme.colors['yellow-400'],
+      backgroundColor: isDark
+        ? theme.colors['yellow-400']
+        : theme.colors['green-400'],
       paddingHorizontal: 8,
       paddingVertical: 3,
       borderRadius: 4,
@@ -447,7 +451,7 @@ const styles = (theme: Theme) =>
       fontFamily: 'Switzer',
       fontSize: 11,
       fontWeight: '600',
-      color: theme.colors['neutral-800'],
+      color: isDark ? '#322924' : theme.colors['neutral-100'],
     },
     planPriceContainer: {
       alignItems: 'flex-end',
@@ -475,7 +479,9 @@ const styles = (theme: Theme) =>
       marginTop: 2,
     },
     ctaButton: {
-      backgroundColor: theme.colors['neutral-800'],
+      backgroundColor: isDark
+        ? theme.colors['yellow-400']
+        : theme.colors['green-400'],
       paddingVertical: 16,
       borderRadius: 25,
       alignItems: 'center',
@@ -485,7 +491,7 @@ const styles = (theme: Theme) =>
       fontFamily: 'Switzer',
       fontSize: 16,
       fontWeight: '600',
-      color: '#fff',
+      color: isDark ? '#322924' : theme.colors['neutral-100'],
     },
     legalText: {
       ...theme.typography.h4,

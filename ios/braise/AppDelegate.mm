@@ -8,6 +8,7 @@
 #import "AppDelegate.h"
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTBridge.h>
+#import <React/RCTLinkingManager.h>
 
 @interface AppDelegate ()
 @property (nonatomic, strong) id pendingRecipe;
@@ -92,7 +93,7 @@
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
   [self processImportURL:url];
-  return YES;
+  return [RCTLinkingManager application:application openURL:url options:options];
 }
 
 @end
