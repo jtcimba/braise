@@ -10,6 +10,7 @@
     "test": "jest",
     "export-launch-logo": "node scripts/export-launch-logo.mjs",
     "deploy:function": "node scripts/deploy-function.mjs",
+    "postinstall": "node scripts/fix-esm-compat.js",
     "prepare": "husky"
   },
   "dependencies": {
