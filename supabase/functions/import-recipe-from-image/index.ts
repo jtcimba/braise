@@ -1,8 +1,5 @@
 import '@supabase/functions-js/edge-runtime.d.ts';
-import {
-  cleanIngredients,
-  splitNumberedInstructions,
-} from '../_shared/recipeUtils.ts';
+import {callClaudeApi, assembleRecipeResult} from '../_shared/recipeUtils.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -96,106 +93,34 @@ Return ONLY the JSON object, no markdown, no explanation, no code fences.`;
 
   const messageContent: object[] = images.map(base64 => ({
     type: 'image',
-    source: {
-      type: 'base64',
-      media_type: 'image/jpeg',
-      data: base64,
-    },
+    source: {type: 'base64', media_type: 'image/jpeg', data: base64},
   }));
   messageContent.push({
     type: 'text',
     text: 'Extract the recipe from these photos.',
   });
 
-  console.log(
-    'Sending request to Claude with',
-    messageContent.length,
-    'content blocks',
-  );
   try {
-    const claudeResponse = await fetch(
-      'https://api.anthropic.com/v1/messages',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 4096,
-          system: systemPrompt,
-          messages: [{role: 'user', content: messageContent}],
-        }),
-      },
+    const claudeResult = await callClaudeApi(
+      ANTHROPIC_API_KEY,
+      systemPrompt,
+      messageContent,
     );
 
-    console.log('Claude response status:', claudeResponse.status);
-    if (!claudeResponse.ok) {
-      const errorText = await claudeResponse.text();
-      console.error('Claude API error:', claudeResponse.status, errorText);
-      return new Response(JSON.stringify({error: 'Recipe extraction failed'}), {
-        status: 502,
+    if (!claudeResult.ok) {
+      return new Response(JSON.stringify({error: claudeResult.error}), {
+        status: claudeResult.status,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
       });
     }
 
-    const claudeData = await claudeResponse.json();
-    const content = claudeData.content?.[0]?.text;
-    console.log('Claude response content length:', content?.length ?? 0);
-
-    if (!content) {
-      return new Response(
-        JSON.stringify({error: 'No response from extraction service'}),
-        {
-          status: 502,
-          headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
-        },
-      );
-    }
-
-    let jsonString = content.trim();
-    jsonString = jsonString
-      .replace(/^```(?:json)?\s*\n?/, '')
-      .replace(/\n?```\s*$/, '');
-
-    console.log('Cleaned JSON string:', jsonString);
-    let recipe;
-    try {
-      recipe = JSON.parse(jsonString);
-      console.log('Parsed recipe title:', recipe.title);
-    } catch {
-      console.error('Failed to parse Claude response as JSON:', jsonString);
-      return new Response(
-        JSON.stringify({error: 'Failed to parse extracted recipe'}),
-        {
-          status: 502,
-          headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
-        },
-      );
-    }
-
-    const result = {
-      title: recipe.title || '',
-      author: recipe.author || '',
-      original_url: '',
-      host_url: '',
-      host_name: '',
-      categories: recipe.categories || '',
-      image: '',
-      ingredients: cleanIngredients(recipe.ingredients || ''),
-      instructions: splitNumberedInstructions(recipe.instructions || ''),
-      total_time: recipe.total_time || '',
-      total_time_unit: recipe.total_time_unit || '',
-      servings: recipe.servings || '',
-      about: recipe.about || '',
-    };
-
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
-    });
+    return new Response(
+      JSON.stringify(assembleRecipeResult(claudeResult.data)),
+      {
+        status: 200,
+        headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+      },
+    );
   } catch (err) {
     console.error('Unexpected error:', err);
     return new Response(JSON.stringify({error: 'Internal server error'}), {

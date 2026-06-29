@@ -74,5 +74,8 @@ node_modules/
 **.sample
 
 .env
+.env.local
+supabase/.env
 supabase/.temp/
+supabase/functions/_tests/fixtures/*.jpg
 .vscode/

@@ -1,6 +1,6 @@
 export function cleanIngredients(ingredients: string): string {
   return ingredients
-    .replace(/\(,\s*((?:[^\n()]*|\([^\n()]*\))*)\)/g, ', $1')
+    .replace(/\s*\(,\s*((?:[^\n()]*|\([^\n()]*\))*)\)/g, ', $1')
     .replace(/\(\(/g, '(')
     .replace(/\)\)/g, ')');
 }
@@ -29,10 +29,21 @@ export interface RecipeResult {
   image: string;
   ingredients: string;
   instructions: string;
-  total_time: string;
-  total_time_unit: string;
-  servings: string;
+  total_time?: number;
+  total_time_unit?: string;
+  servings?: number;
   about: string;
+}
+
+function parseOptionalInt(s: unknown): number | undefined {
+  if (s === null || s === undefined || s === '') {
+    return undefined;
+  }
+  if (typeof s === 'number') {
+    return isNaN(s) ? undefined : Math.trunc(s);
+  }
+  const n = parseInt(String(s), 10);
+  return isNaN(n) ? undefined : n;
 }
 
 // --- JSON-LD extraction ---
@@ -82,10 +93,14 @@ export function formatRecipeFromJsonLd(
   const categories = extractCategories(recipeObj, title);
   const image = extractImage(recipeObj);
   const ingredientsArray = extractStringArray('recipeIngredient', recipeObj);
-  const ingredients = ingredientsArray.map(i => cleanIngredients(i)).join('\n');
-  const instructions = extractInstructions(recipeObj);
-  const [totalTime, totalTimeUnit] = extractTime(recipeObj);
-  const servings = extractServings(recipeObj);
+  const ingredients = ingredientsArray
+    .map(i => cleanIngredients(i))
+    .join('\n')
+    .replace(/\n+$/, '');
+  const instructions = extractInstructions(recipeObj).replace(/\n+$/, '');
+  const [totalTimeStr, totalTimeUnitStr] = extractTime(recipeObj);
+  const totalTime = parseOptionalInt(totalTimeStr);
+  const servings = parseOptionalInt(extractServings(recipeObj));
   const about = extractString('description', recipeObj);
 
   return {
@@ -99,7 +114,8 @@ export function formatRecipeFromJsonLd(
     ingredients,
     instructions,
     total_time: totalTime,
-    total_time_unit: totalTimeUnit,
+    total_time_unit:
+      totalTime !== undefined ? totalTimeUnitStr || undefined : undefined,
     servings,
     about,
   };
@@ -392,4 +408,115 @@ function extractServings(obj: JsonObject): string {
     }
   }
   return '';
+}
+
+// --- Claude API ---
+
+const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
+
+export type ClaudeCallResult =
+  | {ok: true; data: Record<string, unknown>}
+  | {ok: false; status: 502; error: string};
+
+export async function callClaudeApi(
+  apiKey: string,
+  systemPrompt: string,
+  content: string | object[],
+): Promise<ClaudeCallResult> {
+  let claudeResponse: Response;
+  try {
+    claudeResponse = await fetch(CLAUDE_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 4096,
+        system: systemPrompt,
+        messages: [{role: 'user', content}],
+      }),
+    });
+  } catch {
+    return {ok: false, status: 502, error: 'Recipe extraction failed'};
+  }
+
+  if (!claudeResponse.ok) {
+    console.error(
+      'Claude API error:',
+      claudeResponse.status,
+      await claudeResponse.text(),
+    );
+    return {ok: false, status: 502, error: 'Recipe extraction failed'};
+  }
+
+  const claudeData = await claudeResponse.json();
+  const text: string | undefined = claudeData.content?.[0]?.text;
+
+  if (!text) {
+    return {
+      ok: false,
+      status: 502,
+      error: 'No response from extraction service',
+    };
+  }
+
+  const jsonString = text
+    .trim()
+    .replace(/^```(?:json)?\s*\n?/, '')
+    .replace(/\n?```\s*$/, '');
+
+  try {
+    return {ok: true, data: JSON.parse(jsonString)};
+  } catch {
+    console.error('Failed to parse Claude response as JSON:', jsonString);
+    return {ok: false, status: 502, error: 'Failed to parse extracted recipe'};
+  }
+}
+
+export function assembleRecipeResult(
+  raw: Record<string, unknown>,
+  sourceUrl = '',
+): RecipeResult {
+  let hostUrl = '';
+  let hostName = '';
+  if (sourceUrl) {
+    try {
+      const parsed = new URL(sourceUrl);
+      hostUrl = `${parsed.protocol}//${parsed.host}`;
+      hostName = parsed.hostname;
+    } catch {
+      // invalid URL — leave blank
+    }
+  }
+
+  const totalTime = parseOptionalInt(raw.total_time);
+  const servings = parseOptionalInt(raw.servings);
+
+  return {
+    title: (raw.title as string) || '',
+    author: (raw.author as string) || '',
+    original_url: sourceUrl,
+    host_url: hostUrl,
+    host_name: hostName,
+    categories: (raw.categories as string) || '',
+    image: (raw.image as string) || '',
+    ingredients: cleanIngredients((raw.ingredients as string) || '').replace(
+      /\n+$/,
+      '',
+    ),
+    instructions: splitNumberedInstructions(
+      (raw.instructions as string) || '',
+    ).replace(/\n+$/, ''),
+    total_time: totalTime,
+    total_time_unit:
+      totalTime !== undefined && raw.total_time_unit
+        ? String(raw.total_time_unit)
+        : undefined,
+    servings,
+    about: (raw.about as string) || '',
+  };
 }
