@@ -5,9 +5,9 @@ export interface Recipe {
   host_url?: string;
   host_name?: string;
   image?: string;
-  total_time?: string;
+  total_time?: number;
   total_time_unit?: string;
-  servings?: string;
+  servings?: number;
   ingredients?: string;
   instructions?: string;
   categories?: string;
