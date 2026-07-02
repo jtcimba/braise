@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
+  Keyboard,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -38,6 +39,20 @@ export default function AddModal({visible, onClose}: AddModalProps) {
   const [isImporting, setIsImporting] = useState(false);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [recipeUrl, setRecipeUrl] = useState('');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardWillShow', e => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener('keyboardWillHide', () => {
+      setKeyboardHeight(0);
+    });
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const newRecipe: Recipe = {
     id: '',
@@ -46,9 +61,9 @@ export default function AddModal({visible, onClose}: AddModalProps) {
     host_url: '',
     host_name: '',
     image: '',
-    total_time: '',
+    total_time: undefined,
     total_time_unit: '',
-    servings: '',
+    servings: undefined,
     ingredients: '',
     instructions: '',
     categories: '',
@@ -220,9 +235,12 @@ export default function AddModal({visible, onClose}: AddModalProps) {
       onBackdropPress={handleClose}
       onSwipeComplete={handleClose}
       swipeDirection={['down']}
-      avoidKeyboard
       style={styles(theme).modalOverlay}>
-      <View style={styles(theme).modalContainer}>
+      <View
+        style={[
+          styles(theme).modalContainer,
+          showUrlInput && keyboardHeight > 0 && {paddingBottom: keyboardHeight},
+        ]}>
         <TouchableOpacity
           style={styles(theme).closeButton}
           onPress={handleClose}>

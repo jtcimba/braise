@@ -8,8 +8,6 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -180,190 +178,187 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
   const headerHeight = useHeaderHeight();
 
   return (
-    <KeyboardAvoidingView
-      style={styles(theme).container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={tablet ? 0 : undefined}>
-      <ScrollView
-        ref={scrollViewRef}
-        style={[styles(theme).contentContainer, {marginTop: headerHeight}]}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles(theme).scrollContentContainer}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={tablet ? styles(theme).tabletContentWrapper : undefined}>
-            <TouchableOpacity
-              style={styles(theme).imageContainer}
-              onPress={handleImageSelection}
-              disabled={isUploadingImage}
-              activeOpacity={0.8}>
-              <Image
-                style={styles(theme).image}
-                source={{
-                  uri: editingData.image ? editingData.image : null,
-                }}
-              />
-              {isUploadingImage && (
-                <View style={styles(theme).uploadingOverlay}>
-                  <Text style={styles(theme).uploadingText}>Uploading...</Text>
-                </View>
-              )}
-              {!editingData.image && !isUploadingImage && (
-                <View style={styles(theme).placeholderOverlay}>
-                  <Ionicons
-                    name="camera-outline"
-                    size={40}
-                    color={theme.colors['toffee-400']}
-                  />
-                  <Text style={styles(theme).placeholderText}>
-                    Tap to add image
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            <View style={styles(theme).headerContainer}>
-              <TextInput
-                style={styles(theme).titleInput}
-                value={editingData.title}
-                placeholder="Recipe name"
-                placeholderTextColor={theme.colors['toffee-400']}
-                onChangeText={text =>
-                  onChangeEditingData({...editingData, title: text})
-                }
-                multiline
-              />
-              <TextInput
-                style={styles(theme).authorInput}
-                value={editingData.author}
-                placeholder="Author"
-                placeholderTextColor={theme.colors['toffee-400']}
-                onChangeText={text =>
-                  onChangeEditingData({...editingData, author: text})
-                }
-              />
-            </View>
-            <View style={styles(theme).bodyContainer}>
-              <View style={styles(theme).detailsContainer}>
-                <View style={styles(theme).detailsRow}>
-                  <View style={styles(theme).metadataServingsContainer}>
-                    <Text style={styles(theme).metadataText}>Servings</Text>
-                    <View style={styles(theme).servingsToggleContainer}>
-                      <TouchableOpacity
-                        style={styles(theme).servingsToggleButton}
-                        onPress={() => {
-                          const num = parseInt(
-                            editingData.servings?.toString() || '1',
-                            10,
-                          );
-                          if (num > 1) {
-                            handleServingsUpdate(String(num - 1));
-                          }
-                        }}>
-                        <Ionicons
-                          name="remove-outline"
-                          size={16}
-                          color={theme.colors['neutral-800']}
-                        />
-                      </TouchableOpacity>
-                      <Text style={styles(theme).servingsValue}>
-                        {editingData.servings != null
-                          ? editingData.servings.toString()
-                          : '-'}
-                      </Text>
-                      <TouchableOpacity
-                        style={styles(theme).servingsToggleButton}
-                        onPress={() => {
-                          const num = parseInt(
-                            editingData.servings?.toString() || '1',
-                            10,
-                          );
-                          handleServingsUpdate(String(num + 1));
-                        }}>
-                        <Ionicons
-                          name="add-outline"
-                          size={16}
-                          color={theme.colors['neutral-800']}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    style={styles(theme).metadataTimeContainer}
-                    onPress={() => setTotalTimeModalVisible(true)}>
-                    <Text style={styles(theme).metadataText}>Total Time</Text>
-                    <Text style={styles(theme).metadataValue}>
-                      {editingData.total_time
-                        ? editingData.total_time +
-                          ' ' +
-                          (editingData.total_time_unit || 'min')
+    <ScrollView
+      ref={scrollViewRef}
+      style={[styles(theme).container, {marginTop: headerHeight}]}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles(theme).scrollContentContainer}
+      automaticallyAdjustKeyboardInsets
+      keyboardShouldPersistTaps="handled">
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={tablet ? styles(theme).tabletContentWrapper : undefined}>
+          <TouchableOpacity
+            style={styles(theme).imageContainer}
+            onPress={handleImageSelection}
+            disabled={isUploadingImage}
+            activeOpacity={0.8}>
+            <Image
+              style={styles(theme).image}
+              source={{
+                uri: editingData.image ? editingData.image : null,
+              }}
+            />
+            {isUploadingImage && (
+              <View style={styles(theme).uploadingOverlay}>
+                <Text style={styles(theme).uploadingText}>Uploading...</Text>
+              </View>
+            )}
+            {!editingData.image && !isUploadingImage && (
+              <View style={styles(theme).placeholderOverlay}>
+                <Ionicons
+                  name="camera-outline"
+                  size={40}
+                  color={theme.colors['toffee-400']}
+                />
+                <Text style={styles(theme).placeholderText}>
+                  Tap to add image
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <View style={styles(theme).headerContainer}>
+            <TextInput
+              style={styles(theme).titleInput}
+              value={editingData.title}
+              placeholder="Recipe name"
+              placeholderTextColor={theme.colors['toffee-400']}
+              onChangeText={text =>
+                onChangeEditingData({...editingData, title: text})
+              }
+              multiline
+            />
+            <TextInput
+              style={styles(theme).authorInput}
+              value={editingData.author}
+              placeholder="Author"
+              placeholderTextColor={theme.colors['toffee-400']}
+              onChangeText={text =>
+                onChangeEditingData({...editingData, author: text})
+              }
+            />
+          </View>
+          <View style={styles(theme).bodyContainer}>
+            <View style={styles(theme).detailsContainer}>
+              <View style={styles(theme).detailsRow}>
+                <View style={styles(theme).metadataServingsContainer}>
+                  <Text style={styles(theme).metadataText}>Servings</Text>
+                  <View style={styles(theme).servingsToggleContainer}>
+                    <TouchableOpacity
+                      style={styles(theme).servingsToggleButton}
+                      onPress={() => {
+                        const num = parseInt(
+                          editingData.servings?.toString() || '1',
+                          10,
+                        );
+                        if (num > 1) {
+                          handleServingsUpdate(String(num - 1));
+                        }
+                      }}>
+                      <Ionicons
+                        name="remove-outline"
+                        size={16}
+                        color={theme.colors['neutral-800']}
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles(theme).servingsValue}>
+                      {editingData.servings != null
+                        ? editingData.servings.toString()
                         : '-'}
                     </Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles(theme).servingsToggleButton}
+                      onPress={() => {
+                        const num = parseInt(
+                          editingData.servings?.toString() || '1',
+                          10,
+                        );
+                        handleServingsUpdate(String(num + 1));
+                      }}>
+                      <Ionicons
+                        name="add-outline"
+                        size={16}
+                        color={theme.colors['neutral-800']}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <TextInput
-                  style={styles(theme).aboutInput}
-                  value={editingData.about}
-                  placeholder="Add a description or notes about this recipe..."
-                  placeholderTextColor={theme.colors['toffee-400']}
-                  onChangeText={(text: any) => {
-                    onChangeEditingData({
-                      ...editingData,
-                      about: text,
-                    });
-                  }}
-                  multiline
-                  scrollEnabled={false}
-                />
-                <CategoryEditor
-                  categories={categoriesArray}
-                  onChange={handleCategoryUpdate}
-                />
+                <TouchableOpacity
+                  style={styles(theme).metadataTimeContainer}
+                  onPress={() => setTotalTimeModalVisible(true)}>
+                  <Text style={styles(theme).metadataText}>Total Time</Text>
+                  <Text style={styles(theme).metadataValue}>
+                    {editingData.total_time
+                      ? editingData.total_time +
+                        ' ' +
+                        (editingData.total_time_unit || 'min')
+                      : '-'}
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <View style={styles(theme).tabBarContainer}>
-                <CustomToggle
-                  value={false}
-                  onValueChange={v => {
-                    if (v) {
-                      setModalVisible(true);
-                    }
-                  }}
-                  leftLabel="Ingredients"
-                  rightLabel="Directions"
-                />
-              </View>
-              <IngredientEditor
-                ingredients={editingData.ingredients}
-                onChange={(value: string) =>
-                  onChangeEditingData((prev: any) => ({
-                    ...prev,
-                    ingredients: value,
-                  }))
-                }
-                scrollViewRef={scrollViewRef}
+              <TextInput
+                style={styles(theme).aboutInput}
+                value={editingData.about}
+                placeholder="Add a description or notes about this recipe..."
+                placeholderTextColor={theme.colors['toffee-400']}
+                onChangeText={(text: any) => {
+                  onChangeEditingData({
+                    ...editingData,
+                    about: text,
+                  });
+                }}
+                multiline
+                scrollEnabled={false}
               />
-
-              <InstructionsEditor
-                instructions={editingData.instructions}
-                handleInstructionsUpdate={handleInstructionUpdate}
-                handleModalClose={() => setModalVisible(false)}
-                modalVisible={modalVisible}
-              />
-
-              <TotalTimePickerModal
-                visible={totalTimeModalVisible}
-                onClose={() => setTotalTimeModalVisible(false)}
-                onConfirm={handleTotalTimeUpdate}
-                currentTime={
-                  editingData.total_time != null
-                    ? editingData.total_time.toString()
-                    : ''
-                }
-                currentUnit={editingData.total_time_unit}
+              <CategoryEditor
+                categories={categoriesArray}
+                onChange={handleCategoryUpdate}
               />
             </View>
+            <View style={styles(theme).tabBarContainer}>
+              <CustomToggle
+                value={false}
+                onValueChange={v => {
+                  if (v) {
+                    setModalVisible(true);
+                  }
+                }}
+                leftLabel="Ingredients"
+                rightLabel="Directions"
+              />
+            </View>
+            <IngredientEditor
+              ingredients={editingData.ingredients}
+              onChange={(value: string) =>
+                onChangeEditingData((prev: any) => ({
+                  ...prev,
+                  ingredients: value,
+                }))
+              }
+              scrollViewRef={scrollViewRef}
+            />
+
+            <InstructionsEditor
+              instructions={editingData.instructions}
+              handleInstructionsUpdate={handleInstructionUpdate}
+              handleModalClose={() => setModalVisible(false)}
+              modalVisible={modalVisible}
+            />
+
+            <TotalTimePickerModal
+              visible={totalTimeModalVisible}
+              onClose={() => setTotalTimeModalVisible(false)}
+              onConfirm={handleTotalTimeUpdate}
+              currentTime={
+                editingData.total_time != null
+                  ? editingData.total_time.toString()
+                  : ''
+              }
+              currentUnit={editingData.total_time_unit}
+            />
           </View>
-        </TouchableWithoutFeedback>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   );
 }
 
@@ -396,6 +391,7 @@ const styles = (theme: Theme) =>
       width: '100%',
       height: '100%',
       resizeMode: 'cover',
+      backgroundColor: theme.colors['neutral-300'],
     },
     uploadingOverlay: {
       position: 'absolute',
