@@ -93,10 +93,12 @@ export default function IngredientEditor({
         const idx = rows.findIndex(r => r.id === id);
         if (idx < rows.length - 1) {
           amountRefs.current.get(rows[idx + 1].id)?.focus();
+        } else {
+          addRow();
         }
       }
     },
-    [rows],
+    [rows, addRow],
   );
 
   const renderItem = useCallback(
@@ -138,10 +140,17 @@ export default function IngredientEditor({
               value={item.text}
               placeholder="Ingredient"
               placeholderTextColor={theme.colors['neutral-300']}
-              onChangeText={v => updateField(item.id, 'text', v)}
-              returnKeyType="next"
-              onSubmitEditing={() => focusNext(item.id, 'text')}
+              onChangeText={v => {
+                if (v.includes('\n')) {
+                  focusNext(item.id, 'text');
+                } else {
+                  updateField(item.id, 'text', v);
+                }
+              }}
+              multiline
+              scrollEnabled={false}
               blurOnSubmit={false}
+              returnKeyType="next"
             />
             <TouchableOpacity
               style={styles(theme).deleteButton}
@@ -225,6 +234,7 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
       flex: 1,
       padding: 0,
+      marginTop: -4,
     },
     deleteButton: {
       paddingLeft: 8,

@@ -306,7 +306,7 @@ const styles = (theme: any) =>
     imagePlaceholder: {
       width: '100%',
       height: '100%',
-      backgroundColor: theme.colors['toffee-400'],
+      backgroundColor: theme.colors['neutral-300'],
       alignItems: 'center',
       justifyContent: 'center',
     },
