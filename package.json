@@ -12,7 +12,7 @@
     "deploy:function": "node scripts/deploy-function.mjs",
     "serve:functions": "supabase functions serve --no-verify-jwt --env-file supabase/.env",
     "test:unit": "deno test --config supabase/functions/_tests/deno.json --allow-read supabase/functions/_tests/recipeUtils.test.ts",
-    "test:functions": "deno test --config supabase/functions/_tests/deno.json --allow-read --allow-net supabase/functions/_tests/importRecipeLive.test.ts supabase/functions/_tests/importRecipeFromImage.test.ts",
+    "test:functions": "deno test --config supabase/functions/_tests/deno.json --allow-read --allow-net supabase/functions/_tests/importRecipeLive.test.ts supabase/functions/_tests/importRecipeFromImage.test.ts supabase/functions/_tests/structureIngredients.test.ts",
     "postinstall": "node scripts/fix-esm-compat.js",
     "prepare": "husky"
   },

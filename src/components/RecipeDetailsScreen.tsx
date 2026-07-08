@@ -16,6 +16,7 @@ import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import DetailsMenuHeader from './DetailsMenuHeader';
 import {recipeService} from '../services';
+import {RecipeIngredient} from '../models';
 
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
@@ -24,9 +25,9 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const [isLoading, setIsLoading] = useState(false);
   const [editingData, onChangeEditingData] = useState({...route.params.item});
   const [showSavedMessage, setShowSavedMessage] = useState(false);
-  const [scaledIngredients, setScaledIngredients] = useState(
-    route.params.item.ingredients || '',
-  );
+  const [structuredIngredients, setStructuredIngredients] = useState<
+    RecipeIngredient[]
+  >([]);
   const autoSaveTriggeredRef = useRef(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
   const scaleAnim = useState(new Animated.Value(0.8))[0];
@@ -69,6 +70,17 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     });
   }, [fadeAnim, scaleAnim]);
 
+  const loadStructuredIngredients = useCallback(async (recipeId: string) => {
+    const rows = await recipeService.fetchRecipeIngredients(recipeId);
+    setStructuredIngredients(rows);
+  }, []);
+
+  useEffect(() => {
+    if (data.id) {
+      loadStructuredIngredients(data.id);
+    }
+  }, [data.id, loadStructuredIngredients]);
+
   const handleSavePress = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -79,14 +91,17 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
 
       onChangeData(savedRecipe);
       onChangeEditingData(savedRecipe);
-      setScaledIngredients(savedRecipe.ingredients || '');
       showSavedMessageTemporarily();
+
+      if (savedRecipe.id) {
+        await loadStructuredIngredients(savedRecipe.id);
+      }
     } catch (e: any) {
       Alert.alert('Error', e.message || 'Failed to save recipe');
     } finally {
       setIsLoading(false);
     }
-  }, [editingData, showSavedMessageTemporarily]);
+  }, [editingData, showSavedMessageTemporarily, loadStructuredIngredients]);
 
   const handleDeletePress = useCallback(async () => {
     setIsLoading(true);
@@ -121,7 +136,6 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   useEffect(() => {
     if (viewMode === 'view') {
       onChangeEditingData(data);
-      setScaledIngredients(data.ingredients || '');
     }
   }, [viewMode, data]);
 
@@ -136,10 +150,10 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     () => (
       <DetailsMenuHeader
         navigation={navigation}
-        scaledIngredients={scaledIngredients}
+        structuredIngredients={structuredIngredients}
       />
     ),
-    [navigation, scaledIngredients],
+    [navigation, structuredIngredients],
   );
 
   useEffect(() => {
@@ -178,7 +192,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       {viewMode === 'view' && (
         <RecipeViewer
           data={data}
-          onScaledIngredientsChange={setScaledIngredients}
+          structuredIngredients={structuredIngredients}
         />
       )}
       {viewMode !== 'view' && (

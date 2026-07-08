@@ -166,7 +166,7 @@ Deno.serve(async req => {
     return new Response(
       JSON.stringify({error: 'ANTHROPIC_API_KEY not configured'}),
       {
-        status: 500,
+        status: 503,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
       },
     );

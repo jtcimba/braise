@@ -1,5 +1,6 @@
 import {supabase} from '../supabase-client';
 import Storage from '../storage';
+import {RecipeIngredient} from '../models';
 
 const processNewlines = (recipe: any) => {
   if (recipe.ingredients) {
@@ -18,6 +19,27 @@ const processForSave = (recipe: any) => {
     total_time: recipe.total_time ? parseInt(recipe.total_time, 10) : null,
     servings: recipe.servings ? parseInt(recipe.servings, 10) : null,
   };
+};
+
+const structureRecipeIngredients = async (
+  recipeId: string,
+  ingredientsString: string,
+): Promise<void> => {
+  const lines = (ingredientsString || '')
+    .split('\n')
+    .map((l: string) => l.trim())
+    .filter(Boolean);
+
+  try {
+    const {error} = await supabase.functions.invoke('structure-ingredients', {
+      body: {recipe_id: recipeId, ingredient_lines: lines},
+    });
+    if (error) {
+      console.error('Failed to structure ingredients:', error.message);
+    }
+  } catch (e: any) {
+    console.error('Failed to structure ingredients:', e.message);
+  }
 };
 
 export const recipeService = {
@@ -75,6 +97,12 @@ export const recipeService = {
       const processedRecipe = processNewlines(newRecipe);
       const localRecipes = await Storage.loadRecipesFromLocal();
       await Storage.saveRecipesToLocal([...localRecipes, processedRecipe]);
+
+      await structureRecipeIngredients(
+        String(processedRecipe.id),
+        processedRecipe.ingredients || '',
+      );
+
       return processedRecipe;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to create recipe');
@@ -113,6 +141,12 @@ export const recipeService = {
         r.id === processedRecipe.id ? processedRecipe : r,
       );
       await Storage.saveRecipesToLocal(updatedRecipes);
+
+      await structureRecipeIngredients(
+        String(processedRecipe.id),
+        processedRecipe.ingredients || '',
+      );
+
       return processedRecipe;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to update recipe');
@@ -139,6 +173,20 @@ export const recipeService = {
     } catch (error: any) {
       console.error('Failed to update viewed_at:', error.message);
     }
+  },
+
+  async fetchRecipeIngredients(recipeId: string): Promise<RecipeIngredient[]> {
+    const {data, error} = await supabase
+      .from('recipe_ingredients')
+      .select('*')
+      .eq('recipe_id', recipeId)
+      .order('sort_order', {ascending: true});
+
+    if (error) {
+      console.error('Failed to fetch recipe ingredients:', error.message);
+      return [];
+    }
+    return data || [];
   },
 
   async deleteRecipe(recipeId: string) {
