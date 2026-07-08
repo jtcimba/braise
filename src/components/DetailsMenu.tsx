@@ -16,16 +16,17 @@ import {useEditingHandler} from '../context/EditingHandlerContext';
 import {useGroceryListModal} from '../context/GroceryListModalContext';
 import {Theme} from '../../theme/types';
 import {useTheme} from '../../theme/ThemeProvider';
+import {RecipeIngredient} from '../models';
 
 interface DetailsMenuProps {
   navigation: any;
-  ingredients?: string;
+  structuredIngredients?: RecipeIngredient[];
   routeData?: any;
 }
 
 export default function DetailsMenu({
   navigation,
-  ingredients = '',
+  structuredIngredients = [],
   routeData = {},
 }: DetailsMenuProps) {
   const theme = useTheme() as unknown as Theme;
@@ -78,7 +79,7 @@ export default function DetailsMenu({
       routeData?.id && routeData?.title
         ? {id: routeData.id, title: routeData.title}
         : undefined;
-    showModal(ingredients, recipeInfo);
+    showModal(structuredIngredients, recipeInfo);
   };
 
   return (

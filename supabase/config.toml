@@ -399,9 +399,22 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 enabled = true
 verify_jwt = false
 import_map = "./functions/import-recipe/deno.json"
-# Uncomment to specify a custom file path to the entrypoint.
-# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
 entrypoint = "./functions/import-recipe/index.ts"
-# Specifies static files to be bundled with the function. Supports glob patterns.
-# For example, if you want to serve static HTML pages in your function:
-# static_files = [ "./functions/import-recipe/*.html" ]
+
+[functions.import-recipe-from-image]
+enabled = true
+verify_jwt = false
+import_map = "./functions/import-recipe-from-image/deno.json"
+entrypoint = "./functions/import-recipe-from-image/index.ts"
+
+[functions.structure-ingredients]
+enabled = true
+verify_jwt = false
+import_map = "./functions/structure-ingredients/deno.json"
+entrypoint = "./functions/structure-ingredients/index.ts"
+
+[functions.backfill-recipe-ingredients]
+enabled = true
+verify_jwt = false
+import_map = "./functions/backfill-recipe-ingredients/deno.json"
+entrypoint = "./functions/backfill-recipe-ingredients/index.ts"

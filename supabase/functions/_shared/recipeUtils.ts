@@ -419,6 +419,111 @@ export type ClaudeCallResult =
   | {ok: true; data: Record<string, unknown>}
   | {ok: false; status: 502; error: string};
 
+export interface StructuredIngredient {
+  display_text: string;
+  base_name: string;
+  prep: string | null;
+  quantity: string | null;
+  unit: string | null;
+}
+
+export type StructureIngredientsResult =
+  | {ok: true; data: StructuredIngredient[]}
+  | {ok: false; error: string};
+
+const STRUCTURING_SYSTEM_PROMPT = `You are an ingredient structuring assistant. Given a JSON array of recipe ingredient lines, parse each line into structured fields.
+
+Return ONLY a JSON array of objects with these exact fields:
+- "display_text": string (the original ingredient line, preserved exactly)
+- "base_name": string (the purchasable product name a person would look for at a grocery store)
+- "prep": string or null (home preparation instruction — e.g. "diced", "minced", "sliced", "cubed"; null if none)
+- "quantity": string or null (the numeric quantity as a string, e.g. "2", "1/2", "3/4"; null if none)
+- "unit": string or null (the unit of measurement, e.g. "cup", "tsp", "lb", "clove"; null if none)
+
+Rules for base_name vs prep:
+- base_name: the name of the product as sold at a grocery store
+- prep: home preparation instructions (dice, chop, mince, slice, cube, cut, torn, chopped)
+- Packaging-form words (shredded, ground, powdered, crushed, dried, smoked, roasted) stay IN base_name because they describe how the product is manufactured or sold (e.g. "shredded cheese", "ground beef", "dried oregano", "powdered sugar", "crushed tomatoes")
+
+CRITICAL: Output array must have exactly the same number of elements as the input array, in the same order. Do not split, merge, skip, or reorder lines.
+
+Examples (given as input array → output array):
+Input: ["2 cups tomatoes, diced","1 tsp red pepper flakes","1 lb ground beef","3 potatoes, cut into cubes","1 cup shredded parmesan","2 cloves garlic, minced"]
+Output: [{"display_text":"2 cups tomatoes, diced","base_name":"tomatoes","prep":"diced","quantity":"2","unit":"cup"},{"display_text":"1 tsp red pepper flakes","base_name":"red pepper flakes","prep":null,"quantity":"1","unit":"tsp"},{"display_text":"1 lb ground beef","base_name":"ground beef","prep":null,"quantity":"1","unit":"lb"},{"display_text":"3 potatoes, cut into cubes","base_name":"potatoes","prep":"cubed","quantity":"3","unit":null},{"display_text":"1 cup shredded parmesan","base_name":"shredded parmesan","prep":null,"quantity":"1","unit":"cup"},{"display_text":"2 cloves garlic, minced","base_name":"garlic","prep":"minced","quantity":"2","unit":"clove"}]
+
+Return ONLY the JSON array, no markdown, no explanation, no code fences.`;
+
+export async function structureIngredients(
+  apiKey: string,
+  lines: string[],
+): Promise<StructureIngredientsResult> {
+  if (lines.length === 0) {
+    return {ok: true, data: []};
+  }
+
+  let claudeResponse: Response;
+  try {
+    claudeResponse = await fetch(CLAUDE_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 8192,
+        system: STRUCTURING_SYSTEM_PROMPT,
+        messages: [{role: 'user', content: JSON.stringify(lines)}],
+      }),
+    });
+  } catch {
+    return {ok: false, error: 'Structuring service unavailable'};
+  }
+
+  if (!claudeResponse.ok) {
+    console.error(
+      'Claude structuring error:',
+      claudeResponse.status,
+      await claudeResponse.text(),
+    );
+    return {ok: false, error: 'Structuring service error'};
+  }
+
+  const claudeData = await claudeResponse.json();
+  const text: string | undefined = claudeData.content?.[0]?.text;
+
+  if (!text) {
+    return {ok: false, error: 'No response from structuring service'};
+  }
+
+  const jsonString = text
+    .trim()
+    .replace(/^```(?:json)?\s*\n?/, '')
+    .replace(/\n?```\s*$/, '');
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonString);
+  } catch {
+    console.error('Failed to parse structuring response:', jsonString);
+    return {ok: false, error: 'Failed to parse structuring response'};
+  }
+
+  if (!Array.isArray(parsed)) {
+    return {ok: false, error: 'Structuring response is not an array'};
+  }
+
+  if (parsed.length !== lines.length) {
+    console.error(
+      `Structuring length mismatch: expected ${lines.length}, got ${parsed.length}`,
+    );
+    return {ok: false, error: 'Structuring response length mismatch'};
+  }
+
+  return {ok: true, data: parsed as StructuredIngredient[]};
+}
+
 export async function callClaudeApi(
   apiKey: string,
   systemPrompt: string,

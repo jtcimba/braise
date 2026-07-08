@@ -17,3 +17,15 @@ export interface Recipe {
   modified_at?: string;
   viewed_at?: string;
 }
+
+export interface RecipeIngredient {
+  id: string;
+  recipe_id: number;
+  display_text: string;
+  base_name: string;
+  prep: string | null;
+  quantity: string | null;
+  unit: string | null;
+  sort_order: number;
+  created_at?: string;
+}

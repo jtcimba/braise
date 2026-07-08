@@ -14,12 +14,18 @@ import {Theme} from '../../theme/types';
 import {useHeaderHeight} from '@react-navigation/elements';
 import CustomToggle from './CustomToggle';
 import {parseIngredient, scaleIngredients} from '../services';
-
 import {useGroceryListModal} from '../context/GroceryListModalContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
+import {RecipeIngredient} from '../models';
 
-export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
+export default function RecipeViewer({
+  data,
+  structuredIngredients = [],
+}: {
+  data: any;
+  structuredIngredients?: RecipeIngredient[];
+}) {
   const theme = useTheme() as unknown as Theme;
   const {showModal} = useGroceryListModal();
   const [tab, setTab] = useState('ingredients');
@@ -37,10 +43,6 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
 
     setCurrentServings(newServings);
     setScaledIngredients(newScaledIngredients);
-
-    if (onScaledIngredientsChange) {
-      onScaledIngredientsChange(newScaledIngredients);
-    }
   };
 
   const handleDecreaseServings = () => {
@@ -58,14 +60,8 @@ export default function RecipeViewer({data, onScaledIngredientsChange}: any) {
   const onAddToShoppingListPress = () => {
     const recipeInfo =
       data?.id && data?.title ? {id: data.id, title: data.title} : undefined;
-    showModal(scaledIngredients, recipeInfo);
+    showModal(structuredIngredients, recipeInfo);
   };
-
-  useEffect(() => {
-    if (onScaledIngredientsChange) {
-      onScaledIngredientsChange(scaledIngredients);
-    }
-  }, [scaledIngredients, onScaledIngredientsChange]);
 
   useEffect(() => {
     if (data.ingredients) {

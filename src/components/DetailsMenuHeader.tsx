@@ -1,25 +1,24 @@
 import React from 'react';
 import {useRoute} from '@react-navigation/native';
 import DetailsMenu from './DetailsMenu';
+import {RecipeIngredient} from '../models';
 
 interface DetailsMenuHeaderProps {
   navigation: any;
-  scaledIngredients?: string;
+  structuredIngredients?: RecipeIngredient[];
 }
 
 export default function DetailsMenuHeader({
   navigation,
-  scaledIngredients,
+  structuredIngredients = [],
 }: DetailsMenuHeaderProps) {
   const route = useRoute();
-  const ingredients =
-    scaledIngredients || (route.params as any)?.item?.ingredients || '';
   const routeData = (route.params as any)?.item || {};
 
   return (
     <DetailsMenu
       navigation={navigation}
-      ingredients={ingredients}
+      structuredIngredients={structuredIngredients}
       routeData={routeData}
     />
   );

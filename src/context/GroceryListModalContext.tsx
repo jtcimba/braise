@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useState, ReactNode} from 'react';
+import {RecipeIngredient} from '../models';
 
 export interface RecipeInfo {
   id: string;
@@ -7,9 +8,9 @@ export interface RecipeInfo {
 
 interface GroceryListModalContextType {
   isVisible: boolean;
-  ingredients: string;
+  structuredIngredients: RecipeIngredient[];
   recipe: RecipeInfo | null;
-  showModal: (ingredients: string, recipe?: RecipeInfo) => void;
+  showModal: (ingredients: RecipeIngredient[], recipe?: RecipeInfo) => void;
   hideModal: () => void;
 }
 
@@ -25,11 +26,16 @@ export function GroceryListModalProvider({
   children,
 }: GroceryListModalProviderProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [ingredients, setIngredients] = useState('');
+  const [structuredIngredients, setStructuredIngredients] = useState<
+    RecipeIngredient[]
+  >([]);
   const [recipe, setRecipe] = useState<RecipeInfo | null>(null);
 
-  const showModal = (ingredientsToShow: string, recipeInfo?: RecipeInfo) => {
-    setIngredients(ingredientsToShow);
+  const showModal = (
+    ingredients: RecipeIngredient[],
+    recipeInfo?: RecipeInfo,
+  ) => {
+    setStructuredIngredients(ingredients);
     setRecipe(recipeInfo ?? null);
     setIsVisible(true);
   };
@@ -42,7 +48,7 @@ export function GroceryListModalProvider({
     <GroceryListModalContext.Provider
       value={{
         isVisible,
-        ingredients,
+        structuredIngredients,
         recipe,
         showModal,
         hideModal,

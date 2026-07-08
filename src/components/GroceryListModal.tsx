@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useMemo} from 'react';
 import {
   View,
   Text,
@@ -13,17 +13,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {useGroceryListModal} from '../context/GroceryListModalContext';
-import {
-  parseIngredient,
-  combineAmounts,
-  categorizeIngredient,
-} from '../services';
+import {combineAmounts, categorizeIngredient} from '../services';
 import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
+import {RecipeIngredient} from '../models';
 
 interface Ingredient {
   id: string;
   name: string;
-  amount?: string;
+  amount: string;
 }
 
 interface GroceryItem {
@@ -38,11 +35,22 @@ interface GroceryItem {
 
 const STORAGE_KEY = 'grocery_list_items';
 
+function toGroceryIngredients(rows: RecipeIngredient[]): Ingredient[] {
+  return rows.map(row => ({
+    id: row.id,
+    name: row.base_name,
+    amount:
+      row.quantity && row.unit
+        ? `${row.quantity} ${row.unit}`
+        : row.quantity || '',
+  }));
+}
+
 export default function GroceryListModal() {
   const theme = useTheme() as unknown as Theme;
   const {
     isVisible: visible,
-    ingredients,
+    structuredIngredients,
     recipe,
     hideModal,
   } = useGroceryListModal();
@@ -51,32 +59,18 @@ export default function GroceryListModal() {
   );
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const parseIngredients = (ingredientsString: string): Ingredient[] => {
-    if (!ingredientsString) {
-      return [];
-    }
-
-    return ingredientsString
-      .split('\n')
-      .filter((ingredient: string) => ingredient.trim())
-      .map((ingredient: string, index: number) => {
-        const {quantity, unit, text} = parseIngredient(ingredient);
-        return {
-          id: `ingredient-${index}`,
-          name: text,
-          amount: quantity && unit ? `${quantity} ${unit}` : quantity || '',
-        };
-      });
-  };
-
-  const parsedIngredients = parseIngredients(ingredients);
+  const parsedIngredients = useMemo(
+    () => toGroceryIngredients(structuredIngredients),
+    [structuredIngredients],
+  );
 
   useEffect(() => {
-    if (visible && ingredients) {
-      const parsed = parseIngredients(ingredients);
-      setSelectedIngredients(new Set(parsed.map(ingredient => ingredient.id)));
+    if (visible && structuredIngredients.length > 0) {
+      setSelectedIngredients(
+        new Set(parsedIngredients.map(ingredient => ingredient.id)),
+      );
     }
-  }, [visible, ingredients]);
+  }, [visible, structuredIngredients, parsedIngredients]);
 
   const toggleIngredient = (id: string) => {
     setSelectedIngredients(prev => {
@@ -195,9 +189,9 @@ export default function GroceryListModal() {
         </View>
         <View style={styles(theme).ingredientText}>
           <Text style={styles(theme).ingredientName}>{item.name}</Text>
-          {item.amount && (
+          {item.amount ? (
             <Text style={styles(theme).ingredientAmount}>{item.amount}</Text>
-          )}
+          ) : null}
         </View>
       </View>
     </TouchableOpacity>
@@ -325,11 +319,6 @@ const styles = (theme: Theme) =>
     title: {
       ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
-    },
-    subtitle: {
-      ...theme.typography.b1,
-      color: theme.colors['toffee-400'],
-      marginBottom: 15,
     },
     ingredientsContainer: {
       marginBottom: 20,
