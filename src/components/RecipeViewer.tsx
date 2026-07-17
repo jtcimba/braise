@@ -231,6 +231,23 @@ export default function RecipeViewer({
                       </View>
                     );
                   })
+                ) : data.ingredients && !isLoadingIngredients ? (
+                  data.ingredients
+                    .split('\n')
+                    .filter((l: string) => l.trim())
+                    .map((line: string, index: number, arr: string[]) => (
+                      <View
+                        style={[
+                          styles(theme).ingredientLine,
+                          index !== arr.length - 1 &&
+                            styles(theme).ingredientDivider,
+                        ]}
+                        key={index}>
+                        <Text style={styles(theme).ingredientText}>
+                          {line.trim()}
+                        </Text>
+                      </View>
+                    ))
                 ) : isLoadingIngredients ? null : (
                   <View style={styles(theme).emptyStateContainer}>
                     <Text style={styles(theme).emptyStateText}>
