@@ -637,7 +637,7 @@
 				CODE_SIGN_ENTITLEMENTS = braise/braise.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5HK264ADU8;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = braise/Info.plist;
@@ -674,7 +674,7 @@
 				CODE_SIGN_ENTITLEMENTS = braise/braise.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 0;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5HK264ADU8;
 				INFOPLIST_FILE = braise/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
