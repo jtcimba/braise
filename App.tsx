@@ -38,9 +38,15 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Store Supabase credentials in App Group for share extension
-async function storeSupabaseCredentials(session: Session): Promise<boolean> {
+async function storeSupabaseCredentials(session: Session): Promise<void> {
+  try {
+    await Purchases.logIn(session.user.id);
+  } catch (error) {
+    console.error('Failed to log in to RevenueCat:', error);
+  }
+
   if (Platform.OS !== 'ios' || !AppGroupStorage) {
-    return false;
+    return;
   }
 
   try {
@@ -56,8 +62,6 @@ async function storeSupabaseCredentials(session: Session): Promise<boolean> {
         session.access_token,
       );
       await AppGroupStorage.setItem('supabaseUserId', session.user.id);
-      const {customerInfo} = await Purchases.logIn(session.user.id);
-      const isPro = !!customerInfo.entitlements.active.pro;
 
       // Store API URL if provided
       if (recipeImportAPIURL) {
@@ -65,12 +69,10 @@ async function storeSupabaseCredentials(session: Session): Promise<boolean> {
       }
 
       console.log('Stored Supabase credentials in App Group');
-      return isPro;
     }
   } catch (error) {
     console.error('Failed to store Supabase credentials:', error);
   }
-  return false;
 }
 
 function AddComponent() {
@@ -308,13 +310,13 @@ export default function App({}: AppProps): React.JSX.Element {
       handleResetPasswordUrl(url);
     });
 
-    supabase.auth.getSession().then(({data: {session}}) => {
+    supabase.auth.getSession().then(async ({data: {session}}) => {
       setAuthSession(session);
-      setIsLoadingSession(false);
       if (session) {
-        // Store Supabase credentials and auth token in App Group for share extension
-        storeSupabaseCredentials(session);
+        // Link RevenueCat to the user before rendering so isPro is accurate on first render
+        await storeSupabaseCredentials(session);
       }
+      setIsLoadingSession(false);
     });
     const {
       data: {subscription},

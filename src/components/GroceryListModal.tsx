@@ -40,9 +40,7 @@ function toGroceryIngredients(rows: RecipeIngredient[]): Ingredient[] {
     id: row.id,
     name: row.base_name,
     amount:
-      row.quantity && row.unit
-        ? `${row.quantity} ${row.unit}`
-        : row.quantity || '',
+      row.amount && row.unit ? `${row.amount} ${row.unit}` : row.amount || '',
   }));
 }
 
@@ -58,6 +56,7 @@ export default function GroceryListModal() {
     new Set(),
   );
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [shouldRender, setShouldRender] = useState(false);
 
   const parsedIngredients = useMemo(
     () => toGroceryIngredients(structuredIngredients),
@@ -199,6 +198,7 @@ export default function GroceryListModal() {
 
   useEffect(() => {
     if (visible) {
+      setShouldRender(true);
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 150,
@@ -209,11 +209,15 @@ export default function GroceryListModal() {
         toValue: 0,
         duration: 150,
         useNativeDriver: true,
-      }).start();
+      }).start(({finished}) => {
+        if (finished) {
+          setShouldRender(false);
+        }
+      });
     }
   }, [visible, fadeAnim]);
 
-  if (!visible) {
+  if (!shouldRender) {
     return null;
   }
 

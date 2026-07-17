@@ -32,6 +32,7 @@ export default function TotalTimePickerModal({
   const [selectedTime, setSelectedTime] = useState(currentTime || '-');
   const [selectedUnit, setSelectedUnit] = useState(currentUnit || '-');
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState(visible);
 
   const timeOptions = [
     '-',
@@ -41,6 +42,7 @@ export default function TotalTimePickerModal({
 
   useEffect(() => {
     if (visible) {
+      setModalVisible(true);
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 150,
@@ -51,7 +53,11 @@ export default function TotalTimePickerModal({
         toValue: 0,
         duration: 150,
         useNativeDriver: true,
-      }).start();
+      }).start(({finished}) => {
+        if (finished) {
+          setModalVisible(false);
+        }
+      });
     }
   }, [visible, fadeAnim]);
 
@@ -62,7 +68,7 @@ export default function TotalTimePickerModal({
 
   return (
     <Modal
-      visible={visible}
+      visible={modalVisible}
       transparent={true}
       animationType="none"
       onRequestClose={onClose}>

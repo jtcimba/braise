@@ -27,8 +27,36 @@ import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {useHeaderHeight} from '@react-navigation/elements';
 import {supabase} from '../supabase-client';
+import {RecipeIngredient} from '../models';
 
-export default function RecipeEditor({editingData, onChangeEditingData}: any) {
+const rawToRecipeIngredients = (raw: string): RecipeIngredient[] => {
+  if (!raw) {
+    return [];
+  }
+  return raw
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .map((line, i) => ({
+      id: `raw-${i}`,
+      recipe_id: 0,
+      name: line,
+      base_name: '',
+      amount: null,
+      unit: null,
+      sort_order: i,
+    }));
+};
+
+export default function RecipeEditor({
+  editingData,
+  onChangeEditingData,
+  structuredIngredients,
+}: {
+  editingData: any;
+  onChangeEditingData: any;
+  structuredIngredients: RecipeIngredient[];
+}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [totalTimeModalVisible, setTotalTimeModalVisible] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -172,6 +200,14 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
         ? editingData.categories.split(',').filter((cat: string) => cat.trim())
         : [],
     [editingData.categories],
+  );
+
+  const effectiveIngredients = useMemo(
+    () =>
+      structuredIngredients.length > 0
+        ? structuredIngredients
+        : rawToRecipeIngredients(editingData.ingredients || ''),
+    [structuredIngredients, editingData.ingredients],
   );
 
   const tablet = isTablet();
@@ -327,11 +363,11 @@ export default function RecipeEditor({editingData, onChangeEditingData}: any) {
               />
             </View>
             <IngredientEditor
-              ingredients={editingData.ingredients}
-              onChange={(value: string) =>
+              ingredients={effectiveIngredients}
+              onChange={rows =>
                 onChangeEditingData((prev: any) => ({
                   ...prev,
-                  ingredients: value,
+                  ingredientRows: rows,
                 }))
               }
               scrollViewRef={scrollViewRef}

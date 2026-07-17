@@ -13,9 +13,10 @@ const processNewlines = (recipe: any) => {
 };
 
 const processForSave = (recipe: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const {ingredientRows: _ingredientRows, ...rest} = recipe;
   return {
-    ...recipe,
-    ingredients: recipe.ingredients?.replace(/\\n$/, ''),
+    ...rest,
     total_time: recipe.total_time ? parseInt(recipe.total_time, 10) : null,
     servings: recipe.servings ? parseInt(recipe.servings, 10) : null,
   };
@@ -23,11 +24,10 @@ const processForSave = (recipe: any) => {
 
 const structureRecipeIngredients = async (
   recipeId: string,
-  ingredientsString: string,
+  rows: {amount: string; name: string}[],
 ): Promise<void> => {
-  const lines = (ingredientsString || '')
-    .split('\n')
-    .map((l: string) => l.trim())
+  const lines = rows
+    .map(r => [r.amount, r.name].filter(Boolean).join(' '))
     .filter(Boolean);
 
   try {
@@ -100,7 +100,7 @@ export const recipeService = {
 
       await structureRecipeIngredients(
         String(processedRecipe.id),
-        processedRecipe.ingredients || '',
+        recipe.ingredientRows || [],
       );
 
       return processedRecipe;
@@ -142,10 +142,12 @@ export const recipeService = {
       );
       await Storage.saveRecipesToLocal(updatedRecipes);
 
-      await structureRecipeIngredients(
-        String(processedRecipe.id),
-        processedRecipe.ingredients || '',
-      );
+      if (recipe.ingredientRows !== undefined) {
+        await structureRecipeIngredients(
+          String(processedRecipe.id),
+          recipe.ingredientRows,
+        );
+      }
 
       return processedRecipe;
     } catch (error: any) {
@@ -173,6 +175,32 @@ export const recipeService = {
     } catch (error: any) {
       console.error('Failed to update viewed_at:', error.message);
     }
+  },
+
+  async fetchRecipeWithIngredients(
+    recipeId: string,
+  ): Promise<{recipe: any; ingredients: RecipeIngredient[]}> {
+    const {data, error} = await supabase
+      .from('recipes')
+      .select(
+        '*, recipe_ingredients(id, name, base_name, amount, unit, sort_order)',
+      )
+      .eq('id', recipeId)
+      .order('sort_order', {
+        ascending: true,
+        referencedTable: 'recipe_ingredients',
+      })
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const {recipe_ingredients, ...recipe} = data;
+    return {
+      recipe: processNewlines(recipe),
+      ingredients: recipe_ingredients || [],
+    };
   },
 
   async fetchRecipeIngredients(recipeId: string): Promise<RecipeIngredient[]> {
