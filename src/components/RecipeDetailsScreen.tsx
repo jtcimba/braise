@@ -18,19 +18,37 @@ import DetailsMenuHeader from './DetailsMenuHeader';
 import {recipeService} from '../services';
 import {RecipeIngredient} from '../models';
 
+const withIngredientRows = (item: any) => {
+  if (item.ingredientRows?.length || !item.ingredients) {
+    return {...item};
+  }
+  const ingredientRows = item.ingredients
+    .split('\n')
+    .filter((l: string) => l.trim())
+    .map((line: string, i: number) => ({
+      id: `import-${i}`,
+      amount: '',
+      name: line.trim(),
+    }));
+  return {...item, ingredientRows};
+};
+
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
   const {setHandleSavePress, setHandleDeletePress} = useEditingHandler();
   const [data, onChangeData] = useState({...route.params.item});
   const [isLoading, setIsLoading] = useState(false);
-  const [editingData, onChangeEditingData] = useState({...route.params.item});
+  const [editingData, onChangeEditingData] = useState(
+    withIngredientRows({...route.params.item}),
+  );
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [structuredIngredients, setStructuredIngredients] = useState<
     RecipeIngredient[]
   >([]);
+  const [isLoadingIngredients, setIsLoadingIngredients] = useState(!!data.id);
   const autoSaveTriggeredRef = useRef(false);
-  const fadeAnim = useState(new Animated.Value(0))[0];
-  const scaleAnim = useState(new Animated.Value(0.8))[0];
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const theme = useTheme() as unknown as Theme;
 
   const showSavedMessageTemporarily = useCallback(() => {
@@ -70,16 +88,29 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
     });
   }, [fadeAnim, scaleAnim]);
 
-  const loadStructuredIngredients = useCallback(async (recipeId: string) => {
+  const loadRecipeData = useCallback(async (recipeId: string) => {
+    try {
+      const {recipe, ingredients} =
+        await recipeService.fetchRecipeWithIngredients(recipeId);
+      onChangeData(recipe);
+      setStructuredIngredients(ingredients);
+    } catch (e: any) {
+      console.error('Failed to load recipe data:', e.message);
+    } finally {
+      setIsLoadingIngredients(false);
+    }
+  }, []);
+
+  const refreshIngredients = useCallback(async (recipeId: string) => {
     const rows = await recipeService.fetchRecipeIngredients(recipeId);
     setStructuredIngredients(rows);
   }, []);
 
   useEffect(() => {
     if (data.id) {
-      loadStructuredIngredients(data.id);
+      loadRecipeData(data.id);
     }
-  }, [data.id, loadStructuredIngredients]);
+  }, [data.id, loadRecipeData]);
 
   const handleSavePress = useCallback(async () => {
     setIsLoading(true);
@@ -94,14 +125,14 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
       showSavedMessageTemporarily();
 
       if (savedRecipe.id) {
-        await loadStructuredIngredients(savedRecipe.id);
+        await refreshIngredients(savedRecipe.id);
       }
     } catch (e: any) {
       Alert.alert('Error', e.message || 'Failed to save recipe');
     } finally {
       setIsLoading(false);
     }
-  }, [editingData, showSavedMessageTemporarily, loadStructuredIngredients]);
+  }, [editingData, showSavedMessageTemporarily, refreshIngredients]);
 
   const handleDeletePress = useCallback(async () => {
     setIsLoading(true);
@@ -193,12 +224,14 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
         <RecipeViewer
           data={data}
           structuredIngredients={structuredIngredients}
+          isLoadingIngredients={isLoadingIngredients}
         />
       )}
       {viewMode !== 'view' && (
         <RecipeEditor
           editingData={editingData}
           onChangeEditingData={handleChangeEditData}
+          structuredIngredients={structuredIngredients}
         />
       )}
       {isLoading && (
@@ -206,17 +239,16 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
           <ActivityIndicator size="large" color={theme.colors.subtext} />
         </View>
       )}
-      {showSavedMessage && (
-        <Animated.View
-          style={[
-            styles(theme).savedMessageContainer,
-            {opacity: fadeAnim, transform: [{scale: scaleAnim}]},
-          ]}>
-          <View style={styles(theme).saveMessageBackground}>
-            <Text style={styles(theme).savedMessageText}>Recipe Saved!</Text>
-          </View>
-        </Animated.View>
-      )}
+      <Animated.View
+        pointerEvents={showSavedMessage ? 'box-none' : 'none'}
+        style={[
+          styles(theme).savedMessageContainer,
+          {opacity: fadeAnim, transform: [{scale: scaleAnim}]},
+        ]}>
+        <View style={styles(theme).saveMessageBackground}>
+          <Text style={styles(theme).savedMessageText}>Recipe Saved!</Text>
+        </View>
+      </Animated.View>
       <GroceryListModal />
     </View>
   );
@@ -250,13 +282,13 @@ const styles = (theme: any) =>
       height: '100%',
     },
     saveMessageBackground: {
-      backgroundColor: theme.colors.opaque,
+      backgroundColor: theme.colors['neutral-300'],
       borderRadius: 16,
     },
     savedMessageText: {
-      paddingHorizontal: 20,
-      paddingVertical: 40,
-      color: 'white',
-      fontSize: 16,
+      paddingHorizontal: 24,
+      paddingVertical: 16,
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
     },
   });

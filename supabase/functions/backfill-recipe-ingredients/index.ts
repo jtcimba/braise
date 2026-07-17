@@ -52,27 +52,6 @@ Deno.serve(async req => {
       auth: {autoRefreshToken: false, persistSession: false},
     });
 
-    const {data: structured, error: structuredError} = await adminClient
-      .from('recipe_ingredients')
-      .select('recipe_id');
-
-    if (structuredError) {
-      return new Response(
-        JSON.stringify({
-          error: 'fetch structured failed',
-          detail: structuredError.message,
-        }),
-        {
-          status: 500,
-          headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
-        },
-      );
-    }
-
-    const structuredIds = new Set(
-      (structured || []).map((r: {recipe_id: number}) => r.recipe_id),
-    );
-
     const {data: allRecipes, error: fetchError} = await adminClient
       .from('recipes')
       .select('id, ingredients');
@@ -90,18 +69,14 @@ Deno.serve(async req => {
       );
     }
 
-    const recipes = (allRecipes || []).filter(
-      (r: {id: number}) => !structuredIds.has(r.id),
-    );
-
     const results = {
-      total: recipes.length,
+      total: (allRecipes || []).length,
       succeeded: 0,
       failed: 0,
       failures: [] as {recipe_id: number; error: string}[],
     };
 
-    for (const recipe of recipes) {
+    for (const recipe of allRecipes || []) {
       if (!recipe.ingredients?.trim()) {
         results.succeeded++;
         continue;
@@ -140,13 +115,27 @@ Deno.serve(async req => {
 
       const rows = structureResult.data.map((item, i) => ({
         recipe_id: recipe.id,
-        display_text: item.display_text,
+        name: item.name,
         base_name: item.base_name,
-        prep: item.prep ?? null,
-        quantity: item.quantity ?? null,
+        amount: item.amount ?? null,
         unit: item.unit ?? null,
         sort_order: i,
       }));
+
+      // Delete existing rows before inserting updated ones
+      const {error: deleteError} = await adminClient
+        .from('recipe_ingredients')
+        .delete()
+        .eq('recipe_id', recipe.id);
+
+      if (deleteError) {
+        results.failed++;
+        results.failures.push({
+          recipe_id: recipe.id,
+          error: deleteError.message,
+        });
+        continue;
+      }
 
       const {error: insertError} = await adminClient
         .from('recipe_ingredients')

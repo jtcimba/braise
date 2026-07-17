@@ -131,10 +131,9 @@ Deno.serve(async req => {
 
   const rows = result.data.map((item, i) => ({
     recipe_id,
-    display_text: item.display_text,
+    name: item.name,
     base_name: item.base_name,
-    prep: item.prep ?? null,
-    quantity: item.quantity ?? null,
+    amount: item.amount ?? null,
     unit: item.unit ?? null,
     sort_order: i,
   }));

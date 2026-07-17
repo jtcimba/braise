@@ -29,6 +29,7 @@ export default function ServingsPickerModal({
   const theme = useTheme() as unknown as Theme;
   const [selectedServings, setSelectedServings] = useState(currentValue || '-');
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [modalVisible, setModalVisible] = useState(visible);
 
   const servingsOptions = [
     '-',
@@ -38,6 +39,7 @@ export default function ServingsPickerModal({
 
   useEffect(() => {
     if (visible) {
+      setModalVisible(true);
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 150,
@@ -48,7 +50,11 @@ export default function ServingsPickerModal({
         toValue: 0,
         duration: 150,
         useNativeDriver: true,
-      }).start();
+      }).start(({finished}) => {
+        if (finished) {
+          setModalVisible(false);
+        }
+      });
     }
   }, [visible, fadeAnim]);
 
@@ -59,7 +65,7 @@ export default function ServingsPickerModal({
 
   return (
     <Modal
-      visible={visible}
+      visible={modalVisible}
       transparent={true}
       animationType="none"
       onRequestClose={onClose}>

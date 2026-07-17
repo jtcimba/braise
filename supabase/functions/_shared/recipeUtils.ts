@@ -420,10 +420,9 @@ export type ClaudeCallResult =
   | {ok: false; status: 502; error: string};
 
 export interface StructuredIngredient {
-  display_text: string;
+  name: string;
   base_name: string;
-  prep: string | null;
-  quantity: string | null;
+  amount: string | null;
   unit: string | null;
 }
 
@@ -434,22 +433,16 @@ export type StructureIngredientsResult =
 const STRUCTURING_SYSTEM_PROMPT = `You are an ingredient structuring assistant. Given a JSON array of recipe ingredient lines, parse each line into structured fields.
 
 Return ONLY a JSON array of objects with these exact fields:
-- "display_text": string (the original ingredient line, preserved exactly)
-- "base_name": string (the purchasable product name a person would look for at a grocery store)
-- "prep": string or null (home preparation instruction — e.g. "diced", "minced", "sliced", "cubed"; null if none)
-- "quantity": string or null (the numeric quantity as a string, e.g. "2", "1/2", "3/4"; null if none)
-- "unit": string or null (the unit of measurement, e.g. "cup", "tsp", "lb", "clove"; null if none)
-
-Rules for base_name vs prep:
-- base_name: the name of the product as sold at a grocery store
-- prep: home preparation instructions (dice, chop, mince, slice, cube, cut, torn, chopped)
-- Packaging-form words (shredded, ground, powdered, crushed, dried, smoked, roasted) stay IN base_name because they describe how the product is manufactured or sold (e.g. "shredded cheese", "ground beef", "dried oregano", "powdered sugar", "crushed tomatoes")
+- "name": string (the ingredient description without the leading quantity and unit — keep all other text exactly as written, including prep instructions, qualifiers, and packaging descriptors; e.g. "garlic, minced", "salt to taste", "shredded parmesan", "potatoes, cut into cubes")
+- "base_name": string (the core purchasable product a person would search for at a grocery store — strip prep instructions and qualifiers like "to taste" or "for garnish", but keep packaging-form words that describe how the product is sold, e.g. "shredded parmesan", "ground beef", "dried oregano")
+- "amount": string or null (the numeric quantity as a string, e.g. "2", "1/2", "3/4"; null if none)
+- "unit": string or null (abbreviated unit of measurement, always singular, e.g. "tsp", "tbsp", "cup", "oz", "lb", "g", "ml", "clove", "can", "bunch", "pinch", "dash"; null if none)
 
 CRITICAL: Output array must have exactly the same number of elements as the input array, in the same order. Do not split, merge, skip, or reorder lines.
 
 Examples (given as input array → output array):
-Input: ["2 cups tomatoes, diced","1 tsp red pepper flakes","1 lb ground beef","3 potatoes, cut into cubes","1 cup shredded parmesan","2 cloves garlic, minced"]
-Output: [{"display_text":"2 cups tomatoes, diced","base_name":"tomatoes","prep":"diced","quantity":"2","unit":"cup"},{"display_text":"1 tsp red pepper flakes","base_name":"red pepper flakes","prep":null,"quantity":"1","unit":"tsp"},{"display_text":"1 lb ground beef","base_name":"ground beef","prep":null,"quantity":"1","unit":"lb"},{"display_text":"3 potatoes, cut into cubes","base_name":"potatoes","prep":"cubed","quantity":"3","unit":null},{"display_text":"1 cup shredded parmesan","base_name":"shredded parmesan","prep":null,"quantity":"1","unit":"cup"},{"display_text":"2 cloves garlic, minced","base_name":"garlic","prep":"minced","quantity":"2","unit":"clove"}]
+Input: ["2 cups tomatoes, diced","1 tsp red pepper flakes","1 lb ground beef","3 potatoes, cut into cubes","1 cup shredded parmesan","2 cloves garlic, minced","salt to taste"]
+Output: [{"name":"tomatoes, diced","base_name":"tomatoes","amount":"2","unit":"cup"},{"name":"red pepper flakes","base_name":"red pepper flakes","amount":"1","unit":"tsp"},{"name":"ground beef","base_name":"ground beef","amount":"1","unit":"lb"},{"name":"potatoes, cut into cubes","base_name":"potatoes","amount":"3","unit":null},{"name":"shredded parmesan","base_name":"shredded parmesan","amount":"1","unit":"cup"},{"name":"garlic, minced","base_name":"garlic","amount":"2","unit":"clove"},{"name":"salt to taste","base_name":"salt","amount":null,"unit":null}]
 
 Return ONLY the JSON array, no markdown, no explanation, no code fences.`;
 

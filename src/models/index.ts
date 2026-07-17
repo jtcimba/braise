@@ -21,10 +21,9 @@ export interface Recipe {
 export interface RecipeIngredient {
   id: string;
   recipe_id: number;
-  display_text: string;
+  name: string;
   base_name: string;
-  prep: string | null;
-  quantity: string | null;
+  amount: string | null;
   unit: string | null;
   sort_order: number;
   created_at?: string;

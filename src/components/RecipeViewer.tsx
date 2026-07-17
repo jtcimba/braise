@@ -13,48 +13,81 @@ import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {useHeaderHeight} from '@react-navigation/elements';
 import CustomToggle from './CustomToggle';
-import {parseIngredient, scaleIngredients} from '../services';
+import {scaleQuantity} from '../services';
 import {useGroceryListModal} from '../context/GroceryListModalContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
 import {RecipeIngredient} from '../models';
 
+const parseAmountNum = (amount: string | null): number => {
+  if (!amount) {
+    return 0;
+  }
+  if (amount.includes('/')) {
+    const [n, d] = amount.split('/');
+    return parseFloat(n) / parseFloat(d);
+  }
+  return parseFloat(amount) || 0;
+};
+
+const pluralizeUnit = (
+  unit: string | null,
+  amount: string | null,
+): string | null => {
+  if (!unit) {
+    return null;
+  }
+  const num = parseAmountNum(amount);
+  if (num <= 1) {
+    return unit;
+  }
+  const noPlural = new Set([
+    'tsp',
+    'tbsp',
+    'oz',
+    'fl oz',
+    'g',
+    'kg',
+    'ml',
+    'l',
+  ]);
+  if (noPlural.has(unit.toLowerCase()) || unit.endsWith('s')) {
+    return unit;
+  }
+  return unit + 's';
+};
+
 export default function RecipeViewer({
   data,
   structuredIngredients = [],
+  isLoadingIngredients = false,
 }: {
   data: any;
   structuredIngredients?: RecipeIngredient[];
+  isLoadingIngredients?: boolean;
 }) {
   const theme = useTheme() as unknown as Theme;
   const {showModal} = useGroceryListModal();
   const [tab, setTab] = useState('ingredients');
   const [currentServings, setCurrentServings] = useState(data.servings || '-');
-  const [scaledIngredients, setScaledIngredients] = useState(
-    data.ingredients || '',
-  );
 
-  const updateServings = (newServings: string) => {
-    const newScaledIngredients = scaleIngredients(
-      data.ingredients || '',
-      newServings,
-      data.servings != null ? data.servings.toString() : '1',
-    );
-
-    setCurrentServings(newServings);
-    setScaledIngredients(newScaledIngredients);
-  };
+  const originalServings =
+    data.servings != null ? parseFloat(data.servings.toString()) : 1;
+  const scaleFactor =
+    currentServings !== '-'
+      ? parseFloat(currentServings) / originalServings
+      : 1;
 
   const handleDecreaseServings = () => {
     const num = parseInt(currentServings, 10) || 1;
     if (num > 1) {
-      updateServings(String(num - 1));
+      setCurrentServings(String(num - 1));
     }
   };
 
   const handleIncreaseServings = () => {
     const num = parseInt(currentServings, 10) || 1;
-    updateServings(String(num + 1));
+    setCurrentServings(String(num + 1));
   };
 
   const onAddToShoppingListPress = () => {
@@ -62,32 +95,6 @@ export default function RecipeViewer({
       data?.id && data?.title ? {id: data.id, title: data.title} : undefined;
     showModal(structuredIngredients, recipeInfo);
   };
-
-  useEffect(() => {
-    if (data.ingredients) {
-      const originalServings =
-        data.servings != null && data.servings !== '-'
-          ? data.servings.toString()
-          : '1';
-      const servings =
-        currentServings &&
-        currentServings !== '-' &&
-        currentServings !== originalServings
-          ? currentServings
-          : originalServings;
-
-      if (servings !== originalServings) {
-        const newScaledIngredients = scaleIngredients(
-          data.ingredients,
-          servings,
-          originalServings,
-        );
-        setScaledIngredients(newScaledIngredients);
-      } else {
-        setScaledIngredients(data.ingredients);
-      }
-    }
-  }, [data.ingredients, data.servings, currentServings]);
 
   useEffect(() => {
     // Only update currentServings if data.servings changes to a non-null value
@@ -189,36 +196,42 @@ export default function RecipeViewer({
             </View>
             {tab === 'ingredients' && (
               <View style={styles(theme).ingredientsContainer}>
-                {scaledIngredients ? (
-                  scaledIngredients
-                    .split('\n')
-                    .map((ingredient: string, index: number, arr: string[]) => {
-                      const {quantity, unit, text} =
-                        parseIngredient(ingredient);
-                      return (
-                        <View
-                          style={[
-                            styles(theme).ingredientLine,
-                            index !== arr.length - 1 &&
-                              styles(theme).ingredientDivider,
-                          ]}
-                          key={index}>
-                          <View style={styles(theme).quantityContainer}>
-                            {quantity ? (
-                              <Text style={styles(theme).quantity}>
-                                {quantity} {unit}
-                              </Text>
-                            ) : (
-                              <View style={styles(theme).emptyQuantity} />
-                            )}
-                          </View>
+                {structuredIngredients.length > 0 ? (
+                  structuredIngredients.map((row, index) => {
+                    const scaledAmount =
+                      scaleFactor !== 1 && row.amount
+                        ? scaleQuantity(row.amount, scaleFactor)
+                        : row.amount;
+                    const displayUnit = pluralizeUnit(row.unit, scaledAmount);
+                    const amountDisplay = [scaledAmount, displayUnit]
+                      .filter(Boolean)
+                      .join(' ');
+                    return (
+                      <View
+                        style={[
+                          styles(theme).ingredientLine,
+                          index !== structuredIngredients.length - 1 &&
+                            styles(theme).ingredientDivider,
+                        ]}
+                        key={row.id}>
+                        <View style={styles(theme).quantityContainer}>
+                          {amountDisplay ? (
+                            <Text style={styles(theme).quantity}>
+                              {amountDisplay}
+                            </Text>
+                          ) : (
+                            <View style={styles(theme).emptyQuantity} />
+                          )}
+                        </View>
+                        <View style={styles(theme).ingredientNameContainer}>
                           <Text style={styles(theme).ingredientText}>
-                            {text}
+                            {row.name}
                           </Text>
                         </View>
-                      );
-                    })
-                ) : (
+                      </View>
+                    );
+                  })
+                ) : isLoadingIngredients ? null : (
                   <View style={styles(theme).emptyStateContainer}>
                     <Text style={styles(theme).emptyStateText}>
                       No ingredients found. Add them in edit mode or view the
@@ -257,22 +270,24 @@ export default function RecipeViewer({
                 </View>
               </>
             )}
-            <Pressable
-              style={({pressed}) => [
-                styles(theme).addToShoppingListButton,
-                pressed && {backgroundColor: theme.colors['yellow-400']},
-              ]}
-              onPress={onAddToShoppingListPress}>
-              <Ionicons
-                name="list-outline"
-                size={20}
-                color={theme.colors['neutral-100']}
-                style={styles(theme).addToShoppingListIcon}
-              />
-              <Text style={styles(theme).addToShoppingListText}>
-                Add to grocery list
-              </Text>
-            </Pressable>
+            {!isLoadingIngredients && (
+              <Pressable
+                style={({pressed}) => [
+                  styles(theme).addToShoppingListButton,
+                  pressed && {backgroundColor: theme.colors['yellow-400']},
+                ]}
+                onPress={onAddToShoppingListPress}>
+                <Ionicons
+                  name="list-outline"
+                  size={20}
+                  color={theme.colors['neutral-100']}
+                  style={styles(theme).addToShoppingListIcon}
+                />
+                <Text style={styles(theme).addToShoppingListText}>
+                  Add to grocery list
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -354,7 +369,7 @@ const styles = (theme: any) =>
       borderBottomColor: theme.colors['neutral-300'],
     },
     quantityContainer: {
-      width: 80,
+      flex: 1,
       alignItems: 'flex-end',
       paddingRight: 15,
     },
@@ -367,12 +382,12 @@ const styles = (theme: any) =>
       width: 1,
       height: 24,
     },
+    ingredientNameContainer: {
+      flex: 2,
+    },
     ingredientText: {
       ...theme.typography.b1,
-      flex: 1,
       color: theme.colors['neutral-800'],
-      textAlign: 'left',
-      marginLeft: 0,
     },
     lineContainer: {
       flex: 1,

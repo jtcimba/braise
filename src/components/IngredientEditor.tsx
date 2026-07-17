@@ -8,46 +8,35 @@ import DraggableFlatList, {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
-import {parseIngredient} from '../services/unitService';
+import {RecipeIngredient} from '../models';
 
 type IngredientRow = {
   id: string;
   amount: string;
-  text: string;
+  name: string;
 };
 
-const parseRows = (ingredients: string): IngredientRow[] => {
-  if (!ingredients?.trim()) {
-    return [];
-  }
-  return ingredients
-    .split('\n')
-    .filter(l => l.trim())
-    .map((line, i) => {
-      const {quantity, unit, text} = parseIngredient(line);
-      return {
-        id: String(i),
-        amount: [quantity, unit].filter(Boolean).join(' '),
-        text,
-      };
-    });
-};
-
-const serializeRows = (rows: IngredientRow[]): string =>
-  rows.map(r => [r.amount, r.text].filter(Boolean).join(' ')).join('\n');
+const fromRecipeIngredients = (
+  ingredients: RecipeIngredient[],
+): IngredientRow[] =>
+  ingredients.map(r => ({
+    id: r.id,
+    amount: [r.amount, r.unit].filter(Boolean).join(' '),
+    name: r.name,
+  }));
 
 export default function IngredientEditor({
   ingredients,
   onChange,
   scrollViewRef,
 }: {
-  ingredients: string;
-  onChange: (value: string) => void;
+  ingredients: RecipeIngredient[];
+  onChange: (rows: IngredientRow[]) => void;
   scrollViewRef?: React.RefObject<ScrollView>;
 }) {
   const theme = useTheme() as unknown as Theme;
 
-  const initialRows = parseRows(ingredients);
+  const initialRows = fromRecipeIngredients(ingredients);
   const [rows, setRows] = useState<IngredientRow[]>(initialRows);
   const nextId = useRef(initialRows.length);
   const amountRefs = useRef<Map<string, TextInput | null>>(new Map());
@@ -56,7 +45,7 @@ export default function IngredientEditor({
   const commit = useCallback(
     (newRows: IngredientRow[]) => {
       setRows(newRows);
-      onChange(serializeRows(newRows));
+      onChange(newRows);
     },
     [onChange],
   );
@@ -79,14 +68,14 @@ export default function IngredientEditor({
 
   const addRow = useCallback(() => {
     const id = String(Date.now()) + String(nextId.current++);
-    const newRows = [...rows, {id, amount: '', text: ''}];
+    const newRows = [...rows, {id, amount: '', name: ''}];
     commit(newRows);
     // Defer focus until after the new row has mounted
     setTimeout(() => amountRefs.current.get(id)?.focus(), 50);
   }, [rows, commit]);
 
   const focusNext = useCallback(
-    (id: string, field: 'amount' | 'text') => {
+    (id: string, field: 'amount' | 'name') => {
       if (field === 'amount') {
         textRefs.current.get(id)?.focus();
       } else {
@@ -104,6 +93,7 @@ export default function IngredientEditor({
   const renderItem = useCallback(
     ({item, drag, isActive, getIndex}: RenderItemParams<IngredientRow>) => {
       const isLast = (getIndex() ?? 0) === rows.length - 1;
+      const isRaw = item.id.startsWith('raw-');
       return (
         <ScaleDecorator>
           <View
@@ -122,29 +112,33 @@ export default function IngredientEditor({
                 color={theme.colors['neutral-300']}
               />
             </TouchableOpacity>
-            <TextInput
-              ref={ref => amountRefs.current.set(item.id, ref)}
-              style={styles(theme).amountInput}
-              value={item.amount}
-              placeholder="Amount"
-              placeholderTextColor={theme.colors['neutral-300']}
-              onChangeText={v => updateField(item.id, 'amount', v)}
-              returnKeyType="next"
-              onSubmitEditing={() => focusNext(item.id, 'amount')}
-              blurOnSubmit={false}
-            />
-            <View style={styles(theme).separator} />
+            {!isRaw && (
+              <>
+                <TextInput
+                  ref={ref => amountRefs.current.set(item.id, ref)}
+                  style={styles(theme).amountInput}
+                  value={item.amount}
+                  placeholder="Amount"
+                  placeholderTextColor={theme.colors['neutral-300']}
+                  onChangeText={v => updateField(item.id, 'amount', v)}
+                  returnKeyType="next"
+                  onSubmitEditing={() => focusNext(item.id, 'amount')}
+                  blurOnSubmit={false}
+                />
+                <View style={styles(theme).separator} />
+              </>
+            )}
             <TextInput
               ref={ref => textRefs.current.set(item.id, ref)}
               style={styles(theme).nameInput}
-              value={item.text}
+              value={item.name}
               placeholder="Ingredient"
               placeholderTextColor={theme.colors['neutral-300']}
               onChangeText={v => {
                 if (v.includes('\n')) {
-                  focusNext(item.id, 'text');
+                  focusNext(item.id, 'name');
                 } else {
-                  updateField(item.id, 'text', v);
+                  updateField(item.id, 'name', v);
                 }
               }}
               multiline
