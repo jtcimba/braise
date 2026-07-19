@@ -69,16 +69,62 @@ class ShareViewController: UIViewController {
     private func finishWithResult(success: Bool) {
         showResultAnimation(success: success) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.completeRequest()
+                if success, let url = URL(string: "braise://import-complete") {
+                    self.extensionContext?.open(url) { _ in
+                        self.completeRequest()
+                    }
+                } else {
+                    self.completeRequest()
+                }
             }
         }
     }
 
     private func saveAndFinish(_ recipe: [String: Any]) {
-        saveRecipeToSupabase(recipe) { [weak self] success, _ in
-            guard let self = self else { return }
+        saveRecipeToSupabase(recipe) { success, savedRecipe in
+            if success, let savedRecipe = savedRecipe {
+                // Store as JSON Data — raw dict may contain NSNull values from Supabase
+                // which crash UserDefaults.set(_:forKey:)
+                if let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
+                   let jsonData = try? JSONSerialization.data(withJSONObject: savedRecipe) {
+                    sharedDefaults.set(jsonData, forKey: "importedRecipe")
+                    sharedDefaults.synchronize()
+                }
+                self.structureIngredients(
+                    recipeId: savedRecipe["id"],
+                    ingredients: recipe["ingredients"] as? String
+                )
+            }
             self.finishWithResult(success: success)
         }
+    }
+
+    private func structureIngredients(recipeId: Any?, ingredients: String?) {
+        guard let recipeId = recipeId,
+              let ingredients = ingredients, !ingredients.isEmpty,
+              let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
+              let accessToken = sharedDefaults.string(forKey: "supabaseAccessToken"),
+              let supabaseURL = sharedDefaults.string(forKey: "supabaseURL"),
+              let apiURL = URL(string: "\(supabaseURL)/functions/v1/structure-ingredients") else {
+            return
+        }
+
+        let lines = ingredients.split(separator: "\n")
+            .map(String.init)
+            .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
+        guard !lines.isEmpty else { return }
+
+        var request = URLRequest(url: apiURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        request.timeoutInterval = 30.0
+
+        let body: [String: Any] = ["recipe_id": recipeId, "ingredient_lines": lines]
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: body) else { return }
+        request.httpBody = jsonData
+
+        URLSession.shared.dataTask(with: request) { _, _, _ in }.resume()
     }
 
     // MARK: - HTML Extraction
@@ -156,8 +202,8 @@ class ShareViewController: UIViewController {
 
     private func fetchRecipeFromAPI(html: String, url: String?) {
         guard let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
-              let apiURLString = sharedDefaults.string(forKey: "recipeImportAPIURL"),
-              let apiURL = URL(string: apiURLString) else {
+              let supabaseURL = sharedDefaults.string(forKey: "supabaseURL"),
+              let apiURL = URL(string: "\(supabaseURL)/functions/v1/import-recipe") else {
             finishWithResult(success: false)
             return
         }
@@ -195,9 +241,9 @@ class ShareViewController: UIViewController {
         }.resume()
     }
 
-    private func saveRecipeToSupabase(_ recipe: [String: Any], completion: @escaping (Bool, String?) -> Void) {
+    private func saveRecipeToSupabase(_ recipe: [String: Any], completion: @escaping (Bool, [String: Any]?) -> Void) {
         guard let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe") else {
-            completion(false, "Failed to access App Group")
+            completion(false, nil)
             return
         }
 
@@ -205,7 +251,7 @@ class ShareViewController: UIViewController {
               let supabaseAnonKey = sharedDefaults.string(forKey: "supabaseAnonKey"),
               let accessToken = sharedDefaults.string(forKey: "supabaseAccessToken"),
               let userId = sharedDefaults.string(forKey: "supabaseUserId") else {
-            completion(false, "Missing Supabase credentials - app needs to store them in App Group")
+            completion(false, nil)
             return
         }
 
@@ -213,7 +259,7 @@ class ShareViewController: UIViewController {
         processedRecipe["user_id"] = userId
 
         guard let apiURL = URL(string: "\(supabaseURL)/rest/v1/recipes") else {
-            completion(false, "Invalid Supabase URL")
+            completion(false, nil)
             return
         }
 
@@ -227,37 +273,30 @@ class ShareViewController: UIViewController {
         request.timeoutInterval = 30.0
 
         guard let jsonData = try? JSONSerialization.data(withJSONObject: processedRecipe) else {
-            completion(false, "Failed to encode recipe")
+            completion(false, nil)
             return
         }
 
         request.httpBody = jsonData
 
         URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(false, error.localizedDescription)
+            if error != nil {
+                completion(false, nil)
                 return
             }
 
             guard let httpResponse = response as? HTTPURLResponse else {
-                completion(false, "Invalid response")
+                completion(false, nil)
                 return
             }
 
             if (200..<300).contains(httpResponse.statusCode) {
-                completion(true, nil)
+                let savedRecipe = data
+                    .flatMap { try? JSONSerialization.jsonObject(with: $0) as? [[String: Any]] }
+                    .flatMap { $0.first }
+                completion(true, savedRecipe)
             } else {
-                let errorMessage: String
-                if let data = data, let errorJSON = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                   let message = errorJSON["message"] as? String {
-                    errorMessage = message
-                } else if let data = data, let errorString = String(data: data, encoding: .utf8) {
-                    errorMessage = errorString
-                } else {
-                    errorMessage = "HTTP \(httpResponse.statusCode)"
-                }
-
-                completion(false, errorMessage)
+                completion(false, nil)
             }
         }.resume()
     }

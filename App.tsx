@@ -28,7 +28,7 @@ import {Theme} from './theme/types';
 import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
-import {NativeModules, Platform} from 'react-native';
+import {NativeModules, Platform, DeviceEventEmitter} from 'react-native';
 import Purchases, {LOG_LEVEL} from 'react-native-purchases';
 import {useSubscription} from './src/hooks/useSubscription';
 import {isTablet, useHeaderStatusBarHeight} from './src/hooks/useTablet';
@@ -310,6 +310,15 @@ export default function App({}: AppProps): React.JSX.Element {
       handleResetPasswordUrl(url);
     });
 
+    const importSubscription = DeviceEventEmitter.addListener(
+      'ImportCompleted',
+      (recipe: any) => {
+        if (navigationRef.current?.isReady()) {
+          navigationRef.current.navigate('RecipeDetailsScreen', {item: recipe});
+        }
+      },
+    );
+
     supabase.auth.getSession().then(async ({data: {session}}) => {
       setAuthSession(session);
       if (session) {
@@ -336,6 +345,7 @@ export default function App({}: AppProps): React.JSX.Element {
     return () => {
       subscription.unsubscribe();
       linkingSubscription.remove();
+      importSubscription.remove();
     };
   }, []);
 

@@ -57,13 +57,16 @@
     // Read recipe from App Group UserDefaults
     NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.braise.recipe"];
     if (sharedDefaults) {
-      id recipeObj = [sharedDefaults objectForKey:@"importedRecipe"];
-      if (recipeObj) {
-        // Emit the event with the recipe
-        [self emitImportEvent:recipeObj retryCount:0];
-        // Clear the recipe from UserDefaults after reading
+      id stored = [sharedDefaults objectForKey:@"importedRecipe"];
+      if (stored) {
         [sharedDefaults removeObjectForKey:@"importedRecipe"];
         [sharedDefaults synchronize];
+        // Stored as JSON Data to handle null values from Supabase
+        NSData *data = [stored isKindOfClass:[NSData class]] ? stored : nil;
+        id recipeObj = data ? [NSJSONSerialization JSONObjectWithData:data options:0 error:nil] : stored;
+        if (recipeObj) {
+          [self emitImportEvent:recipeObj retryCount:0];
+        }
       }
     }
   }
