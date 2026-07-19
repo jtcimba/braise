@@ -81,11 +81,13 @@ class ShareViewController: UIViewController {
     }
 
     private func saveAndFinish(_ recipe: [String: Any]) {
-        saveRecipeToSupabase(recipe) { [weak self] success, savedRecipe in
-            guard let self = self else { return }
+        saveRecipeToSupabase(recipe) { success, savedRecipe in
             if success, let savedRecipe = savedRecipe {
-                if let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe") {
-                    sharedDefaults.set(savedRecipe, forKey: "importedRecipe")
+                // Store as JSON Data — raw dict may contain NSNull values from Supabase
+                // which crash UserDefaults.set(_:forKey:)
+                if let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
+                   let jsonData = try? JSONSerialization.data(withJSONObject: savedRecipe) {
+                    sharedDefaults.set(jsonData, forKey: "importedRecipe")
                     sharedDefaults.synchronize()
                 }
                 self.structureIngredients(
@@ -200,8 +202,8 @@ class ShareViewController: UIViewController {
 
     private func fetchRecipeFromAPI(html: String, url: String?) {
         guard let sharedDefaults = UserDefaults(suiteName: "group.com.braise.recipe"),
-              let apiURLString = sharedDefaults.string(forKey: "recipeImportAPIURL"),
-              let apiURL = URL(string: apiURLString) else {
+              let supabaseURL = sharedDefaults.string(forKey: "supabaseURL"),
+              let apiURL = URL(string: "\(supabaseURL)/functions/v1/import-recipe") else {
             finishWithResult(success: false)
             return
         }
@@ -257,7 +259,7 @@ class ShareViewController: UIViewController {
         processedRecipe["user_id"] = userId
 
         guard let apiURL = URL(string: "\(supabaseURL)/rest/v1/recipes") else {
-            completion(false, "Invalid Supabase URL")
+            completion(false, nil)
             return
         }
 
