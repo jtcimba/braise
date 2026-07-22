@@ -2,11 +2,13 @@ import React, {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useRef,
   useState,
   useMemo,
 } from 'react';
 import {
   Text,
+  TextInput,
   View,
   StyleSheet,
   FlatList,
@@ -14,7 +16,9 @@ import {
   RefreshControl,
   Alert,
   TouchableOpacity,
+  type TextInput as TextInputType,
 } from 'react-native';
+import Modal from 'react-native-modal';
 import {DrawerActions, useNavigation} from '@react-navigation/native';
 import ListItem from './ListItem';
 import Storage from '../storage';
@@ -22,6 +26,7 @@ import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import SearchAndFilters from './SearchAndFilters';
 import {recipeService} from '../services';
+import {collectionsService} from '../services/collectionsService';
 import HowItWorksModal from './HowItWorksModal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useCollections} from '../context/CollectionsContext';
@@ -31,6 +36,16 @@ const sortModes = [
   {key: 'modified_at', label: 'Last modified'},
   {key: 'created_at', label: 'Last added'},
 ];
+
+const getRecipeCategories = (recipe: any): string[] => {
+  if (typeof recipe.categories === 'string') {
+    return recipe.categories.split(',').map((cat: string) => cat.trim());
+  }
+  if (Array.isArray(recipe.categories)) {
+    return recipe.categories;
+  }
+  return [];
+};
 
 type RecipesScreenProps = {
   route?: {params?: {refresh?: boolean}};
@@ -44,10 +59,73 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [sortIndex, setSortIndex] = useState(0);
+  const [showCollectionOptions, setShowCollectionOptions] = useState(false);
+  const [collectionOptionsView, setCollectionOptionsView] = useState<
+    'menu' | 'rename'
+  >('menu');
+  const [renameValue, setRenameValue] = useState('');
+  const renameInputRef = useRef<TextInputType>(null);
   const theme = useTheme() as unknown as Theme;
-  const {activeCollection, setTotalRecipeCount} = useCollections();
+  const {
+    activeCollection,
+    setActiveCollection,
+    refreshCollections,
+    setTotalRecipeCount,
+  } = useCollections();
 
-  const toggleSort = () => setSortIndex(i => (i + 1) % sortModes.length);
+  const toggleSort = useCallback(
+    () => setSortIndex(i => (i + 1) % sortModes.length),
+    [],
+  );
+
+  useEffect(() => {
+    if (collectionOptionsView === 'rename') {
+      setTimeout(() => renameInputRef.current?.focus(), 50);
+    }
+  }, [collectionOptionsView]);
+
+  const handleRename = useCallback(
+    async (name: string) => {
+      if (!activeCollection) {
+        return;
+      }
+      try {
+        await collectionsService.updateCollection(activeCollection.id, {name});
+        setActiveCollection({...activeCollection, name});
+        await refreshCollections();
+      } catch {
+        Alert.alert('Error', 'Failed to rename collection.');
+      }
+    },
+    [activeCollection, setActiveCollection, refreshCollections],
+  );
+
+  const handleDeleteCollection = useCallback(() => {
+    setShowCollectionOptions(false);
+    if (!activeCollection) {
+      return;
+    }
+    Alert.alert(
+      `Delete "${activeCollection.name}"?`,
+      'Recipes stay in your library — only the collection is removed.',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await collectionsService.deleteCollection(activeCollection.id);
+              setActiveCollection(null);
+              await refreshCollections();
+            } catch {
+              Alert.alert('Error', 'Failed to delete collection.');
+            }
+          },
+        },
+      ],
+    );
+  }, [activeCollection, setActiveCollection, refreshCollections]);
 
   useLayoutEffect(() => {
     const openDrawer = () => navigation.dispatch(DrawerActions.openDrawer());
@@ -66,25 +144,32 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
           <Text style={styles(theme).headerTitle}>{title}</Text>
         </TouchableOpacity>
       ),
+      headerRight: activeCollection
+        ? () => (
+            <TouchableOpacity
+              onPress={() => setShowCollectionOptions(true)}
+              style={styles(theme).headerRightButton}
+              activeOpacity={0.7}>
+              <Ionicons
+                name="ellipsis-horizontal"
+                size={22}
+                color={theme.colors['neutral-800']}
+              />
+            </TouchableOpacity>
+          )
+        : () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Settings' as never)}
+              activeOpacity={0.7}>
+              <Ionicons
+                name="settings-outline"
+                size={24}
+                color={theme.colors['neutral-800']}
+              />
+            </TouchableOpacity>
+          ),
     });
   }, [navigation, activeCollection, theme]);
-
-  const getRecipeCategories = (recipe: any): string[] => {
-    if (typeof recipe.categories === 'string') {
-      return recipe.categories.split(',').map((cat: string) => cat.trim());
-    }
-    if (Array.isArray(recipe.categories)) {
-      return recipe.categories;
-    }
-    return [];
-  };
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    fetchRecipes().then(() => {
-      setRefreshing(false);
-    });
-  };
 
   const fetchRecipes = useCallback(async () => {
     try {
@@ -96,6 +181,13 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       Alert.alert('Error', error.message || 'Failed to fetch recipes.');
     }
   }, [setTotalRecipeCount]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchRecipes().then(() => {
+      setRefreshing(false);
+    });
+  }, [fetchRecipes]);
 
   useEffect(() => {
     if (route?.params?.refresh) {
@@ -128,25 +220,28 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
     });
   }, [filteredData, sortIndex]);
 
-  const handleSearch = (query: string) => {
-    if (!query.trim()) {
-      setFilteredData(data);
-      return;
-    }
-    const q = query.toLowerCase();
-    const searchResults = data.filter(recipe => {
-      return [
-        recipe.title,
-        recipe.author,
-        recipe.about,
-        recipe.ingredients,
-        getRecipeCategories(recipe).join(' '),
-      ]
-        .filter(Boolean)
-        .some((field: string) => field.toLowerCase().includes(q));
-    });
-    setFilteredData(searchResults);
-  };
+  const handleSearch = useCallback(
+    (query: string) => {
+      if (!query.trim()) {
+        setFilteredData(data);
+        return;
+      }
+      const q = query.toLowerCase();
+      const searchResults = data.filter(recipe => {
+        return [
+          recipe.title,
+          recipe.author,
+          recipe.about,
+          recipe.ingredients,
+          getRecipeCategories(recipe).join(' '),
+        ]
+          .filter(Boolean)
+          .some((field: string) => field.toLowerCase().includes(q));
+      });
+      setFilteredData(searchResults);
+    },
+    [data],
+  );
 
   return (
     <View style={styles(theme).container}>
@@ -154,6 +249,107 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
         visible={showHowItWorks}
         onClose={() => setShowHowItWorks(false)}
       />
+      <Modal
+        isVisible={showCollectionOptions}
+        onBackdropPress={() => setShowCollectionOptions(false)}
+        onSwipeComplete={() => setShowCollectionOptions(false)}
+        onModalWillShow={() => setCollectionOptionsView('menu')}
+        swipeDirection={['down']}
+        style={styles(theme).modalOverlay}
+        avoidKeyboard>
+        <View style={styles(theme).modal}>
+          {collectionOptionsView === 'menu' ? (
+            <>
+              <View style={styles(theme).modalHeader}>
+                <Text style={styles(theme).modalTitle}>
+                  {activeCollection?.name}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setShowCollectionOptions(false)}>
+                  <Ionicons
+                    name="close-outline"
+                    size={25}
+                    color={theme.colors['neutral-800']}
+                  />
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={styles(theme).modalItem}
+                onPress={() => {
+                  setRenameValue(activeCollection?.name ?? '');
+                  setCollectionOptionsView('rename');
+                }}>
+                <Ionicons
+                  name="pencil"
+                  size={18}
+                  style={styles(theme).modalIcon}
+                />
+                <Text style={styles(theme).modalItemText}>Rename</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles(theme).modalItem}
+                onPress={handleDeleteCollection}>
+                <Ionicons
+                  name="trash-outline"
+                  size={18}
+                  style={styles(theme).modalIconDestructive}
+                />
+                <Text style={styles(theme).modalItemTextDestructive}>
+                  Delete collection
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <View style={styles(theme).modalHeader}>
+                <Text style={styles(theme).modalTitle}>Rename collection</Text>
+                <TouchableOpacity
+                  onPress={() => setCollectionOptionsView('menu')}>
+                  <Ionicons
+                    name="close-outline"
+                    size={25}
+                    color={theme.colors['neutral-800']}
+                  />
+                </TouchableOpacity>
+              </View>
+              <TextInput
+                ref={renameInputRef}
+                style={styles(theme).renameInput}
+                value={renameValue}
+                onChangeText={setRenameValue}
+                placeholder="Collection name"
+                placeholderTextColor={theme.colors['toffee-400']}
+                returnKeyType="done"
+                autoCapitalize="words"
+                selectTextOnFocus
+              />
+              <View style={styles(theme).renameButtons}>
+                <TouchableOpacity
+                  style={styles(theme).renameCancelButton}
+                  onPress={() => setCollectionOptionsView('menu')}
+                  activeOpacity={0.7}>
+                  <Text style={styles(theme).renameCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles(theme).renameSaveButton,
+                    !renameValue.trim() &&
+                      styles(theme).renameSaveButtonDisabled,
+                  ]}
+                  disabled={!renameValue.trim()}
+                  onPress={async () => {
+                    await handleRename(renameValue.trim());
+                    setShowCollectionOptions(false);
+                  }}
+                  activeOpacity={0.7}>
+                  <Text style={styles(theme).renameSaveText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+        </View>
+      </Modal>
+
       <SearchAndFilters
         onSearch={handleSearch}
         sortLabel={sortModes[sortIndex].label}
@@ -205,7 +401,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   );
 }
 
-const styles = (theme: any) =>
+const styles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -221,6 +417,55 @@ const styles = (theme: any) =>
       ...theme.typography.h1,
       color: theme.colors['neutral-800'],
       paddingTop: 3,
+    },
+    headerRightButton: {
+      paddingRight: 15,
+    },
+    modalOverlay: {
+      justifyContent: 'flex-end',
+      margin: 0,
+    },
+    modal: {
+      backgroundColor: theme.colors['neutral-100'],
+      borderRadius: 25,
+      paddingHorizontal: 25,
+      paddingTop: 10,
+      paddingBottom: 40,
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors['neutral-300'],
+      marginBottom: 4,
+    },
+    modalTitle: {
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
+    },
+    modalItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 10,
+      marginTop: 6,
+    },
+    modalIcon: {
+      marginRight: 15,
+      color: theme.colors['neutral-800'],
+    },
+    modalIconDestructive: {
+      marginRight: 15,
+      color: theme.colors.notification,
+    },
+    modalItemText: {
+      ...theme.typography.h2,
+      color: theme.colors['neutral-800'],
+    },
+    modalItemTextDestructive: {
+      ...theme.typography.h2,
+      color: theme.colors.notification,
     },
     noRecipes: {
       flex: 1,
@@ -251,5 +496,46 @@ const styles = (theme: any) =>
     howItWorksButtonText: {
       ...theme.typography['h2-emphasized'],
       color: theme.colors['toffee-400'],
+    },
+    renameInput: {
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      marginVertical: 16,
+      ...theme.typography.h2,
+      color: theme.colors['neutral-800'],
+    },
+    renameButtons: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    renameCancelButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      alignItems: 'center',
+    },
+    renameCancelText: {
+      ...theme.typography.h4,
+      color: theme.colors['toffee-400'],
+    },
+    renameSaveButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 8,
+      backgroundColor: theme.colors['neutral-800'],
+      alignItems: 'center',
+    },
+    renameSaveButtonDisabled: {
+      opacity: 0.4,
+    },
+    renameSaveText: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-100'],
+      fontWeight: '500',
     },
   });
