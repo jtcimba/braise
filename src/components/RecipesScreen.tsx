@@ -56,21 +56,14 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       headerLeft: () => (
         <TouchableOpacity
           onPress={openDrawer}
-          style={{paddingLeft: 15}}
+          style={styles(theme).hamburger}
           activeOpacity={0.7}>
           <Ionicons name="menu" size={24} color={theme.colors['neutral-800']} />
         </TouchableOpacity>
       ),
       headerTitle: () => (
         <TouchableOpacity onPress={openDrawer} activeOpacity={0.7}>
-          <Text
-            style={{
-              ...theme.typography.h1,
-              color: theme.colors['neutral-800'],
-              paddingTop: 3,
-            }}>
-            {title}
-          </Text>
+          <Text style={styles(theme).headerTitle}>{title}</Text>
         </TouchableOpacity>
       ),
     });
@@ -220,6 +213,14 @@ const styles = (theme: any) =>
     },
     listContentEmpty: {
       flexGrow: 1,
+    },
+    hamburger: {
+      paddingLeft: 15,
+    },
+    headerTitle: {
+      ...theme.typography.h1,
+      color: theme.colors['neutral-800'],
+      paddingTop: 3,
     },
     noRecipes: {
       flex: 1,

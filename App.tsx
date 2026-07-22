@@ -110,7 +110,6 @@ function TabNavigator({navigation}: {navigation: any}) {
     <>
       <Tab.Navigator
         screenOptions={({route}) => ({
-          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => {
             return (
               <TabBarIcon
@@ -178,7 +177,7 @@ function TabNavigator({navigation}: {navigation: any}) {
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
-      drawerContent={props => <CollectionsDrawer {...props} />}
+      drawerContent={CollectionsDrawer}
       screenOptions={{
         headerShown: false,
         drawerType: 'front',
@@ -229,7 +228,6 @@ function NavigationStack({
               paddingLeft: 15,
               marginBottom: 10,
             },
-            // eslint-disable-next-line react/no-unstable-nested-components
             headerRight: () => <DetailsMenuHeader navigation={nav} />,
             headerRightContainerStyle: {
               paddingRight: 20,
