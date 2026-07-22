@@ -1,5 +1,6 @@
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 import React, {useEffect, useRef, useState} from 'react';
 import {View, StyleSheet, Linking} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
@@ -19,7 +20,9 @@ import BackIcon from './src/components/BackIcon';
 import CloseIcon from './src/components/CloseIcon';
 import DetailsMenuHeader from './src/components/DetailsMenuHeader';
 import AddModal from './src/components/AddModal';
+import CollectionsDrawer from './src/components/CollectionsDrawer';
 import PaywallScreen from './src/components/PaywallScreen';
+import {CollectionsProvider} from './src/context/CollectionsContext';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ThemeProvider, useTheme, useAppearance} from './theme/ThemeProvider';
 import {LightTheme, DarkTheme} from './theme/theme';
@@ -36,6 +39,7 @@ import {isTablet, useHeaderStatusBarHeight} from './src/hooks/useTablet';
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 // Store Supabase credentials in App Group for share extension
 async function storeSupabaseCredentials(session: Session): Promise<void> {
@@ -106,7 +110,6 @@ function TabNavigator({navigation}: {navigation: any}) {
     <>
       <Tab.Navigator
         screenOptions={({route}) => ({
-          // eslint-disable-next-line react/no-unstable-nested-components
           tabBarIcon: ({color, size}) => {
             return (
               <TabBarIcon
@@ -139,10 +142,6 @@ function TabNavigator({navigation}: {navigation: any}) {
             headerRightContainerStyle: {paddingRight: 15},
             headerShadowVisible: false,
             headerStatusBarHeight,
-            headerTitleStyle: {
-              ...theme?.typography.h1,
-              color: theme.colors['neutral-800'],
-            },
           }}
         />
         <Tab.Screen
@@ -175,6 +174,21 @@ function TabNavigator({navigation}: {navigation: any}) {
   );
 }
 
+function DrawerNavigator() {
+  return (
+    <Drawer.Navigator
+      drawerContent={CollectionsDrawer}
+      screenOptions={{
+        headerShown: false,
+        drawerType: 'front',
+        overlayColor: 'rgba(0,0,0,0.3)',
+        drawerStyle: {width: 280},
+      }}>
+      <Drawer.Screen name="Main" component={TabNavigator} />
+    </Drawer.Navigator>
+  );
+}
+
 function NavigationStack({
   navigationRef,
   navigationReadyRef,
@@ -196,7 +210,7 @@ function NavigationStack({
       <Stack.Navigator>
         <Stack.Screen
           name="Home"
-          component={TabNavigator}
+          component={DrawerNavigator}
           options={{
             headerShown: false,
           }}
@@ -214,7 +228,6 @@ function NavigationStack({
               paddingLeft: 15,
               marginBottom: 10,
             },
-            // eslint-disable-next-line react/no-unstable-nested-components
             headerRight: () => <DetailsMenuHeader navigation={nav} />,
             headerRightContainerStyle: {
               paddingRight: 20,
@@ -357,10 +370,12 @@ export default function App({}: AppProps): React.JSX.Element {
             <LoadingScreen />
           ) : authSession?.user && !isRecoverySession ? (
             <GroceryListModalProvider>
-              <NavigationStack
-                navigationRef={navigationRef}
-                navigationReadyRef={navigationReadyRef}
-              />
+              <CollectionsProvider>
+                <NavigationStack
+                  navigationRef={navigationRef}
+                  navigationReadyRef={navigationReadyRef}
+                />
+              </CollectionsProvider>
             </GroceryListModalProvider>
           ) : (
             <Auth

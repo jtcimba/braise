@@ -1,4 +1,10 @@
-import React, {useCallback, useEffect, useState, useMemo} from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useMemo,
+} from 'react';
 import {
   Text,
   View,
@@ -9,14 +15,16 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {DrawerActions, useNavigation} from '@react-navigation/native';
 import ListItem from './ListItem';
 import Storage from '../storage';
 import {useTheme} from '../../theme/ThemeProvider';
+import {Theme} from '../../theme/types';
 import SearchAndFilters from './SearchAndFilters';
 import {recipeService} from '../services';
 import HowItWorksModal from './HowItWorksModal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useCollections} from '../context/CollectionsContext';
 
 const sortModes = [
   {key: 'viewed_at', label: 'Last viewed'},
@@ -36,9 +44,30 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [sortIndex, setSortIndex] = useState(0);
-  const theme = useTheme() as any;
+  const theme = useTheme() as unknown as Theme;
+  const {activeCollection, setTotalRecipeCount} = useCollections();
 
   const toggleSort = () => setSortIndex(i => (i + 1) % sortModes.length);
+
+  useLayoutEffect(() => {
+    const openDrawer = () => navigation.dispatch(DrawerActions.openDrawer());
+    const title = activeCollection?.name ?? 'All Recipes';
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={openDrawer}
+          style={styles(theme).hamburger}
+          activeOpacity={0.7}>
+          <Ionicons name="menu" size={24} color={theme.colors['neutral-800']} />
+        </TouchableOpacity>
+      ),
+      headerTitle: () => (
+        <TouchableOpacity onPress={openDrawer} activeOpacity={0.7}>
+          <Text style={styles(theme).headerTitle}>{title}</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, activeCollection, theme]);
 
   const getRecipeCategories = (recipe: any): string[] => {
     if (typeof recipe.categories === 'string') {
@@ -49,13 +78,6 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
     }
     return [];
   };
-
-  const categories = useMemo(() => {
-    if (!data.length) {
-      return [];
-    }
-    return [...new Set(data.flatMap(getRecipeCategories).filter(Boolean))];
-  }, [data]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -69,10 +91,11 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       const recipes = await recipeService.fetchRecipes();
       setData(recipes);
       setFilteredData(recipes);
+      setTotalRecipeCount(recipes.length);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to fetch recipes.');
     }
-  }, []);
+  }, [setTotalRecipeCount]);
 
   useEffect(() => {
     if (route?.params?.refresh) {
@@ -86,6 +109,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       if (localRecipes.length > 0) {
         setData(localRecipes);
         setFilteredData(localRecipes);
+        setTotalRecipeCount(localRecipes.length);
         setLoading(false);
       } else {
         fetchRecipes().then(() => {
@@ -93,7 +117,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
         });
       }
     });
-  }, [fetchRecipes, route]);
+  }, [fetchRecipes, route, setTotalRecipeCount]);
 
   const sortedData = useMemo(() => {
     const key = sortModes[sortIndex].key;
@@ -124,34 +148,6 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
     setFilteredData(searchResults);
   };
 
-  const handleFiltersChange = (filters: string[]) => {
-    if (filters.length === 0) {
-      setFilteredData(data);
-      return;
-    }
-    const filteredResults = data.filter(recipe =>
-      filters.some(filter => getRecipeCategories(recipe).includes(filter)),
-    );
-    setFilteredData(filteredResults);
-  };
-
-  const listHeader = (
-    <View style={styles(theme).listHeader}>
-      <TouchableOpacity onPress={toggleSort} activeOpacity={0.5}>
-        <View style={styles(theme).listHeaderSort}>
-          <Text style={styles(theme).listHeaderSortLabel}>
-            {sortModes[sortIndex].label}
-          </Text>
-          <Ionicons
-            name="swap-vertical"
-            size={14}
-            color={theme.colors['toffee-400']}
-          />
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
-
   return (
     <View style={styles(theme).container}>
       <HowItWorksModal
@@ -160,14 +156,13 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
       />
       <SearchAndFilters
         onSearch={handleSearch}
-        onFiltersChange={handleFiltersChange}
-        filterOptions={categories}
+        sortLabel={sortModes[sortIndex].label}
+        onSortPress={toggleSort}
       />
       {isLoading ? (
         <ActivityIndicator />
       ) : (
         <FlatList
-          ListHeaderComponent={listHeader}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -219,25 +214,13 @@ const styles = (theme: any) =>
     listContentEmpty: {
       flexGrow: 1,
     },
-    listHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      paddingBottom: 8,
+    hamburger: {
+      paddingLeft: 15,
     },
-    listHeaderCount: {
-      ...theme.typography.h4,
-      color: theme.colors['toffee-400'],
-    },
-    listHeaderSort: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    listHeaderSortLabel: {
-      ...theme.typography.h4,
-      color: theme.colors['toffee-400'],
+    headerTitle: {
+      ...theme.typography.h1,
+      color: theme.colors['neutral-800'],
+      paddingTop: 3,
     },
     noRecipes: {
       flex: 1,

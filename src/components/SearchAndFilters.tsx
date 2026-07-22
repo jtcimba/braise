@@ -1,31 +1,29 @@
 import React, {useState} from 'react';
 import {
   View,
+  Text,
   TextInput,
   StyleSheet,
-  ScrollView,
   Keyboard,
   TouchableOpacity,
 } from 'react-native';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
-import FilterChip from './FilterChip';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface SearchAndFiltersProps {
   onSearch: (query: string) => void;
-  onFiltersChange: (filters: string[]) => void;
-  filterOptions: string[];
+  sortLabel: string;
+  onSortPress: () => void;
 }
 
 export default function SearchAndFilters({
   onSearch,
-  onFiltersChange,
-  filterOptions,
+  sortLabel,
+  onSortPress,
 }: SearchAndFiltersProps) {
   const theme = useTheme() as unknown as Theme;
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);
@@ -35,21 +33,6 @@ export default function SearchAndFilters({
   const clearSearch = () => {
     setSearchQuery('');
     onSearch('');
-  };
-
-  const toggleFilter = (filter: string) => {
-    const newFilters = selectedFilters.includes(filter)
-      ? selectedFilters.filter(f => f !== filter)
-      : [...selectedFilters, filter];
-    setSelectedFilters(newFilters);
-    onFiltersChange(newFilters);
-  };
-
-  const capitalizeFirstLetter = (text: string) => {
-    if (!text) {
-      return '';
-    }
-    return text.charAt(0).toUpperCase() + text.slice(1);
   };
 
   return (
@@ -77,21 +60,19 @@ export default function SearchAndFilters({
           </TouchableOpacity>
         )}
       </View>
-      {filterOptions.length > 0 && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles(theme).filtersContainer}>
-          {filterOptions.map(filter => (
-            <FilterChip
-              key={filter}
-              label={capitalizeFirstLetter(filter)}
-              selected={selectedFilters.includes(filter)}
-              onPress={() => toggleFilter(filter)}
-            />
-          ))}
-        </ScrollView>
-      )}
+      <View style={styles(theme).sortRow}>
+        <TouchableOpacity
+          onPress={onSortPress}
+          activeOpacity={0.5}
+          style={styles(theme).sortButton}>
+          <Text style={styles(theme).sortLabel}>{sortLabel}</Text>
+          <Ionicons
+            name="swap-vertical"
+            size={14}
+            color={theme.colors['toffee-400']}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -125,8 +106,18 @@ const styles = (theme: Theme) =>
       transform: [{translateY: -12}],
       padding: 2,
     },
-    filtersContainer: {
-      paddingHorizontal: 15,
-      marginBottom: 10,
+    sortRow: {
+      flexDirection: 'row',
+      paddingHorizontal: 20,
+      paddingBottom: 8,
+    },
+    sortButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    sortLabel: {
+      ...theme.typography.h4,
+      color: theme.colors['toffee-400'],
     },
   });
