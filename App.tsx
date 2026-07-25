@@ -27,6 +27,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {ThemeProvider, useTheme, useAppearance} from './theme/ThemeProvider';
 import {LightTheme, DarkTheme} from './theme/theme';
 import {GroceryListModalProvider} from './src/context/GroceryListModalContext';
+import {AddToCollectionModalProvider} from './src/context/AddToCollectionModalContext';
 import {Theme} from './theme/types';
 import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
@@ -223,14 +224,19 @@ function NavigationStack({
             headerShadowVisible: false,
             headerStatusBarHeight,
             headerTitle: () => null,
-            headerLeft: () => BackIcon(nav, 'RecipeDetailsScreen'),
+            headerLeft: () =>
+              BackIcon(
+                nav,
+                'RecipeDetailsScreen',
+                navTheme.colors['neutral-800'],
+              ),
             headerLeftContainerStyle: {
-              paddingLeft: 15,
+              paddingLeft: 5,
               marginBottom: 10,
             },
             headerRight: () => <DetailsMenuHeader navigation={nav} />,
             headerRightContainerStyle: {
-              paddingRight: 20,
+              paddingRight: 10,
               marginBottom: 10,
             },
           })}
@@ -370,12 +376,14 @@ export default function App({}: AppProps): React.JSX.Element {
             <LoadingScreen />
           ) : authSession?.user && !isRecoverySession ? (
             <GroceryListModalProvider>
-              <CollectionsProvider>
-                <NavigationStack
-                  navigationRef={navigationRef}
-                  navigationReadyRef={navigationReadyRef}
-                />
-              </CollectionsProvider>
+              <AddToCollectionModalProvider>
+                <CollectionsProvider>
+                  <NavigationStack
+                    navigationRef={navigationRef}
+                    navigationReadyRef={navigationReadyRef}
+                  />
+                </CollectionsProvider>
+              </AddToCollectionModalProvider>
             </GroceryListModalProvider>
           ) : (
             <Auth

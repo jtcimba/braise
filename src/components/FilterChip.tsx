@@ -39,7 +39,7 @@ const styles = (theme: Theme) =>
       borderColor: theme.colors['neutral-300'],
     },
     selectedChip: {
-      backgroundColor: theme.colors['green-400'],
+      backgroundColor: theme.colors['yellow-400'],
       borderColor: theme.colors['neutral-100'],
     },
     label: {

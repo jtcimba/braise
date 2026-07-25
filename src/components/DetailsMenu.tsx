@@ -14,6 +14,7 @@ import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
 import {useEditingHandler} from '../context/EditingHandlerContext';
 import {useGroceryListModal} from '../context/GroceryListModalContext';
+import {useAddToCollectionModal} from '../context/AddToCollectionModalContext';
 import {Theme} from '../../theme/types';
 import {useTheme} from '../../theme/ThemeProvider';
 import {RecipeIngredient} from '../models';
@@ -35,6 +36,7 @@ export default function DetailsMenu({
   const dispatch = useAppDispatch();
   const {handleSavePress, handleDeletePress} = useEditingHandler();
   const {showModal} = useGroceryListModal();
+  const {showModal: showAddToCollectionModal} = useAddToCollectionModal();
 
   const onEditPress = () => {
     setmodalVisible(false);
@@ -73,6 +75,13 @@ export default function DetailsMenu({
     dispatch(changeViewMode('view'));
   };
 
+  const onAddToCollectionPress = () => {
+    setmodalVisible(false);
+    if (routeData?.id) {
+      showAddToCollectionModal(routeData.id);
+    }
+  };
+
   const onAddToGroceryListPress = () => {
     setmodalVisible(false);
     const recipeInfo =
@@ -89,8 +98,8 @@ export default function DetailsMenu({
           <TouchableOpacity onPress={() => setmodalVisible(true)}>
             <Ionicons
               name="ellipsis-horizontal"
-              size={25}
-              color={theme.colors.text}
+              size={22}
+              color={theme.colors['neutral-800']}
             />
           </TouchableOpacity>
         </View>
@@ -140,6 +149,16 @@ export default function DetailsMenu({
             onPress={onAddToGroceryListPress}>
             <Ionicons name="list" size={18} style={styles(theme).icon} />
             <Text style={styles(theme).editText}>Add to grocery list</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles(theme).modalItem}
+            onPress={onAddToCollectionPress}>
+            <Ionicons
+              name="bookmark-outline"
+              size={18}
+              style={styles(theme).icon}
+            />
+            <Text style={styles(theme).editText}>Add to collection</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles(theme).modalItem}

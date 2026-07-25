@@ -12,6 +12,7 @@ import {useEditingHandler} from '../context/EditingHandlerContext';
 import RecipeViewer from './RecipeViewer';
 import RecipeEditor from './RecipeEditor';
 import GroceryListModal from './GroceryListModal';
+import AddToCollectionModal from './AddToCollectionModal';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import DetailsMenuHeader from './DetailsMenuHeader';
@@ -250,6 +251,7 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
         </View>
       </Animated.View>
       <GroceryListModal />
+      <AddToCollectionModal />
     </View>
   );
 }

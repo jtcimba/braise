@@ -173,14 +173,21 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
 
   const fetchRecipes = useCallback(async () => {
     try {
-      const recipes = await recipeService.fetchRecipes();
+      let recipes;
+      if (activeCollection) {
+        recipes = await collectionsService.fetchCollectionRecipes(
+          activeCollection.id,
+        );
+      } else {
+        recipes = await recipeService.fetchRecipes();
+        setTotalRecipeCount(recipes.length);
+      }
       setData(recipes);
       setFilteredData(recipes);
-      setTotalRecipeCount(recipes.length);
     } catch (error: any) {
       Alert.alert('Error', error.message || 'Failed to fetch recipes.');
     }
-  }, [setTotalRecipeCount]);
+  }, [setTotalRecipeCount, activeCollection]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -197,6 +204,10 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
 
   useEffect(() => {
     setLoading(true);
+    if (activeCollection) {
+      fetchRecipes().then(() => setLoading(false));
+      return;
+    }
     Storage.loadRecipesFromLocal().then(localRecipes => {
       if (localRecipes.length > 0) {
         setData(localRecipes);
@@ -209,7 +220,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
         });
       }
     });
-  }, [fetchRecipes, route, setTotalRecipeCount]);
+  }, [fetchRecipes, route, setTotalRecipeCount, activeCollection]);
 
   const sortedData = useMemo(() => {
     const key = sortModes[sortIndex].key;
@@ -378,20 +389,28 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
           ListEmptyComponent={
             !refreshing ? (
               <View style={styles(theme).noRecipes}>
-                <Text style={styles(theme).emptyTitle}>
-                  Your recipe library is empty
-                </Text>
-                <Text style={styles(theme).emptyMessage}>
-                  Add recipes from the web using your browser's share sheet—it
-                  only takes a few taps.
-                </Text>
-                <TouchableOpacity
-                  style={styles(theme).howItWorksButton}
-                  onPress={() => setShowHowItWorks(true)}>
-                  <Text style={styles(theme).howItWorksButtonText}>
-                    How it works
+                {activeCollection ? (
+                  <Text style={styles(theme).emptyTitle}>
+                    No recipes in this collection yet.
                   </Text>
-                </TouchableOpacity>
+                ) : (
+                  <>
+                    <Text style={styles(theme).emptyTitle}>
+                      Your recipe library is empty
+                    </Text>
+                    <Text style={styles(theme).emptyMessage}>
+                      Add recipes from the web using your browser's share
+                      sheet—it only takes a few taps.
+                    </Text>
+                    <TouchableOpacity
+                      style={styles(theme).howItWorksButton}
+                      onPress={() => setShowHowItWorks(true)}>
+                      <Text style={styles(theme).howItWorksButtonText}>
+                        How it works
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
               </View>
             ) : null
           }

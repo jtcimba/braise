@@ -149,7 +149,7 @@ const styles = (theme: Theme) =>
     cancelButton: {
       flex: 1,
       paddingVertical: 12,
-      borderRadius: 8,
+      borderRadius: 25,
       borderWidth: 1,
       borderColor: theme.colors['neutral-300'],
       alignItems: 'center',
@@ -161,7 +161,7 @@ const styles = (theme: Theme) =>
     confirmButton: {
       flex: 1,
       paddingVertical: 12,
-      borderRadius: 8,
+      borderRadius: 25,
       backgroundColor: theme.colors['neutral-800'],
       alignItems: 'center',
     },
