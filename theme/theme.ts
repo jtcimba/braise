@@ -7,7 +7,7 @@ import {TextStyle} from 'react-native';
 export const typography = {
   h1: {
     fontFamily: 'TAYTommyTokyoRegular',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '400',
   } as TextStyle,
   h2: {
@@ -41,14 +41,13 @@ export const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    'neutral-100': '#F9F3E8',
-    'neutral-300': '#D9D2C7',
-    'toffee-400': '#826B64',
-    'neutral-800': '#322924',
-    'yellow-400': '#F5C27C',
-    'green-400': '#4FA863',
-    background: '#F9F3E8',
-    card: '#F9F3E8',
+    'neutral-100': 'rgb(255, 253, 246)',
+    'neutral-300': 'rgb(218, 218, 218)',
+    'toffee-400': 'rgb(154, 150, 149)',
+    'neutral-800': 'rgb(21, 21, 21)',
+    'yellow-400': 'rgb(249, 197, 83)',
+    background: 'rgb(255, 253, 246)',
+    card: 'rgb(255, 253, 246)',
   },
   typography,
 };
@@ -57,14 +56,13 @@ export const DarkTheme = {
   ...NavDarkTheme,
   colors: {
     ...NavDarkTheme.colors,
-    'neutral-100': '#131110',
-    'neutral-300': '#3D3630',
-    'toffee-400': '#9E8880',
-    'neutral-800': '#F0E9DF',
-    'yellow-400': '#F9D070',
-    'green-400': '#F9D070',
-    background: '#131110',
-    card: '#131110',
+    'neutral-100': 'rgb(21, 21, 21)',
+    'neutral-300': 'rgb(39, 39, 38)',
+    'toffee-400': 'rgb(154, 150, 149)',
+    'neutral-800': 'rgb(255, 253, 246)',
+    'yellow-400': 'rgb(249, 197, 83)',
+    background: 'rgb(21, 21, 21)',
+    card: 'rgb(21, 21, 21)',
   },
   typography,
 };

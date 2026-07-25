@@ -353,7 +353,7 @@ export default function Auth({
           <Text
             style={[
               styles(theme).linkText,
-              {color: theme.colors['green-400']},
+              {color: theme.colors['yellow-400']},
             ]}>
             Sign Up
           </Text>
@@ -473,7 +473,7 @@ export default function Auth({
           <Text
             style={[
               styles(theme).linkText,
-              {color: theme.colors['green-400']},
+              {color: theme.colors['yellow-400']},
             ]}>
             Sign In
           </Text>
@@ -567,7 +567,7 @@ export default function Auth({
               <Text
                 style={[
                   styles(theme).linkText,
-                  {color: theme.colors['green-400']},
+                  {color: theme.colors['yellow-400']},
                 ]}>
                 Back to Sign In
               </Text>

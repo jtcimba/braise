@@ -17,7 +17,7 @@ interface TabBarIconProps {
 }
 
 const TabBarIcon = forwardRef<any, TabBarIconProps>(
-  ({name, color = '#909090', size = 22, onPressFunction}, ref) => {
+  ({name, color = '#909090', size = 16, onPressFunction}, ref) => {
     const scale = useRef(new Animated.Value(1)).current;
 
     const icons: {[key: string]: string} = {

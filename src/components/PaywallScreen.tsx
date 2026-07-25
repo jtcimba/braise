@@ -402,7 +402,7 @@ const styles = (theme: Theme, isDark: boolean) =>
     },
     trialBold: {
       ...theme.typography['h2-emphasized'],
-      color: isDark ? theme.colors['yellow-400'] : theme.colors['green-400'],
+      color: isDark ? theme.colors['yellow-400'] : theme.colors['yellow-400'],
     },
     plans: {
       gap: 12,
@@ -421,7 +421,7 @@ const styles = (theme: Theme, isDark: boolean) =>
     planCardSelected: {
       borderColor: isDark
         ? theme.colors['yellow-400']
-        : theme.colors['green-400'],
+        : theme.colors['yellow-400'],
       borderWidth: 2,
       backgroundColor: isDark
         ? 'rgba(249, 208, 112, 0.12)'
@@ -442,7 +442,7 @@ const styles = (theme: Theme, isDark: boolean) =>
     saveBadge: {
       backgroundColor: isDark
         ? theme.colors['yellow-400']
-        : theme.colors['green-400'],
+        : theme.colors['yellow-400'],
       paddingHorizontal: 8,
       paddingVertical: 3,
       borderRadius: 4,
@@ -481,7 +481,7 @@ const styles = (theme: Theme, isDark: boolean) =>
     ctaButton: {
       backgroundColor: isDark
         ? theme.colors['yellow-400']
-        : theme.colors['green-400'],
+        : theme.colors['yellow-400'],
       paddingVertical: 16,
       borderRadius: 25,
       alignItems: 'center',

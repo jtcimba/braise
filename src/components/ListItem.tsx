@@ -37,7 +37,7 @@ export default function Item({item, navigation, isFirst}: any) {
         {item.total_time && (
           <View style={styles(theme).timeContainer}>
             <Text style={styles(theme).time}>
-              {item.total_time} {item.total_time_unit.toUpperCase() || 'MIN'}
+              {item.total_time} {item.total_time_unit || 'min'}
             </Text>
           </View>
         )}
@@ -84,7 +84,7 @@ const styles = (theme: Theme) =>
     },
     time: {
       ...theme.typography.h4,
-      color: theme.colors['green-400'],
+      color: theme.colors['neutral-800'],
     },
     timeContainer: {
       alignSelf: 'flex-start',

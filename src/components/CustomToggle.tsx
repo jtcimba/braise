@@ -72,13 +72,13 @@ const styles = (theme: Theme) =>
       borderRadius: 22,
     },
     pillOptionSelected: {
-      backgroundColor: theme.colors['green-400'],
+      backgroundColor: theme.colors['yellow-400'],
     },
     pillText: {
-      ...theme.typography['h2-emphasized'],
+      ...theme.typography.h2,
     },
     pillTextSelected: {
-      color: theme.colors['neutral-100'],
+      color: theme.colors['neutral-800'],
       fontWeight: '600',
     },
     pillTextUnselected: {

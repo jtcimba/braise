@@ -15,9 +15,11 @@ import {useHeaderHeight} from '@react-navigation/elements';
 import CustomToggle from './CustomToggle';
 import {scaleQuantity} from '../services';
 import {useGroceryListModal} from '../context/GroceryListModalContext';
+import {useAddToCollectionModal} from '../context/AddToCollectionModalContext';
+import {collectionsService} from '../services/collectionsService';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
-import {RecipeIngredient} from '../models';
+import {Collection, RecipeIngredient} from '../models';
 
 const parseAmountNum = (amount: string | null): number => {
   if (!amount) {
@@ -68,6 +70,11 @@ export default function RecipeViewer({
 }) {
   const theme = useTheme() as unknown as Theme;
   const {showModal} = useGroceryListModal();
+  const {
+    showModal: showAddToCollectionModal,
+    isVisible: isCollectionModalVisible,
+  } = useAddToCollectionModal();
+  const [recipeCollections, setRecipeCollections] = useState<Collection[]>([]);
   const [tab, setTab] = useState('ingredients');
   const [currentServings, setCurrentServings] = useState(data.servings || '-');
 
@@ -105,6 +112,16 @@ export default function RecipeViewer({
     // If data.servings is null, don't reset currentServings - allow user scaling to persist
   }, [data.servings]);
 
+  useEffect(() => {
+    if (!data.id) {
+      return;
+    }
+    collectionsService
+      .fetchRecipeCollections(data.id)
+      .then(setRecipeCollections)
+      .catch(() => {});
+  }, [data.id, isCollectionModalVisible]);
+
   const tablet = isTablet();
   const headerHeight = useHeaderHeight();
 
@@ -130,7 +147,6 @@ export default function RecipeViewer({
               <Text style={styles(theme).author}>{data.author}</Text>
             )}
           </View>
-          <View style={styles(theme).divider} />
           <View style={styles(theme).bodyContainer}>
             <View style={styles(theme).metadataCard}>
               <View style={styles(theme).detailsRow}>
@@ -173,17 +189,26 @@ export default function RecipeViewer({
             {data.about && (
               <Text style={styles(theme).aboutText}>{data.about}</Text>
             )}
-            {data.categories && (
+            {recipeCollections.length > 0 && (
               <View style={styles(theme).tagsRow}>
-                {data.categories.split(',').map((cat: string, idx: number) => {
-                  return (
-                    <View key={idx} style={styles(theme).tagPill}>
-                      <Text style={styles(theme).tagPillText}>
-                        {cat.trim().toLocaleLowerCase()}
-                      </Text>
-                    </View>
-                  );
-                })}
+                {recipeCollections.map(collection => (
+                  <View key={collection.id} style={styles(theme).tagPill}>
+                    <Text style={styles(theme).tagPillText}>
+                      {collection.name}
+                    </Text>
+                  </View>
+                ))}
+                <TouchableOpacity
+                  style={[styles(theme).tagPill, styles(theme).addPill]}
+                  onPress={() => data.id && showAddToCollectionModal(data.id)}
+                  activeOpacity={0.7}>
+                  <Ionicons
+                    name="add"
+                    size={13}
+                    color={theme.colors['toffee-400']}
+                  />
+                  <Text style={styles(theme).addPillText}>Add</Text>
+                </TouchableOpacity>
               </View>
             )}
             <View style={styles(theme).tabBarContainer}>
@@ -321,9 +346,9 @@ const styles = (theme: any) =>
     imageContainer: {
       position: 'relative',
       height: 260,
-      marginHorizontal: 20,
+      marginHorizontal: 10,
       marginBottom: 20,
-      borderRadius: 15,
+      borderRadius: 25,
       overflow: 'hidden',
     },
     image: {
@@ -339,10 +364,9 @@ const styles = (theme: any) =>
       justifyContent: 'center',
     },
     bodyContainer: {
-      paddingHorizontal: 20,
-      paddingTop: 10,
+      marginTop: 10,
+      paddingHorizontal: 15,
       paddingBottom: 20,
-      backgroundColor: theme.colors['neutral-100'],
     },
     tabletContentWrapper: {
       maxWidth: MAX_CONTENT_WIDTH,
@@ -363,7 +387,7 @@ const styles = (theme: any) =>
       color: theme.colors['neutral-800'],
     },
     author: {
-      marginTop: 4,
+      marginTop: 5,
       ...theme.typography.h2,
       color: theme.colors['toffee-400'],
     },
@@ -446,23 +470,35 @@ const styles = (theme: any) =>
       flexWrap: 'wrap',
     },
     tagPill: {
-      backgroundColor: theme.colors['neutral-300'],
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
       borderRadius: 15,
       paddingHorizontal: 10,
       paddingTop: 5,
-      paddingBottom: 7,
+      paddingBottom: 6,
       marginVertical: 5,
       marginRight: 5,
     },
     tagPillText: {
-      color: theme.colors['toffee-400'],
+      color: theme.colors['neutral-800'],
       ...theme.typography.h4,
     },
+    addPill: {
+      backgroundColor: 'transparent',
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    addPillText: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
+      marginLeft: 2,
+    },
     tabBarContainer: {
-      marginTop: 10,
+      marginTop: 5,
       marginBottom: 5,
-      borderTopWidth: 1,
-      borderTopColor: theme.colors['neutral-300'],
       paddingTop: 10,
       width: '100%',
     },
@@ -492,9 +528,8 @@ const styles = (theme: any) =>
       marginBottom: 10,
     },
     headerContainer: {
-      paddingHorizontal: 20,
-      paddingTop: 0,
-      paddingBottom: 14,
+      paddingHorizontal: 15,
+      paddingTop: 5,
     },
     divider: {
       borderBottomWidth: 1,
@@ -515,11 +550,11 @@ const styles = (theme: any) =>
     },
     metadataText: {
       ...theme.typography.h2,
-      color: theme.colors['toffee-400'],
+      color: theme.colors['neutral-800'],
       marginRight: 6,
     },
     metadataValue: {
-      ...theme.typography['h2-emphasized'],
+      ...theme.typography['h4-emphasized'],
       color: theme.colors['neutral-800'],
     },
     servingsToggleContainer: {
@@ -549,7 +584,7 @@ const styles = (theme: any) =>
       paddingHorizontal: 20,
       borderRadius: 24,
       marginTop: 24,
-      marginBottom: 20,
+      marginBottom: 10,
     },
     addToShoppingListIcon: {
       marginRight: 8,
