@@ -9,6 +9,8 @@ import {
   Alert,
   TextInput,
   Keyboard,
+  NativeModules,
+  Platform,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -24,8 +26,21 @@ import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useAppDispatch} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
-import {Recipe} from '../models/index';
 import {supabase} from '../supabase-client';
+import {recipeService, ingredientRowsFromText} from '../services';
+
+function isTikTokUrl(url: string): boolean {
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return (
+      host === 'tiktok.com' ||
+      host === 'vm.tiktok.com' ||
+      host.endsWith('.tiktok.com')
+    );
+  } catch {
+    return false;
+  }
+}
 
 interface AddModalProps {
   visible: boolean;
@@ -54,7 +69,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
     };
   }, []);
 
-  const newRecipe: Recipe = {
+  const newRecipe = {
     id: '',
     title: '',
     author: '',
@@ -102,25 +117,15 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         throw new Error(error?.message || 'Failed to extract recipe');
       }
 
-      const importedRecipe: Recipe = {
+      const savedRecipe = await recipeService.createRecipe({
+        ...data,
         id: '',
-        title: data.title || '',
-        author: data.author || '',
-        host_url: data.host_url || '',
-        host_name: data.host_name || '',
-        image: '',
-        total_time: data.total_time || '',
-        total_time_unit: data.total_time_unit || '',
-        servings: data.servings || '',
-        ingredients: data.ingredients || '',
-        instructions: data.instructions || '',
-        categories: data.categories || '',
-        about: data.about || '',
-      };
+        ingredientRows: ingredientRowsFromText(data.ingredients),
+      });
 
       handleClose();
-      dispatch(changeViewMode('edit'));
-      navigation.navigate('RecipeDetailsScreen', {item: importedRecipe});
+      dispatch(changeViewMode('view'));
+      navigation.navigate('RecipeDetailsScreen', {item: savedRecipe});
     } catch (err: any) {
       console.error('Photo import error:', err.message);
       Alert.alert(
@@ -171,6 +176,82 @@ export default function AddModal({visible, onClose}: AddModalProps) {
 
     setIsImporting(true);
     try {
+      if (isTikTokUrl(trimmed)) {
+        const {data, error} = await supabase.functions.invoke(
+          'process-social-video',
+          {body: {url: trimmed, platform: 'tiktok'}},
+        );
+        if (error || !data?.job_id) {
+          throw new Error('Failed to start import');
+        }
+        const jobId: string = data.job_id;
+        const {AppGroupStorage} = NativeModules;
+        if (Platform.OS === 'ios' && AppGroupStorage) {
+          await AppGroupStorage.setItem('pendingSocialJobId', jobId);
+        }
+
+        // Poll for job completion while the user stays in the app.
+        // AppState-based polling in App.tsx only fires on foreground transitions,
+        // which never happens when the import is triggered from within the app.
+        const deadline = Date.now() + 60_000;
+        while (Date.now() < deadline) {
+          await new Promise(r => setTimeout(r, 3_000));
+          try {
+            const {data: rows} = await supabase
+              .from('video_import_jobs')
+              .select('status, extracted_recipe, low_confidence, platform')
+              .eq('id', jobId)
+              .limit(1);
+            const job = rows?.[0];
+            if (!job) continue;
+
+            if (job.status === 'ready_for_review') {
+              if (Platform.OS === 'ios' && AppGroupStorage) {
+                await AppGroupStorage.removeItem('pendingSocialJobId');
+              }
+              const extracted = job.extracted_recipe ?? {};
+              const savedRecipe = await recipeService.createRecipe({
+                ...extracted,
+                id: '',
+                ingredientRows: ingredientRowsFromText(extracted.ingredients),
+              });
+              handleClose();
+              dispatch(changeViewMode('view'));
+              navigation.navigate('RecipeDetailsScreen', {
+                item: savedRecipe,
+                lowConfidence: job.low_confidence,
+                sourceUrl: extracted.host_url ?? '',
+                sourcePlatform: job.platform,
+              });
+              return;
+            }
+
+            if (job.status === 'failed') {
+              if (Platform.OS === 'ios' && AppGroupStorage) {
+                await AppGroupStorage.removeItem('pendingSocialJobId');
+              }
+              Alert.alert(
+                'Import Failed',
+                "We couldn't find a recipe in that video. The creator may not have included the recipe in their caption.",
+                [{text: 'OK', style: 'cancel'}],
+              );
+              return;
+            }
+          } catch {
+            // Network hiccup during poll — keep trying
+          }
+        }
+
+        // Timed out: leave pendingSocialJobId stored so the AppState handler
+        // can pick it up if the user backgrounds and re-foregrounds the app.
+        handleClose();
+        Alert.alert(
+          'Import Started',
+          "Your TikTok recipe is taking a moment to process. Open Braise in a bit to see it.",
+        );
+        return;
+      }
+
       let html: string;
       try {
         const pageResponse = await fetch(trimmed, {
@@ -198,25 +279,15 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         throw new Error(error?.message || 'Failed to extract recipe');
       }
 
-      const importedRecipe: Recipe = {
+      const savedRecipe = await recipeService.createRecipe({
+        ...data,
         id: '',
-        title: data.title || '',
-        author: data.author || '',
-        host_url: data.host_url || '',
-        host_name: data.host_name || '',
-        image: data.image || '',
-        total_time: data.total_time || '',
-        total_time_unit: data.total_time_unit || '',
-        servings: data.servings || '',
-        ingredients: data.ingredients || '',
-        instructions: data.instructions || '',
-        categories: data.categories || '',
-        about: data.about || '',
-      };
+        ingredientRows: ingredientRowsFromText(data.ingredients),
+      });
 
       handleClose();
-      dispatch(changeViewMode('edit'));
-      navigation.navigate('RecipeDetailsScreen', {item: importedRecipe});
+      dispatch(changeViewMode('view'));
+      navigation.navigate('RecipeDetailsScreen', {item: savedRecipe});
     } catch (err: any) {
       console.error('URL import error:', err.message);
       Alert.alert(

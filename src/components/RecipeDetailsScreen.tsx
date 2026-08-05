@@ -6,7 +6,10 @@ import {
   Text,
   Animated,
   Alert,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAppSelector} from '../redux/hooks';
 import {useEditingHandler} from '../context/EditingHandlerContext';
 import RecipeViewer from './RecipeViewer';
@@ -19,29 +22,12 @@ import DetailsMenuHeader from './DetailsMenuHeader';
 import {recipeService} from '../services';
 import {RecipeIngredient} from '../models';
 
-const withIngredientRows = (item: any) => {
-  if (item.ingredientRows?.length || !item.ingredients) {
-    return {...item};
-  }
-  const ingredientRows = item.ingredients
-    .split('\n')
-    .filter((l: string) => l.trim())
-    .map((line: string, i: number) => ({
-      id: `import-${i}`,
-      amount: '',
-      name: line.trim(),
-    }));
-  return {...item, ingredientRows};
-};
-
 export default function RecipeDetailsScreen({route, navigation}: any) {
   const viewMode = useAppSelector(state => state.viewMode.value);
   const {setHandleSavePress, setHandleDeletePress} = useEditingHandler();
   const [data, onChangeData] = useState({...route.params.item});
   const [isLoading, setIsLoading] = useState(false);
-  const [editingData, onChangeEditingData] = useState(
-    withIngredientRows({...route.params.item}),
-  );
+  const [editingData, onChangeEditingData] = useState({...route.params.item});
   const [showSavedMessage, setShowSavedMessage] = useState(false);
   const [structuredIngredients, setStructuredIngredients] = useState<
     RecipeIngredient[]
@@ -51,6 +37,10 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const theme = useTheme() as unknown as Theme;
+
+  const lowConfidence = route.params?.lowConfidence ?? false;
+  const sourceUrl = route.params?.sourceUrl ?? '';
+  const sourcePlatform = route.params?.sourcePlatform ?? '';
 
   const showSavedMessageTemporarily = useCallback(() => {
     setShowSavedMessage(true);
@@ -229,11 +219,39 @@ export default function RecipeDetailsScreen({route, navigation}: any) {
         />
       )}
       {viewMode !== 'view' && (
-        <RecipeEditor
-          editingData={editingData}
-          onChangeEditingData={handleChangeEditData}
-          structuredIngredients={structuredIngredients}
-        />
+        <>
+          {lowConfidence && (
+            <View style={styles(theme).lowConfidenceBanner}>
+              <Ionicons
+                name="warning-outline"
+                size={16}
+                color={theme.colors['neutral-800']}
+              />
+              <Text style={styles(theme).lowConfidenceText}>
+                Some details may be missing — check before saving
+              </Text>
+            </View>
+          )}
+          {sourceUrl ? (
+            <TouchableOpacity
+              style={styles(theme).sourceAttribution}
+              onPress={() => Linking.openURL(sourceUrl)}>
+              <Text style={styles(theme).sourceAttributionText}>
+                Imported from{' '}
+                {sourcePlatform
+                  ? sourcePlatform.charAt(0).toUpperCase() +
+                    sourcePlatform.slice(1)
+                  : 'video'}{' '}
+                · {sourceUrl}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+          <RecipeEditor
+            editingData={editingData}
+            onChangeEditingData={handleChangeEditData}
+            structuredIngredients={structuredIngredients}
+          />
+        </>
       )}
       {isLoading && (
         <View style={styles(theme).loadingOverlay}>
@@ -292,5 +310,27 @@ const styles = (theme: any) =>
       paddingVertical: 16,
       ...theme.typography['h2-emphasized'],
       color: theme.colors['neutral-800'],
+    },
+    lowConfidenceBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: theme.colors['neutral-300'],
+      paddingHorizontal: 16,
+      paddingVertical: 10,
+    },
+    lowConfidenceText: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
+      flex: 1,
+    },
+    sourceAttribution: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      backgroundColor: theme.colors['neutral-100'],
+    },
+    sourceAttributionText: {
+      ...theme.typography.h4,
+      color: theme.colors['toffee-400'],
     },
   });

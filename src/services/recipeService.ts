@@ -2,10 +2,15 @@ import {supabase} from '../supabase-client';
 import Storage from '../storage';
 import {RecipeIngredient} from '../models';
 
+export function ingredientRowsFromText(ingredients: string | null | undefined) {
+  return (ingredients || '')
+    .split('\n')
+    .map((l: string) => l.trim())
+    .filter(Boolean)
+    .map((line: string) => ({id: '', amount: '', name: line}));
+}
+
 const processNewlines = (recipe: any) => {
-  if (recipe.ingredients) {
-    recipe.ingredients = recipe.ingredients.replace(/\\n/g, '\n');
-  }
   if (recipe.instructions) {
     recipe.instructions = recipe.instructions.replace(/\\n/g, '\n');
   }
@@ -13,8 +18,15 @@ const processNewlines = (recipe: any) => {
 };
 
 const processForSave = (recipe: any) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const {ingredientRows: _ingredientRows, ...rest} = recipe;
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    ingredientRows: _ingredientRows,
+    extractionMethod: _extractionMethod,
+    original_url: _original_url,
+    ingredients: _ingredients,
+    ...rest
+  } = recipe;
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   return {
     ...rest,
     total_time: recipe.total_time ? parseInt(recipe.total_time, 10) : null,

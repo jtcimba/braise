@@ -78,7 +78,7 @@ const styles = (theme: Theme) =>
       ...theme.typography.h2,
     },
     pillTextSelected: {
-      color: theme.colors['neutral-800'],
+      color: theme.colors['on-yellow'],
       fontWeight: '600',
     },
     pillTextUnselected: {

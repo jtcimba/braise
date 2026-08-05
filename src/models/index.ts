@@ -8,7 +8,6 @@ export interface Recipe {
   total_time?: number;
   total_time_unit?: string;
   servings?: number;
-  ingredients?: string;
   instructions?: string;
   categories?: string;
   about?: string;

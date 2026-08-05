@@ -4,6 +4,8 @@ import {
   formatRecipeFromJsonLd,
   callClaudeApi,
   assembleRecipeResult,
+  logImportAttempt,
+  getUserIdFromJwt,
 } from '../_shared/recipeUtils.ts';
 
 const CORS_HEADERS = {
@@ -107,6 +109,7 @@ Deno.serve(async req => {
 
   let html: string;
   let sourceUrl = '';
+  let platform = 'url';
 
   try {
     const body = await req.json();
@@ -141,6 +144,9 @@ Deno.serve(async req => {
         },
       );
     }
+    if (body.platform && typeof body.platform === 'string') {
+      platform = body.platform;
+    }
   } catch {
     return new Response(JSON.stringify({error: 'Invalid JSON body'}), {
       status: 400,
@@ -148,11 +154,25 @@ Deno.serve(async req => {
     });
   }
 
+  const startTime = Date.now();
+  const userId = getUserIdFromJwt(req.headers.get('Authorization'));
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
   // Fast path: JSON-LD extraction (no AI call needed)
   const jsonld = extractJsonLd(html);
   if (jsonld) {
     const recipe = formatRecipeFromJsonLd(jsonld, sourceUrl);
     if (recipe) {
+      await logImportAttempt({
+        supabaseUrl: SUPABASE_URL,
+        serviceRoleKey: SERVICE_ROLE_KEY,
+        userId,
+        platform,
+        extractionMethod: 'jsonld',
+        success: true,
+        latencyMs: Date.now() - startTime,
+      });
       return new Response(JSON.stringify(recipe), {
         status: 200,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
@@ -198,14 +218,35 @@ Return ONLY the JSON object, no markdown, no explanation, no code fences.`;
     );
 
     if (!claudeResult.ok) {
+      await logImportAttempt({
+        supabaseUrl: SUPABASE_URL,
+        serviceRoleKey: SERVICE_ROLE_KEY,
+        userId,
+        platform,
+        extractionMethod: 'claude_html',
+        success: false,
+        latencyMs: Date.now() - startTime,
+        error: claudeResult.error,
+      });
       return new Response(JSON.stringify({error: claudeResult.error}), {
         status: claudeResult.status,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
       });
     }
 
+    await logImportAttempt({
+      supabaseUrl: SUPABASE_URL,
+      serviceRoleKey: SERVICE_ROLE_KEY,
+      userId,
+      platform,
+      extractionMethod: 'claude_html',
+      success: true,
+      latencyMs: Date.now() - startTime,
+    });
     return new Response(
-      JSON.stringify(assembleRecipeResult(claudeResult.data, sourceUrl)),
+      JSON.stringify(
+        assembleRecipeResult(claudeResult.data, sourceUrl, 'claude'),
+      ),
       {
         status: 200,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},

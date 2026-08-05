@@ -1,0 +1,16 @@
+{
+  "name": "braise-metadata-server",
+  "version": "1.0.0",
+  "description": "Fetches social video metadata (caption, title) via yt-dlp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -134,15 +134,8 @@ export default function IngredientEditor({
               value={item.name}
               placeholder="Ingredient"
               placeholderTextColor={theme.colors['neutral-300']}
-              onChangeText={v => {
-                if (v.includes('\n')) {
-                  focusNext(item.id, 'name');
-                } else {
-                  updateField(item.id, 'name', v);
-                }
-              }}
-              multiline
-              scrollEnabled={false}
+              onChangeText={v => updateField(item.id, 'name', v)}
+              onSubmitEditing={() => focusNext(item.id, 'name')}
               blurOnSubmit={false}
               returnKeyType="next"
             />

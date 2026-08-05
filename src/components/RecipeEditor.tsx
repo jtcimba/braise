@@ -28,25 +28,6 @@ import {useHeaderHeight} from '@react-navigation/elements';
 import {supabase} from '../supabase-client';
 import {RecipeIngredient} from '../models';
 
-const rawToRecipeIngredients = (raw: string): RecipeIngredient[] => {
-  if (!raw) {
-    return [];
-  }
-  return raw
-    .split('\n')
-    .map(l => l.trim())
-    .filter(Boolean)
-    .map((line, i) => ({
-      id: `raw-${i}`,
-      recipe_id: 0,
-      name: line,
-      base_name: '',
-      amount: null,
-      unit: null,
-      sort_order: i,
-    }));
-};
-
 export default function RecipeEditor({
   editingData,
   onChangeEditingData,
@@ -184,11 +165,8 @@ export default function RecipeEditor({
   }, [editingData.image, onChangeEditingData]);
 
   const effectiveIngredients = useMemo(
-    () =>
-      structuredIngredients.length > 0
-        ? structuredIngredients
-        : rawToRecipeIngredients(editingData.ingredients || ''),
-    [structuredIngredients, editingData.ingredients],
+    () => structuredIngredients,
+    [structuredIngredients],
   );
 
   const tablet = isTablet();

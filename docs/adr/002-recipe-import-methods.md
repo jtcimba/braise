@@ -1,7 +1,7 @@
 # ADR 002: Recipe Import Method Architecture
 
 **Date:** 2026-07-30
-**Status:** Implemented
+**Status:** Amended 2026-08-04
 
 ## Context
 
@@ -19,21 +19,22 @@ All three paths converge on the same `Recipe` data model and the same post-save 
 
 ```
 User pastes URL
+  → isTikTokUrl() check
+      → TikTok: async social video path (see Method 4 below)
   → client-side fetch() of page HTML (mobile Safari User-Agent)
   → POST /functions/v1/import-recipe { html, url }
       → fast path: extractJsonLd() — parses Recipe JSON-LD schema, no AI call
       → fallback: Claude Haiku — extracts recipe from stripped/truncated HTML
-  → Recipe model → RecipeDetailsScreen (edit mode)
+  → recipeService.createRecipe() → auto-save
+  → RecipeDetailsScreen (view mode)
   → POST /functions/v1/structure-ingredients (fire-and-forget, after save)
 ```
 
 ### Key decisions
 
-**Client-side HTML fetch.** The app fetches the page HTML before sending it to the edge function. This avoids SSRF risk in the edge function for arbitrary user-supplied URLs (the edge function does validate URLs if called with `url`-only for backwards compatibility, but the primary path sends pre-fetched HTML).
+**Client-side HTML fetch.** The app fetches the page HTML before sending it to the edge function. This avoids SSRF risk in the edge function for arbitrary user-supplied URLs, and crucially allows YouTube URLs to work: YouTube blocks server-side fetches with bot-detection, but device-side fetches with a mobile User-Agent succeed.
 
-**JSON-LD fast path → auto-save.** Most recipe websites embed `application/ld+json` with `@type: Recipe`. The edge function extracts and formats this without an AI call and returns `extractionMethod: 'jsonld'`. The app saves immediately and navigates to the recipe in view mode.
-
-**Claude Haiku fallback → review screen.** For pages without JSON-LD, Claude Haiku processes the stripped, truncated HTML (100k char limit). The edge function returns `extractionMethod: 'claude'`. The app routes to RecipeDetailsScreen in edit mode — the user must review and save manually. Scripts, styles, nav, footer, and SVG tags are stripped first to reduce token cost and noise.
+**All extraction paths auto-save** (amendment 2026-08-04). Originally JSON-LD auto-saved to view mode while Claude extraction opened an edit-mode review screen. This distinction was removed: all extraction results now auto-save and navigate to view mode, consistent with Method 2 (photo) and social video. Scripts, styles, nav, footer, and SVG tags are still stripped before passing HTML to Claude to reduce token cost and noise.
 
 ---
 
@@ -54,7 +55,7 @@ User takes photo or picks from library (1–3 images, max 2000x2000, 0.8 quality
 
 ### Key decisions
 
-**Always requires review.** Photos have no structured metadata, so every extraction goes through Claude Haiku vision. The app always routes to RecipeDetailsScreen in edit mode — there is no auto-save path for photo import.
+**Always requires review → now auto-saves** (amendment 2026-08-04). Originally photo import opened edit mode; updated to auto-save and navigate to view mode, consistent with all other import paths.
 
 **Base64 over upload.** Images are sent as base64 strings directly in the request body rather than uploaded to storage first. This keeps the flow synchronous and avoids managing temporary file storage. The 3-image limit and resize cap bound the payload size.
 
@@ -62,7 +63,33 @@ User takes photo or picks from library (1–3 images, max 2000x2000, 0.8 quality
 
 ---
 
-## Method 3: Write Your Own (From Scratch)
+## Method 3: Social Video — In-App Link (TikTok)
+
+**Entry point:** `AddModal.tsx` → `handleUrlImport` (TikTok branch)
+
+See ADR 001 for the full social video architecture decision. This section covers the in-app variant.
+
+### Flow
+
+```
+User pastes TikTok URL
+  → POST /functions/v1/process-social-video { url, platform: 'tiktok' }
+      → metadata server: yt-dlp --print description --no-download
+      → import-from-transcript edge function extracts recipe from caption
+      → video_import_jobs row set to ready_for_review or failed
+  → AddModal polls video_import_jobs every 3s for up to 60s
+      → ready_for_review: recipeService.createRecipe() → view mode RecipeDetailsScreen
+      → failed: error alert
+      → timeout: leaves pendingSocialJobId in App Group for AppState handler
+```
+
+### Key decisions
+
+**In-app polling, not AppState.** When the import is triggered from within the app, the user never backgrounds — so `AppState` change events never fire. The modal polls directly and only falls back to the AppState path on timeout. See ADR 001 for the full polling design.
+
+---
+
+## Method 4: Write Your Own (From Scratch)
 
 **Entry point:** `AddModal.tsx` → `handleClose` + `navigation.navigate('RecipeDetailsScreen', { item: emptyRecipe })`
 
@@ -98,9 +125,13 @@ Shared module used by both `import-recipe` and `import-recipe-from-image`:
 | `splitNumberedInstructions` | Splits run-on numbered steps into separate lines |
 | `structureIngredients` | Called by `structure-ingredients` edge function |
 
+### `ingredientRowsFromText` (client-side utility)
+
+All import paths that receive an ingredient string from an edge function call `ingredientRowsFromText(ingredients)` before passing to `recipeService.createRecipe`. This splits the newline-delimited string into `{id, amount, name}` row objects expected by `structure-ingredients`. Defined once in `recipeService.ts` and exported; used by `AddModal`, `App.tsx`, and the share extension completion handler.
+
 ### `structure-ingredients` (post-save, all methods)
 
-After a recipe is saved to the `recipes` table, all three methods trigger `structure-ingredients` as a fire-and-forget call. This parses the ingredient string into rows in `recipe_ingredients` with fields `name`, `base_name`, `amount`, `unit` — used by the grocery list feature.
+After a recipe is saved to the `recipes` table, all four methods trigger `structure-ingredients` as a fire-and-forget call. This parses the ingredient string into rows in `recipe_ingredients` with fields `name`, `base_name`, `amount`, `unit` — used by the grocery list feature.
 
 ### AI model
 
@@ -108,20 +139,47 @@ All AI extraction uses **Claude Haiku** (`claude-haiku-4-5-20251001`). Chosen fo
 
 ---
 
-## Share Extension (URL import variant)
+## Share Extension
 
-The iOS Share Extension (`RecipeImportShareExtension`) mirrors Method 1 but runs out-of-process:
+The iOS Share Extension (`RecipeImportShareExtension`) runs out-of-process and routes incoming shares by URL type:
+
+### Regular URLs (recipe websites via Safari or other apps)
 
 ```
-User shares a recipe URL from Safari or another app
+User shares a recipe URL
   → extension fetches page HTML (URLSession, mobile User-Agent)
   → POST /functions/v1/import-recipe { html, url }
-  → saves directly to Supabase (bypasses RecipeDetailsScreen)
-  → writes importedRecipe to App Group UserDefaults
-  → opens braise://import-complete deep link
+  → auto-saves to Supabase, writes importedRecipe to App Group UserDefaults
+  → main app picks up importedRecipe on next foreground, navigates to RecipeDetailsScreen (view mode)
 ```
 
-The same JSON-LD vs Claude rule applies here: JSON-LD extraction auto-saves and the deep link opens the recipe in view mode; Claude extraction opens RecipeDetailsScreen in edit mode for review before saving. Social video URLs (TikTok, Instagram, YouTube) are detected and routed differently — see ADR 001.
+Note: both JSON-LD and Claude extraction paths auto-save. The edit-mode review distinction described in the original document was removed in August 2026 to match the uniform auto-save behavior across all import methods.
+
+### TikTok and Instagram URLs
+
+```
+User shares a TikTok or Instagram URL
+  → POST /functions/v1/process-social-video { url, platform }
+  → receives job_id, writes pendingSocialJobId to App Group UserDefaults
+  → shows "processing" message, dismisses
+  → main app polls on next foreground via AppState handler
+```
+
+See ADR 001 for the full async job lifecycle.
+
+### YouTube URLs
+
+YouTube shares arrive as `public.plain-text` (not `public.url`) from the YouTube app. The share extension cannot reliably extract or process these URLs server-side (yt-dlp hits bot-detection), so YouTube is handled via a clipboard fallback:
+
+```
+User shares a YouTube URL
+  → extension copies URL to UIPasteboard (main thread)
+  → shows inline message explaining clipboard copy
+  → after 2.5s: opens braise:// to bring app to foreground
+  → user pastes into AddModal → Method 1 (URL import) handles it
+```
+
+YouTube links work well via Method 1 because device-side HTML fetch bypasses YouTube's server-side bot detection.
 
 ---
 
@@ -154,3 +212,5 @@ Logged from each edge function after every attempt. RLS restricts reads to servi
 - The JSON-LD fast path means common recipe sites (NYT Cooking, Serious Eats, AllRecipes) incur no AI cost.
 - Base64 image payloads can be large for high-quality photos. The 3-image cap and resize limit bound this, but very large payloads may approach Supabase Edge Function limits.
 - `structure-ingredients` runs asynchronously after save. If it fails, the recipe is still saved but the grocery list will not have structured ingredient data until a backfill is run.
+- All paths auto-save without a confirmation step. A bad extraction lands directly in the recipe list; the user must delete it manually. This is intentionally traded against the friction of a mandatory review step on every import.
+- YouTube via share sheet requires the user to take an extra step (paste from clipboard). This is an accepted tradeoff given that YouTube via link works well and the alternative (attempting server-side fetch) reliably fails.

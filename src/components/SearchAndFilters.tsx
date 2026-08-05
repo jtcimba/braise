@@ -98,6 +98,7 @@ const styles = (theme: Theme) =>
       textAlignVertical: 'center',
       includeFontPadding: false,
       ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
     },
     clearButton: {
       position: 'absolute',

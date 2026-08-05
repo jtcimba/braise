@@ -1,5 +1,10 @@
 import '@supabase/functions-js/edge-runtime.d.ts';
-import {callClaudeApi, assembleRecipeResult} from '../_shared/recipeUtils.ts';
+import {
+  callClaudeApi,
+  assembleRecipeResult,
+  logImportAttempt,
+  getUserIdFromJwt,
+} from '../_shared/recipeUtils.ts';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -65,6 +70,11 @@ Deno.serve(async req => {
     });
   }
 
+  const startTime = Date.now();
+  const userId = getUserIdFromJwt(req.headers.get('Authorization'));
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+
   const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
   if (!ANTHROPIC_API_KEY) {
     return new Response(
@@ -108,14 +118,33 @@ Return ONLY the JSON object, no markdown, no explanation, no code fences.`;
     );
 
     if (!claudeResult.ok) {
+      await logImportAttempt({
+        supabaseUrl: SUPABASE_URL,
+        serviceRoleKey: SERVICE_ROLE_KEY,
+        userId,
+        platform: 'photo',
+        extractionMethod: 'claude_vision',
+        success: false,
+        latencyMs: Date.now() - startTime,
+        error: claudeResult.error,
+      });
       return new Response(JSON.stringify({error: claudeResult.error}), {
         status: claudeResult.status,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
       });
     }
 
+    await logImportAttempt({
+      supabaseUrl: SUPABASE_URL,
+      serviceRoleKey: SERVICE_ROLE_KEY,
+      userId,
+      platform: 'photo',
+      extractionMethod: 'claude_vision',
+      success: true,
+      latencyMs: Date.now() - startTime,
+    });
     return new Response(
-      JSON.stringify(assembleRecipeResult(claudeResult.data)),
+      JSON.stringify(assembleRecipeResult(claudeResult.data, '', 'claude')),
       {
         status: 200,
         headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},

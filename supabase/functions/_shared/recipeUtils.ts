@@ -33,6 +33,7 @@ export interface RecipeResult {
   total_time_unit?: string;
   servings?: number;
   about: string;
+  extractionMethod: 'jsonld' | 'claude' | 'caption_text' | 'caption_url';
 }
 
 function parseOptionalInt(s: unknown): number | undefined {
@@ -118,6 +119,7 @@ export function formatRecipeFromJsonLd(
       totalTime !== undefined ? totalTimeUnitStr || undefined : undefined,
     servings,
     about,
+    extractionMethod: 'jsonld' as const,
   };
 }
 
@@ -575,9 +577,55 @@ export async function callClaudeApi(
   }
 }
 
+export async function logImportAttempt(params: {
+  supabaseUrl: string;
+  serviceRoleKey: string;
+  userId?: string | null;
+  platform: string;
+  extractionMethod: string;
+  success: boolean;
+  latencyMs: number;
+  error?: string | null;
+}): Promise<void> {
+  const {supabaseUrl, serviceRoleKey, ...logData} = params;
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/import_logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+      },
+      body: JSON.stringify({
+        user_id: logData.userId ?? null,
+        platform: logData.platform,
+        extraction_method: logData.extractionMethod,
+        success: logData.success,
+        latency_ms: logData.latencyMs,
+        error: logData.error ?? null,
+      }),
+    });
+  } catch (err) {
+    console.error('Failed to write import log:', err);
+  }
+}
+
+export function getUserIdFromJwt(authHeader: string | null): string | null {
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  try {
+    const payload = authHeader.slice(7).split('.')[1];
+    if (!payload) return null;
+    const decoded = JSON.parse(atob(payload));
+    return typeof decoded.sub === 'string' ? decoded.sub : null;
+  } catch {
+    return null;
+  }
+}
+
 export function assembleRecipeResult(
   raw: Record<string, unknown>,
   sourceUrl = '',
+  extractionMethod: RecipeResult['extractionMethod'] = 'claude',
 ): RecipeResult {
   let hostUrl = '';
   let hostName = '';
@@ -616,5 +664,6 @@ export function assembleRecipeResult(
         : undefined,
     servings,
     about: (raw.about as string) || '',
+    extractionMethod,
   };
 }
