@@ -24,7 +24,9 @@ async function getUserFromJwt(jwt: string): Promise<string | null> {
       Authorization: `Bearer ${jwt}`,
     },
   });
-  if (!response.ok) return null;
+  if (!response.ok) {
+    return null;
+  }
   const data = await response.json();
   return typeof data.id === 'string' ? data.id : null;
 }
@@ -43,7 +45,9 @@ async function insertJob(
     },
     body: JSON.stringify({user_id: userId, platform, status: 'processing'}),
   });
-  if (!response.ok) return null;
+  if (!response.ok) {
+    return null;
+  }
   const data = await response.json();
   return data[0]?.id ?? null;
 }
@@ -129,7 +133,9 @@ async function callImportFromTranscript(
   }
 
   const data = await response.json();
-  if (!data.recipe) return null;
+  if (!data.recipe) {
+    return null;
+  }
   return {recipe: data.recipe, lowConfidence: data.lowConfidence ?? false};
 }
 

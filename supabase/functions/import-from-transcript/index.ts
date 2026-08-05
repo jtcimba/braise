@@ -69,7 +69,9 @@ function isSocialUrl(urlString: string): boolean {
 function extractFirstNonSocialUrl(text: string): string | null {
   const urlPattern = /https?:\/\/[^\s)>\]"']+/g;
   const matches = text.match(urlPattern);
-  if (!matches) return null;
+  if (!matches) {
+    return null;
+  }
   return matches.find(url => !isSocialUrl(url)) ?? null;
 }
 
@@ -178,7 +180,9 @@ Deno.serve(async req => {
         headers: {'User-Agent': USER_AGENT},
         signal: AbortSignal.timeout(15_000),
       });
-      if (!pageResponse.ok) throw new Error(`HTTP ${pageResponse.status}`);
+      if (!pageResponse.ok) {
+        throw new Error(`HTTP ${pageResponse.status}`);
+      }
       html = await pageResponse.text();
     } catch {
       return extractFromCaption(caption, title, sourceUrl, ANTHROPIC_API_KEY);

@@ -611,10 +611,14 @@ export async function logImportAttempt(params: {
 }
 
 export function getUserIdFromJwt(authHeader: string | null): string | null {
-  if (!authHeader?.startsWith('Bearer ')) return null;
+  if (!authHeader?.startsWith('Bearer ')) {
+    return null;
+  }
   try {
     const payload = authHeader.slice(7).split('.')[1];
-    if (!payload) return null;
+    if (!payload) {
+      return null;
+    }
     const decoded = JSON.parse(atob(payload));
     return typeof decoded.sub === 'string' ? decoded.sub : null;
   } catch {

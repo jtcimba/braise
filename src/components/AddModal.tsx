@@ -203,7 +203,9 @@ export default function AddModal({visible, onClose}: AddModalProps) {
               .eq('id', jobId)
               .limit(1);
             const job = rows?.[0];
-            if (!job) continue;
+            if (!job) {
+              continue;
+            }
 
             if (job.status === 'ready_for_review') {
               if (Platform.OS === 'ios' && AppGroupStorage) {
@@ -247,7 +249,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         handleClose();
         Alert.alert(
           'Import Started',
-          "Your TikTok recipe is taking a moment to process. Open Braise in a bit to see it.",
+          'Your TikTok recipe is taking a moment to process. Open Braise in a bit to see it.',
         );
         return;
       }

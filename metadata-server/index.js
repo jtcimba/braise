@@ -1,12 +1,17 @@
 const express = require('express');
-const { execFile } = require('child_process');
-const { promisify } = require('util');
+const {execFile} = require('child_process');
+const {promisify} = require('util');
 
 const execFileAsync = promisify(execFile);
 const app = express();
 app.use(express.json());
 
-const ALLOWED_DOMAINS = ['tiktok.com', 'instagram.com', 'youtube.com', 'youtu.be'];
+const ALLOWED_DOMAINS = [
+  'tiktok.com',
+  'instagram.com',
+  'youtube.com',
+  'youtu.be',
+];
 const AUTH_SECRET = process.env.METADATA_SERVER_SECRET;
 
 const MOBILE_USER_AGENT =
@@ -15,7 +20,9 @@ const MOBILE_USER_AGENT =
 function isAllowedUrl(urlString) {
   try {
     const parsed = new URL(urlString);
-    return ALLOWED_DOMAINS.some(d => parsed.hostname === d || parsed.hostname.endsWith('.' + d));
+    return ALLOWED_DOMAINS.some(
+      d => parsed.hostname === d || parsed.hostname.endsWith('.' + d),
+    );
   } catch {
     return false;
   }
@@ -23,8 +30,12 @@ function isAllowedUrl(urlString) {
 
 function isYouTubeUrl(urlString) {
   try {
-    const { hostname } = new URL(urlString);
-    return hostname === 'youtube.com' || hostname.endsWith('.youtube.com') || hostname === 'youtu.be';
+    const {hostname} = new URL(urlString);
+    return (
+      hostname === 'youtube.com' ||
+      hostname.endsWith('.youtube.com') ||
+      hostname === 'youtu.be'
+    );
   } catch {
     return false;
   }
@@ -39,7 +50,9 @@ async function fetchYouTubeMetadataFromHtml(url) {
     },
     signal: AbortSignal.timeout(15_000),
   });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
 
   const html = await response.text();
 
@@ -48,37 +61,49 @@ async function fetchYouTubeMetadataFromHtml(url) {
 
   // The video description is embedded as "shortDescription":"<json-escaped>" in ytInitialPlayerResponse
   const descMatch = html.match(/"shortDescription":"((?:[^"\\]|\\.)*)"/);
-  if (!descMatch) throw new Error('Could not find video description in page HTML');
+  if (!descMatch) {
+    throw new Error('Could not find video description in page HTML');
+  }
 
   const description = JSON.parse('"' + descMatch[1] + '"');
-  return { title, description };
+  return {title, description};
 }
 
 app.get('/health', (_req, res) => {
-  res.json({ ok: true });
+  res.json({ok: true});
 });
 
 app.post('/metadata', async (req, res) => {
   if (AUTH_SECRET) {
     const provided = req.headers['x-metadata-secret'];
     if (provided !== AUTH_SECRET) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({error: 'Unauthorized'});
     }
   }
 
-  const { url } = req.body;
+  const {url} = req.body;
   if (!url || typeof url !== 'string') {
-    return res.status(400).json({ error: 'url is required' });
+    return res.status(400).json({error: 'url is required'});
   }
   if (!isAllowedUrl(url)) {
-    return res.status(400).json({ error: 'URL not from an allowed domain' });
+    return res.status(400).json({error: 'URL not from an allowed domain'});
   }
 
   try {
-    const { stdout } = await execFileAsync(
+    const {stdout} = await execFileAsync(
       'yt-dlp',
-      ['--print', 'title', '--print', 'description', '--no-download', '--no-playlist', '--js-runtimes', 'node', url],
-      { timeout: 30_000 },
+      [
+        '--print',
+        'title',
+        '--print',
+        'description',
+        '--no-download',
+        '--no-playlist',
+        '--js-runtimes',
+        'node',
+        url,
+      ],
+      {timeout: 30_000},
     );
 
     const lines = stdout.split('\n');
@@ -86,7 +111,7 @@ app.post('/metadata', async (req, res) => {
     // description starts after title line
     const description = lines.slice(1).join('\n').trim();
 
-    return res.json({ title, description });
+    return res.json({title, description});
   } catch (err) {
     // For YouTube, yt-dlp often fails in server environments due to bot detection.
     // Fall back to fetching the page HTML directly, which is how the link import path works.
@@ -99,7 +124,9 @@ app.post('/metadata', async (req, res) => {
       }
     }
     console.error('yt-dlp error:', err.message);
-    return res.status(502).json({ error: 'Failed to fetch metadata', detail: err.message });
+    return res
+      .status(502)
+      .json({error: 'Failed to fetch metadata', detail: err.message});
   }
 });
 
