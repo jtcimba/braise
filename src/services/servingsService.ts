@@ -1,5 +1,3 @@
-import {parseIngredient} from './unitService';
-
 export const scaleQuantity = (
   quantity: string,
   scaleFactor: number,
@@ -54,42 +52,4 @@ export const formatQuantity = (num: number): string => {
 
   // Return as decimal with up to 2 decimal places
   return rounded.toFixed(2).replace(/\.?0+$/, '');
-};
-
-export const scaleIngredients = (
-  ingredients: string,
-  newServings: string,
-  originalServings: string,
-): string => {
-  if (
-    !ingredients ||
-    newServings === '-' ||
-    originalServings === '-' ||
-    newServings === originalServings
-  ) {
-    return ingredients;
-  }
-
-  const originalNum = parseFloat(originalServings);
-  const newNum = parseFloat(newServings);
-
-  if (isNaN(originalNum) || isNaN(newNum) || originalNum === 0) {
-    return ingredients;
-  }
-
-  const scaleFactor = newNum / originalNum;
-
-  return ingredients
-    .split('\n')
-    .map(ingredient => {
-      const {quantity, unit, text} = parseIngredient(ingredient);
-
-      if (!quantity) {
-        return ingredient;
-      }
-
-      const scaledQuantity = scaleQuantity(quantity, scaleFactor);
-      return `${scaledQuantity}${unit ? ' ' + unit : ''} ${text}`.trim();
-    })
-    .join('\n');
 };

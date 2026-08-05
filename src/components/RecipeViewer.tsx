@@ -221,7 +221,8 @@ export default function RecipeViewer({
             </View>
             {tab === 'ingredients' && (
               <View style={styles(theme).ingredientsContainer}>
-                {structuredIngredients.length > 0 ? (
+                {isLoadingIngredients ? null : structuredIngredients.length >
+                  0 ? (
                   structuredIngredients.map((row, index) => {
                     const scaledAmount =
                       scaleFactor !== 1 && row.amount
@@ -256,24 +257,7 @@ export default function RecipeViewer({
                       </View>
                     );
                   })
-                ) : data.ingredients && !isLoadingIngredients ? (
-                  data.ingredients
-                    .split('\n')
-                    .filter((l: string) => l.trim())
-                    .map((line: string, index: number, arr: string[]) => (
-                      <View
-                        style={[
-                          styles(theme).ingredientLine,
-                          index !== arr.length - 1 &&
-                            styles(theme).ingredientDivider,
-                        ]}
-                        key={index}>
-                        <Text style={styles(theme).ingredientText}>
-                          {line.trim()}
-                        </Text>
-                      </View>
-                    ))
-                ) : isLoadingIngredients ? null : (
+                ) : (
                   <View style={styles(theme).emptyStateContainer}>
                     <Text style={styles(theme).emptyStateText}>
                       No ingredients found. Add them in edit mode or view the

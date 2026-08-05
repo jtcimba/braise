@@ -1,7 +1,7 @@
 # ADR 001: Social Video Import Architecture
 
 **Date:** 2026-07-30
-**Status:** Decided
+**Status:** Amended 2026-08-04
 
 ## Context
 
@@ -71,8 +71,8 @@ Supabase Edge Function: import-from-transcript
 Main app (on foreground)
   → reads pendingSocialJobId from App Group UserDefaults
   → if present: queries video_import_jobs for that id
-  → if status = ready_for_review: clears UserDefaults key, opens RecipeDetailsScreen
-    in edit mode with extracted_recipe pre-filled (user must save manually)
+  → if status = ready_for_review: clears UserDefaults key, auto-saves recipe,
+    navigates to RecipeDetailsScreen (view mode) — see amendment below
   → if status = failed: shows alert, clears key
 ```
 
@@ -92,29 +92,58 @@ CREATE TABLE video_import_jobs (
 );
 ```
 
-The extracted recipe JSON is stored in `video_import_jobs`, not in the `recipes` table. A row in `recipes` is only created when the user explicitly saves from the review screen. This keeps the `recipes` table free of draft or speculative data and requires no changes to recipe list, grocery list, or collection queries.
+The extracted recipe JSON is stored in `video_import_jobs`, not in the `recipes` table. A row in `recipes` is created when the app processes the completed job (auto-save). This keeps speculative data out of the recipe table until extraction confirms a result. See the UX amendment below for the change from manual save to auto-save.
 
 ### ToS note
 
 yt-dlp metadata fetch (no video download) is a significantly lower-risk operation than video downloading. No copyrighted content is transferred. The description/caption text is public information. This is an accepted risk given the metadata-only scope; revisit if the transcription path is ever added.
 
-### YouTube note
+### YouTube: clipboard fallback (amendment 2026-08-04)
 
-YouTube shares via `public.plain-text` (not `public.url`). The share extension must check for a plain-text payload containing an HTTP URL and treat it as a social video URL.
+After implementation, YouTube via share sheet was routed through the async metadata path (same as TikTok/Instagram), but this did not work: the YouTube app does not reliably expose an extractable URL from the `NSItemProvider` payload in the share extension context. `yt-dlp` also intermittently fails on YouTube URLs due to bot-detection.
 
-## UX: Review screen before saving
+**Decision:** YouTube share sheet imports are handled via a clipboard fallback, not the async job pipeline:
 
-Social video import must not auto-save. After extraction completes the main app routes to a review step where the user can inspect and correct the extracted recipe before committing it.
+```
+Share extension receives YouTube URL (public.plain-text or public.url)
+  → copy URL to UIPasteboard on main thread
+  → show inline message: "YouTube videos can't be imported from the share sheet.
+     Your link has been copied — open Braise and paste it to import."
+  → after 2.5s: open braise:// deep link to bring app to foreground
+  → user pastes URL into AddModal → normal URL import flow handles it
+```
 
-**Decided:** extend the existing `RecipeDetailsScreen` in edit mode rather than building a new `ImportReviewScreen`. The fields and interactions are identical; only the entry context differs.
+This is intentionally a graceful degradation: YouTube via link works well (the app fetches the page HTML device-side, bypassing bot detection), and the clipboard hand-off preserves the URL without losing it.
 
-The review screen must include:
+## UX: Auto-save and review (amendment 2026-08-04)
+
+Social video extraction auto-saves the recipe and navigates to `RecipeDetailsScreen` in view mode — the same as all other import paths. The earlier plan to open in edit mode (requiring explicit user save) was reversed to match the uniform behavior across import methods.
+
+The view screen includes:
 - Source attribution: "Imported from [Platform] · [tappable source URL]"
 - Low-confidence banner when the edge function returns `lowConfidence: true`: "Some details may be missing — check before saving"
 
 The `lowConfidence` flag is set by the edge function when the caption text is short, missing key recipe fields, or the LLM response includes hedging language. This is a signal to the user, not a hard block.
 
 If the edge function returns `NEEDS_IMAGE_IMPORT` (caption contains a photo of a recipe rather than text), surface a user-facing message directing them to use the photo import method instead.
+
+## In-app TikTok polling (amendment 2026-08-04)
+
+When a TikTok URL is pasted into the in-app AddModal (rather than shared via the share extension), `AppState`-based polling cannot complete the import: the user never leaves the app, so the `active` transition never fires.
+
+**Decision:** `AddModal.handleUrlImport` includes a direct polling loop for the TikTok path:
+
+```
+POST process-social-video → receives job_id
+  → writes job_id to App Group UserDefaults (pendingSocialJobId)
+  → polls video_import_jobs every 3s for up to 60s
+      → if ready_for_review: clears key, auto-saves, navigates to RecipeDetailsScreen
+      → if failed: clears key, shows error alert
+  → on timeout: leaves key stored (AppState handler will pick it up on next foreground)
+               shows gentle "taking a moment" message, closes modal
+```
+
+The `pendingSocialJobId` key therefore serves two purposes: in-app polling uses it as state, and AppState polling uses it as a resumption handle if the user backgrounds the app before the job completes.
 
 ## Subscription gate
 
@@ -126,6 +155,6 @@ The main app is responsible for writing `isPro` to the App Group on every auth a
 
 - A new persistent server is required (Fly.io/Railway), adding infrastructure to maintain.
 - Recipe import from social video is inherently async; the extension UX shows "processing" rather than immediate confirmation.
-- The review-before-save requirement means the async completion flow opens `RecipeDetailsScreen` in edit mode rather than navigating directly to the saved recipe.
+- Social video import auto-saves on completion (same as all other import paths). The recipe appears directly in the list without a manual save step.
 - If a creator does not put the recipe in the caption, import will fail gracefully. Transcription (Option 2) remains available as a future upgrade path.
 - Instagram captions are not publicly accessible without authentication; Instagram support may be limited to caption links only.

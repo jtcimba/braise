@@ -243,7 +243,6 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
           recipe.title,
           recipe.author,
           recipe.about,
-          recipe.ingredients,
           getRecipeCategories(recipe).join(' '),
         ]
           .filter(Boolean)

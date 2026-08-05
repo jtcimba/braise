@@ -518,7 +518,7 @@ const styles = (theme: any) =>
       shadowRadius: 3.84,
     },
     floatingAddButtonText: {
-      color: theme.colors['neutral-800'],
+      color: theme.colors['on-yellow'],
       fontSize: 28,
       fontWeight: 'bold',
     },
