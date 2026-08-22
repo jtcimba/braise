@@ -4,6 +4,8 @@ import {
   assembleRecipeResult,
   extractJsonLd,
   formatRecipeFromJsonLd,
+  logImportAttempt,
+  getUserIdFromJwt,
   RecipeResult,
 } from '../_shared/recipeUtils.ts';
 
@@ -106,14 +108,22 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+type CaptionResult =
+  | {ok: true; recipe: RecipeResult; lowConfidence: boolean}
+  | {ok: false; status: number; error: string};
+
 async function extractFromCaption(
   caption: string,
   title: string,
   sourceUrl: string,
   apiKey: string,
-): Promise<Response> {
+): Promise<CaptionResult> {
   if (!caption || caption.length < 20) {
-    return jsonResponse({error: 'Caption too short to extract a recipe'}, 422);
+    return {
+      ok: false,
+      status: 422,
+      error: 'Caption too short to extract a recipe',
+    };
   }
 
   const content = title
@@ -126,7 +136,7 @@ async function extractFromCaption(
     content,
   );
   if (!claudeResult.ok) {
-    return jsonResponse({error: claudeResult.error}, claudeResult.status);
+    return {ok: false, status: claudeResult.status, error: claudeResult.error};
   }
 
   const recipe = assembleRecipeResult(
@@ -136,7 +146,7 @@ async function extractFromCaption(
   );
   const lowConfidence = caption.length < 100 || recipeIsEmpty(recipe);
 
-  return jsonResponse({recipe, lowConfidence});
+  return {ok: true, recipe, lowConfidence};
 }
 
 Deno.serve(async req => {
@@ -156,12 +166,14 @@ Deno.serve(async req => {
   let caption: string;
   let title: string;
   let sourceUrl: string;
+  let platform: string;
 
   try {
     const body = await req.json();
     caption = typeof body.caption === 'string' ? body.caption : '';
     title = typeof body.title === 'string' ? body.title : '';
     sourceUrl = typeof body.sourceUrl === 'string' ? body.sourceUrl : '';
+    platform = typeof body.platform === 'string' ? body.platform : 'tiktok';
   } catch {
     return jsonResponse({error: 'Invalid JSON body'}, 400);
   }
@@ -170,6 +182,11 @@ Deno.serve(async req => {
   if (!ANTHROPIC_API_KEY) {
     return jsonResponse({error: 'ANTHROPIC_API_KEY not configured'}, 503);
   }
+
+  const startTime = Date.now();
+  const userId = getUserIdFromJwt(authHeader);
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? '';
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
   const captionUrl = extractFirstNonSocialUrl(caption);
 
@@ -185,13 +202,44 @@ Deno.serve(async req => {
       }
       html = await pageResponse.text();
     } catch {
-      return extractFromCaption(caption, title, sourceUrl, ANTHROPIC_API_KEY);
+      const result = await extractFromCaption(
+        caption,
+        title,
+        sourceUrl,
+        ANTHROPIC_API_KEY,
+      );
+      await logImportAttempt({
+        supabaseUrl: SUPABASE_URL,
+        serviceRoleKey: SERVICE_ROLE_KEY,
+        userId,
+        platform,
+        extractionMethod: 'caption_text',
+        success: result.ok,
+        latencyMs: Date.now() - startTime,
+        error: result.ok ? null : result.error,
+      });
+      if (!result.ok) {
+        return jsonResponse({error: result.error}, result.status);
+      }
+      return jsonResponse({
+        recipe: result.recipe,
+        lowConfidence: result.lowConfidence,
+      });
     }
 
     const jsonld = extractJsonLd(html);
     if (jsonld) {
       const recipe = formatRecipeFromJsonLd(jsonld, captionUrl);
       if (recipe) {
+        await logImportAttempt({
+          supabaseUrl: SUPABASE_URL,
+          serviceRoleKey: SERVICE_ROLE_KEY,
+          userId,
+          platform,
+          extractionMethod: 'caption_url',
+          success: true,
+          latencyMs: Date.now() - startTime,
+        });
         return jsonResponse({
           recipe: {...recipe, extractionMethod: 'caption_url' as const},
           lowConfidence: false,
@@ -206,6 +254,16 @@ Deno.serve(async req => {
       `Extract the recipe from this HTML:\n\n${strippedHTML}`,
     );
     if (!claudeResult.ok) {
+      await logImportAttempt({
+        supabaseUrl: SUPABASE_URL,
+        serviceRoleKey: SERVICE_ROLE_KEY,
+        userId,
+        platform,
+        extractionMethod: 'caption_url',
+        success: false,
+        latencyMs: Date.now() - startTime,
+        error: claudeResult.error,
+      });
       return jsonResponse({error: claudeResult.error}, claudeResult.status);
     }
     const recipe = assembleRecipeResult(
@@ -213,8 +271,39 @@ Deno.serve(async req => {
       captionUrl,
       'caption_url',
     );
+    await logImportAttempt({
+      supabaseUrl: SUPABASE_URL,
+      serviceRoleKey: SERVICE_ROLE_KEY,
+      userId,
+      platform,
+      extractionMethod: 'caption_url',
+      success: true,
+      latencyMs: Date.now() - startTime,
+    });
     return jsonResponse({recipe, lowConfidence: recipeIsEmpty(recipe)});
   }
 
-  return extractFromCaption(caption, title, sourceUrl, ANTHROPIC_API_KEY);
+  const result = await extractFromCaption(
+    caption,
+    title,
+    sourceUrl,
+    ANTHROPIC_API_KEY,
+  );
+  await logImportAttempt({
+    supabaseUrl: SUPABASE_URL,
+    serviceRoleKey: SERVICE_ROLE_KEY,
+    userId,
+    platform,
+    extractionMethod: 'caption_text',
+    success: result.ok,
+    latencyMs: Date.now() - startTime,
+    error: result.ok ? null : result.error,
+  });
+  if (!result.ok) {
+    return jsonResponse({error: result.error}, result.status);
+  }
+  return jsonResponse({
+    recipe: result.recipe,
+    lowConfidence: result.lowConfidence,
+  });
 });
