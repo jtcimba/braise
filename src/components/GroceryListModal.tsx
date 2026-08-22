@@ -9,13 +9,14 @@ import {
   Animated,
   FlatList,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {useGroceryListModal} from '../context/GroceryListModalContext';
 import {combineAmounts, categorizeIngredient} from '../services';
 import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 import {RecipeIngredient} from '../models';
+import {useHousehold} from '../hooks/useHousehold';
+import {supabase} from '../supabase-client';
 
 interface Ingredient {
   id: string;
@@ -26,14 +27,8 @@ interface Ingredient {
 interface GroceryItem {
   id: string;
   name: string;
-  category: string;
-  completed: boolean;
   amount: string;
-  recipeId?: string;
-  recipeTitle?: string;
 }
-
-const STORAGE_KEY = 'grocery_list_items';
 
 function toGroceryIngredients(rows: RecipeIngredient[]): Ingredient[] {
   return rows.map(row => ({
@@ -46,10 +41,10 @@ function toGroceryIngredients(rows: RecipeIngredient[]): Ingredient[] {
 
 export default function GroceryListModal() {
   const theme = useTheme() as unknown as Theme;
+  const {householdId} = useHousehold();
   const {
     isVisible: visible,
     structuredIngredients,
-    recipe,
     hideModal,
   } = useGroceryListModal();
   const [selectedIngredients, setSelectedIngredients] = useState<Set<string>>(
@@ -95,79 +90,81 @@ export default function GroceryListModal() {
             selectedIngredients.has(ingredient.id),
           );
 
+    if (ingredientsToAdd.length === 0 || !householdId) {
+      handleClose();
+      return;
+    }
+
     try {
-      const storedItems = await AsyncStorage.getItem(STORAGE_KEY);
-      const existingItems: GroceryItem[] = storedItems
-        ? JSON.parse(storedItems)
-        : [];
+      const {data: existingRows} = await supabase
+        .from('grocery_list_items')
+        .select('id, name, amount')
+        .eq('household_id', householdId);
 
-      const recipeId = recipe?.id;
-      const recipeTitle = recipe?.title;
+      const existingItems: GroceryItem[] = (existingRows ?? []).map(row => ({
+        id: row.id,
+        name: row.name,
+        amount: row.amount ?? '',
+      }));
 
-      const existingItemsMap = new Map<string, GroceryItem>();
+      const existingMap = new Map<string, GroceryItem>();
       existingItems.forEach(item => {
-        const normalizedName = item.name.toLowerCase().trim();
-        const key = recipeId
-          ? `${normalizedName}::${item.recipeId ?? ''}`
-          : normalizedName;
-        if (!existingItemsMap.has(key)) {
-          existingItemsMap.set(key, item);
-        }
+        existingMap.set(item.name.toLowerCase().trim(), item);
       });
 
-      const updatedItems = [...existingItems];
-      const newItems: GroceryItem[] = [];
-      const newItemsMap = new Map<string, GroceryItem>();
+      const toUpdate: {id: string; amount: string}[] = [];
+      const toInsert: {
+        household_id: string;
+        name: string;
+        amount: string | null;
+        category: string;
+        completed: boolean;
+      }[] = [];
+      const newItemNames = new Map<string, (typeof toInsert)[0]>();
 
       ingredientsToAdd.forEach(ingredient => {
-        const normalizedName = ingredient.name.toLowerCase().trim();
-        const matchKey = recipeId
-          ? `${normalizedName}::${recipeId}`
-          : normalizedName;
-        const noRecipeKey = `${normalizedName}::`;
-        const existingItem =
-          existingItemsMap.get(matchKey) ?? existingItemsMap.get(noRecipeKey);
+        const key = ingredient.name.toLowerCase().trim();
+        const existingItem = existingMap.get(key);
 
-        const canMerge =
-          existingItem &&
-          (!existingItem.recipeId || existingItem.recipeId === recipeId);
-
-        if (existingItem && canMerge && ingredient.amount) {
-          const combinedAmount = combineAmounts(
+        if (existingItem && ingredient.amount) {
+          const combined = combineAmounts(
             existingItem.amount,
             ingredient.amount,
           );
-          existingItem.amount = combinedAmount;
-          if (recipeId && recipeTitle) {
-            existingItem.recipeId = recipeId;
-            existingItem.recipeTitle = recipeTitle;
-          }
-        } else if (!existingItem || !canMerge) {
-          const existingNew = newItemsMap.get(matchKey);
+          toUpdate.push({id: existingItem.id, amount: combined});
+          existingItem.amount = combined;
+        } else if (!existingItem) {
+          const existingNew = newItemNames.get(key);
           if (existingNew && ingredient.amount) {
             existingNew.amount = combineAmounts(
-              existingNew.amount,
+              existingNew.amount ?? '',
               ingredient.amount,
             );
           } else if (!existingNew) {
-            const newItem: GroceryItem = {
-              id: Date.now().toString() + Math.random().toString(),
+            const newItem = {
+              household_id: householdId,
               name: ingredient.name.trim(),
               category: categorizeIngredient(ingredient.name),
               completed: false,
-              amount: ingredient.amount || '',
-              ...(recipeId && recipeTitle ? {recipeId, recipeTitle} : {}),
+              amount: ingredient.amount || null,
             };
-            newItems.push(newItem);
-            newItemsMap.set(matchKey, newItem);
+            toInsert.push(newItem);
+            newItemNames.set(key, newItem);
           }
         }
       });
 
-      await AsyncStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify([...updatedItems, ...newItems]),
-      );
+      await Promise.all([
+        ...toUpdate.map(({id, amount}) =>
+          supabase
+            .from('grocery_list_items')
+            .update({amount, updated_at: new Date().toISOString()})
+            .eq('id', id),
+        ),
+        toInsert.length > 0
+          ? supabase.from('grocery_list_items').insert(toInsert)
+          : Promise.resolve(),
+      ]);
 
       handleClose();
     } catch (error) {

@@ -425,7 +425,7 @@ const styles = (theme: Theme, isDark: boolean) =>
       borderWidth: 2,
       backgroundColor: isDark
         ? 'rgba(249, 208, 112, 0.12)'
-        : 'rgba(79, 168, 99, 0.1)',
+        : 'rgba(249, 208, 112, 0.15)',
     },
     planTitleRow: {
       flexDirection: 'row',
@@ -451,7 +451,7 @@ const styles = (theme: Theme, isDark: boolean) =>
       fontFamily: 'Switzer',
       fontSize: 11,
       fontWeight: '600',
-      color: isDark ? '#322924' : theme.colors['neutral-100'],
+      color: theme.colors['on-yellow'],
     },
     planPriceContainer: {
       alignItems: 'flex-end',
@@ -491,7 +491,7 @@ const styles = (theme: Theme, isDark: boolean) =>
       fontFamily: 'Switzer',
       fontSize: 16,
       fontWeight: '600',
-      color: isDark ? '#322924' : theme.colors['neutral-100'],
+      color: theme.colors['on-yellow'],
     },
     legalText: {
       ...theme.typography.h4,

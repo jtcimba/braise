@@ -68,6 +68,12 @@ Deno.serve(async req => {
   });
 
   try {
+    // If this user is the household primary, delete the household (cascades to
+    // household_members and grocery_list_items). If they're a non-primary member,
+    // delete their membership row so the primary retains their household.
+    await supabaseAdmin.from('households').delete().eq('primary_user_id', uid);
+    await supabaseAdmin.from('household_members').delete().eq('user_id', uid);
+
     // Delete recipe images from storage
     const {data: storageFiles, error: listError} = await supabaseAdmin.storage
       .from('recipe_images')
