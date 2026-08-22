@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
+import {supabase} from '../supabase-client';
 import {isTablet, MAX_CONTENT_WIDTH} from '../hooks/useTablet';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
@@ -20,6 +22,21 @@ import {collectionsService} from '../services/collectionsService';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BraiseLogoLight from '../assets/images/braise-logo-light.svg';
 import {Collection, RecipeIngredient} from '../models';
+
+function renderWithBold(text: string, baseStyle: any, boldStyle: any) {
+  const parts = text.split(/\*\*(.+?)\*\*/);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <Text key={i} style={boldStyle}>
+        {part}
+      </Text>
+    ) : (
+      <Text key={i} style={baseStyle}>
+        {part}
+      </Text>
+    ),
+  );
+}
 
 const parseAmountNum = (amount: string | null): number => {
   if (!amount) {
@@ -77,6 +94,11 @@ export default function RecipeViewer({
   const [recipeCollections, setRecipeCollections] = useState<Collection[]>([]);
   const [tab, setTab] = useState('ingredients');
   const [currentServings, setCurrentServings] = useState(data.servings || '-');
+  const [enhancedInstructions, setEnhancedInstructions] = useState<string | null>(
+    data.enhanced_instructions ?? null,
+  );
+  const [showEnhanced, setShowEnhanced] = useState(!!data.enhanced_instructions);
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
   const originalServings =
     data.servings != null ? parseFloat(data.servings.toString()) : 1;
@@ -101,6 +123,35 @@ export default function RecipeViewer({
     const recipeInfo =
       data?.id && data?.title ? {id: data.id, title: data.title} : undefined;
     showModal(structuredIngredients, recipeInfo);
+  };
+
+  const handleEnhance = async () => {
+    if (isEnhancing || !data.instructions || !structuredIngredients.length) {
+      return;
+    }
+    setIsEnhancing(true);
+    try {
+      const {data: result, error} = await supabase.functions.invoke(
+        'enhance-directions',
+        {
+          body: {
+            recipeId: data.id,
+            instructions: data.instructions,
+            ingredients: structuredIngredients.map(i => ({
+              name: i.name,
+              amount: i.amount,
+              unit: i.unit,
+            })),
+          },
+        },
+      );
+      if (!error && result?.instructions) {
+        setEnhancedInstructions(result.instructions);
+        setShowEnhanced(true);
+      }
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   useEffect(() => {
@@ -269,22 +320,57 @@ export default function RecipeViewer({
             )}
             {tab === 'directions' && (
               <>
+                {data.instructions && structuredIngredients.length > 0 && (
+                  <TouchableOpacity
+                    style={styles(theme).enhanceButton}
+                    onPress={
+                      enhancedInstructions
+                        ? () => setShowEnhanced(v => !v)
+                        : handleEnhance
+                    }
+                    disabled={isEnhancing}>
+                    <Text style={[styles(theme).enhanceButtonText, showEnhanced && styles(theme).enhanceButtonTextActive]}>
+                      {showEnhanced ? 'Enhanced' : 'Enhance'}
+                    </Text>
+                    {isEnhancing ? (
+                      <ActivityIndicator
+                        size="small"
+                        color={theme.colors['toffee-400']}
+                        style={styles(theme).enhanceCircle}
+                      />
+                    ) : (
+                      <View
+                        style={[
+                          styles(theme).enhanceCircle,
+                          showEnhanced && styles(theme).enhanceCircleActive,
+                        ]}
+                      />
+                    )}
+                  </TouchableOpacity>
+                )}
                 <View style={styles(theme).instructionsContainer}>
                   {data.instructions ? (
-                    data.instructions
+                    (showEnhanced && enhancedInstructions
+                      ? enhancedInstructions
+                      : data.instructions
+                    )
                       .split('\n')
-                      .map((instruction: any, index: any) => {
-                        return (
-                          <View style={styles(theme).lineContainer} key={index}>
-                            <Text style={styles(theme).lineNumber}>
-                              {index + 1}.
-                            </Text>
-                            <Text style={styles(theme).lineText}>
-                              {instruction}
-                            </Text>
-                          </View>
-                        );
-                      })
+                      .map((instruction: string, index: number) => (
+                        <View style={styles(theme).lineContainer} key={index}>
+                          <Text style={styles(theme).lineNumber}>
+                            {index + 1}.
+                          </Text>
+                          <Text style={styles(theme).lineText}>
+                            {showEnhanced && enhancedInstructions
+                              ? renderWithBold(
+                                  instruction,
+                                  styles(theme).lineText,
+                                  styles(theme).lineTextBold,
+                                )
+                              : instruction}
+                          </Text>
+                        </View>
+                      ))
                   ) : (
                     <View style={styles(theme).emptyStateContainer}>
                       <Text style={styles(theme).emptyStateText}>
@@ -373,6 +459,32 @@ const styles = (theme: any) =>
       ...theme.typography.h2,
       color: theme.colors['toffee-400'],
     },
+    enhanceButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'flex-end',
+      marginRight: 20,
+      marginTop: 10,
+      gap: 8,
+    },
+    enhanceButtonText: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
+    },
+    enhanceButtonTextActive: {
+      ...theme.typography['h4-emphasized'],
+    },
+    enhanceCircle: {
+      width: 16,
+      height: 16,
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+    },
+    enhanceCircleActive: {
+      backgroundColor: theme.colors['yellow-400'],
+      borderColor: theme.colors['yellow-400'],
+    },
     instructionsContainer: {
       paddingHorizontal: 20,
       paddingVertical: 5,
@@ -427,6 +539,11 @@ const styles = (theme: any) =>
       flex: 1,
       marginTop: 1,
       alignSelf: 'flex-start',
+      color: theme.colors['neutral-800'],
+    },
+    lineTextBold: {
+      ...theme.typography.b1,
+      fontWeight: '700',
       color: theme.colors['neutral-800'],
     },
     paddingRight: {
