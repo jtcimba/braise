@@ -94,10 +94,12 @@ export default function RecipeViewer({
   const [recipeCollections, setRecipeCollections] = useState<Collection[]>([]);
   const [tab, setTab] = useState('ingredients');
   const [currentServings, setCurrentServings] = useState(data.servings || '-');
-  const [enhancedInstructions, setEnhancedInstructions] = useState<string | null>(
-    data.enhanced_instructions ?? null,
+  const [enhancedInstructions, setEnhancedInstructions] = useState<
+    string | null
+  >(data.enhanced_instructions ?? null);
+  const [showEnhanced, setShowEnhanced] = useState(
+    !!data.enhanced_instructions,
   );
-  const [showEnhanced, setShowEnhanced] = useState(!!data.enhanced_instructions);
   const [isEnhancing, setIsEnhancing] = useState(false);
 
   const originalServings =
@@ -329,7 +331,11 @@ export default function RecipeViewer({
                         : handleEnhance
                     }
                     disabled={isEnhancing}>
-                    <Text style={[styles(theme).enhanceButtonText, showEnhanced && styles(theme).enhanceButtonTextActive]}>
+                    <Text
+                      style={[
+                        styles(theme).enhanceButtonText,
+                        showEnhanced && styles(theme).enhanceButtonTextActive,
+                      ]}>
                       {showEnhanced ? 'Enhanced' : 'Enhance'}
                     </Text>
                     {isEnhancing ? (

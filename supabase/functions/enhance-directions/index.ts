@@ -43,7 +43,10 @@ Deno.serve(async req => {
   if (!anthropicApiKey) {
     return new Response(
       JSON.stringify({error: 'ANTHROPIC_API_KEY not configured'}),
-      {status: 500, headers: {...CORS_HEADERS, 'Content-Type': 'application/json'}},
+      {
+        status: 500,
+        headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+      },
     );
   }
 
@@ -53,7 +56,10 @@ Deno.serve(async req => {
     global: {headers: {Authorization: authHeader}},
     auth: {autoRefreshToken: false, persistSession: false},
   });
-  const {data: {user}, error: userError} = await userClient.auth.getUser();
+  const {
+    data: {user},
+    error: userError,
+  } = await userClient.auth.getUser();
   if (userError || !user) {
     return new Response(JSON.stringify({error: 'Unauthorized'}), {
       status: 401,
@@ -78,8 +84,13 @@ Deno.serve(async req => {
   const {recipeId, instructions, ingredients} = body;
   if (!recipeId || !instructions?.trim() || !ingredients?.length) {
     return new Response(
-      JSON.stringify({error: 'recipeId, instructions and ingredients are required'}),
-      {status: 400, headers: {...CORS_HEADERS, 'Content-Type': 'application/json'}},
+      JSON.stringify({
+        error: 'recipeId, instructions and ingredients are required',
+      }),
+      {
+        status: 400,
+        headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+      },
     );
   }
 
@@ -109,10 +120,13 @@ Deno.serve(async req => {
       }),
     });
   } catch {
-    return new Response(JSON.stringify({error: 'Enhancement service unavailable'}), {
-      status: 502,
-      headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
-    });
+    return new Response(
+      JSON.stringify({error: 'Enhancement service unavailable'}),
+      {
+        status: 502,
+        headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+      },
+    );
   }
 
   if (!claudeResponse.ok) {
@@ -125,10 +139,13 @@ Deno.serve(async req => {
   const claudeData = await claudeResponse.json();
   const enhanced: string | undefined = claudeData.content?.[0]?.text;
   if (!enhanced) {
-    return new Response(JSON.stringify({error: 'No response from enhancement service'}), {
-      status: 502,
-      headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
-    });
+    return new Response(
+      JSON.stringify({error: 'No response from enhancement service'}),
+      {
+        status: 502,
+        headers: {...CORS_HEADERS, 'Content-Type': 'application/json'},
+      },
+    );
   }
 
   const trimmed = enhanced.trim();
