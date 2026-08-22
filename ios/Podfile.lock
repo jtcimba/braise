@@ -1095,6 +1095,8 @@ PODS:
   - RevenueCat (5.59.2)
   - RNCAsyncStorage (1.24.0):
     - React-Core
+  - RNCClipboard (1.16.3):
+    - React-Core
   - RNCPicker (2.11.1):
     - React-Core
   - RNGestureHandler (2.17.0):
@@ -1223,6 +1225,7 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCPicker (from `../node_modules/@react-native-picker/picker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNPurchases (from `../node_modules/react-native-purchases`)
@@ -1358,6 +1361,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCPicker:
     :path: "../node_modules/@react-native-picker/picker"
   RNGestureHandler:
@@ -1445,6 +1450,7 @@ SPEC CHECKSUMS:
   ReactCommon: 53a7c32268a2ec0779faa89d7af0392f4d8e8dca
   RevenueCat: f352b3661288080bd8bf30bbb96e331940e73c88
   RNCAsyncStorage: b6410dead2732b5c72a7fdb1ecb5651bbcf4674b
+  RNCClipboard: f6679d470d0da2bce2a37b0af7b9e0bf369ecda5
   RNCPicker: da0f1c9411208c1ca52bc98383db54a06e0a3862
   RNGestureHandler: 5a5237e0ca63009caaf0b34050a2c337686361b3
   RNPurchases: 73aa06c6d21f41a3a52b6a8f648118a6a9615d77

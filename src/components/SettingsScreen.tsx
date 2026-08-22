@@ -12,6 +12,9 @@ import {
   Modal,
   ActivityIndicator,
   ActionSheetIOS,
+  TextInput,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Purchases, {CustomerInfo} from 'react-native-purchases';
 import {
@@ -24,6 +27,8 @@ import {supabase} from '../supabase-client';
 import {User} from '@supabase/supabase-js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSubscription} from '../hooks/useSubscription';
+import {useHousehold} from '../hooks/useHousehold';
+import Clipboard from '@react-native-clipboard/clipboard';
 import {useNavigation} from '@react-navigation/native';
 import {isTablet, MAX_CONTENT_WIDTH, MODAL_MAX_WIDTH} from '../hooks/useTablet';
 
@@ -38,9 +43,22 @@ export default function SettingsScreen() {
   const {appearance, setAppearance} = useAppearance();
   const [user, setUser] = useState<User | null>(null);
   const {isPro, isLoading: isSubscriptionLoading} = useSubscription();
+  const {
+    isPrimary,
+    member,
+    inviteCode,
+    isLoading: isHouseholdLoading,
+    refresh: refreshHousehold,
+  } = useHousehold();
   const navigation = useNavigation<any>();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
+  const [isJoining, setIsJoining] = useState(false);
+  const [isGeneratingInvite, setIsGeneratingInvite] = useState(false);
+  const [isRemovingMember, setIsRemovingMember] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -92,6 +110,98 @@ export default function SettingsScreen() {
       setShowDeleteModal(false);
       Alert.alert('Error', 'Failed to delete account. Please try again.');
     }
+  };
+
+  const handleGenerateInvite = async () => {
+    setIsGeneratingInvite(true);
+    try {
+      const {data, error} = await supabase.functions.invoke('generate-invite');
+      if (error) {
+        throw error;
+      }
+      await refreshHousehold();
+      copyCode(data.code);
+    } catch {
+      Alert.alert('Error', 'Failed to generate invite code. Please try again.');
+    } finally {
+      setIsGeneratingInvite(false);
+    }
+  };
+
+  const copyCode = (code: string) => {
+    Clipboard.setString(code);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  };
+
+  const handleShareCode = () => {
+    if (!inviteCode) {
+      return;
+    }
+    copyCode(inviteCode);
+  };
+
+  const handleJoinHousehold = async () => {
+    const trimmed = joinCode.trim().toUpperCase();
+    if (!trimmed) {
+      return;
+    }
+    setIsJoining(true);
+    try {
+      const {error} = await supabase.functions.invoke('accept-invite', {
+        body: {code: trimmed},
+      });
+      if (error) {
+        const message = error.message?.includes('full')
+          ? 'This household is already full.'
+          : error.message?.includes('already sharing')
+          ? 'You are already sharing a household with someone.'
+          : 'Invalid or expired invite code.';
+        Alert.alert('Could not join', message);
+        return;
+      }
+      setShowJoinModal(false);
+      setJoinCode('');
+      await refreshHousehold();
+      Alert.alert('Joined!', 'You have joined the household.');
+    } catch {
+      Alert.alert('Error', 'Failed to join household. Please try again.');
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  const handleRemoveMember = () => {
+    Alert.alert(
+      'Remove member',
+      'This will remove your household member and revoke their access to the shared grocery list.',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            setIsRemovingMember(true);
+            try {
+              const {error} = await supabase.functions.invoke(
+                'remove-household-member',
+              );
+              if (error) {
+                throw error;
+              }
+              await refreshHousehold();
+            } catch {
+              Alert.alert(
+                'Error',
+                'Failed to remove member. Please try again.',
+              );
+            } finally {
+              setIsRemovingMember(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const handleAppearance = () => {
@@ -160,6 +270,98 @@ export default function SettingsScreen() {
             />
           </TouchableOpacity>
         </View>
+        <>
+          <Text style={styles(theme).sectionTitle}>Household</Text>
+          <View style={styles(theme).menuGroup}>
+            {!isHouseholdLoading && isPrimary && member ? (
+              <>
+                <View style={styles(theme).menuRow}>
+                  <Text style={styles(theme).menuRowText}>
+                    {member.email ?? 'Household member'}
+                  </Text>
+                  <Text style={styles(theme).menuRowSubtext}>Member</Text>
+                </View>
+                <View style={styles(theme).menuDivider} />
+                <TouchableOpacity
+                  style={styles(theme).menuRow}
+                  onPress={handleRemoveMember}
+                  disabled={isRemovingMember}>
+                  <Text style={styles(theme).removeMemberText}>
+                    {isRemovingMember ? 'Removing…' : 'Remove member'}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            ) : !isHouseholdLoading && !isPrimary ? (
+              <View style={styles(theme).menuRow}>
+                <Text style={styles(theme).menuRowText}>Household member</Text>
+                <Text style={styles(theme).menuRowSubtext}>Active</Text>
+              </View>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={styles(theme).menuRow}
+                  onPress={inviteCode ? handleShareCode : handleGenerateInvite}
+                  disabled={isHouseholdLoading || isGeneratingInvite}>
+                  <Text style={styles(theme).menuRowText}>
+                    {isGeneratingInvite
+                      ? 'Generating…'
+                      : inviteCode
+                      ? `Invite Code: ${inviteCode}`
+                      : 'Invite household member'}
+                  </Text>
+                  {codeCopied ? (
+                    <View style={styles(theme).copiedPill}>
+                      <Text style={styles(theme).copiedPillText}>Copied</Text>
+                      <Ionicons
+                        name="checkmark"
+                        size={14}
+                        color={theme.colors['neutral-800']}
+                      />
+                    </View>
+                  ) : (
+                    <Ionicons
+                      name="copy-outline"
+                      size={18}
+                      color={theme.colors['toffee-400']}
+                    />
+                  )}
+                </TouchableOpacity>
+                {inviteCode && (
+                  <>
+                    <View style={styles(theme).menuDivider} />
+                    <TouchableOpacity
+                      style={styles(theme).menuRow}
+                      onPress={handleGenerateInvite}
+                      disabled={isGeneratingInvite}>
+                      <Text style={styles(theme).menuRowText}>
+                        Generate new code
+                      </Text>
+                      <Ionicons
+                        name="refresh-outline"
+                        size={18}
+                        color={theme.colors['toffee-400']}
+                      />
+                    </TouchableOpacity>
+                  </>
+                )}
+                <View style={styles(theme).menuDivider} />
+                <TouchableOpacity
+                  style={styles(theme).menuRow}
+                  disabled={isHouseholdLoading}
+                  onPress={() => setShowJoinModal(true)}>
+                  <Text style={styles(theme).menuRowText}>
+                    Join a household
+                  </Text>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={18}
+                    color={theme.colors['toffee-400']}
+                  />
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </>
         <View style={styles(theme).menuGroup}>
           {isPro ? (
             <TouchableOpacity
@@ -225,6 +427,70 @@ export default function SettingsScreen() {
       <View>
         <Text style={styles(theme).version}>v1.1.0</Text>
       </View>
+      <Modal
+        visible={showJoinModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          setShowJoinModal(false);
+          setJoinCode('');
+        }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles(theme).modalOverlay}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setShowJoinModal(false);
+              setJoinCode('');
+            }}>
+            <View style={StyleSheet.absoluteFill} />
+          </TouchableWithoutFeedback>
+          <View style={styles(theme).modalContent}>
+            <Text style={styles(theme).modalTitle}>Join a household</Text>
+            <Text style={styles(theme).modalBody}>
+              Enter the 6-character code shared by your household primary.
+            </Text>
+            <TextInput
+              style={styles(theme).codeInput}
+              placeholder="Enter code"
+              placeholderTextColor={theme.colors['toffee-400']}
+              value={joinCode}
+              onChangeText={text => setJoinCode(text.toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={6}
+            />
+            {isJoining ? (
+              <ActivityIndicator
+                size="large"
+                color={theme.colors['neutral-800']}
+              />
+            ) : (
+              <>
+                <Pressable
+                  style={({pressed}) => [
+                    styles(theme).joinButton,
+                    pressed && {opacity: 0.7},
+                  ]}
+                  onPress={handleJoinHousehold}>
+                  <Text style={styles(theme).joinButtonText}>Join</Text>
+                </Pressable>
+                <Pressable
+                  style={({pressed}) => [
+                    styles(theme).cancelButton,
+                    pressed && {opacity: 0.5},
+                  ]}
+                  onPress={() => {
+                    setShowJoinModal(false);
+                    setJoinCode('');
+                  }}>
+                  <Text style={styles(theme).cancelText}>Cancel</Text>
+                </Pressable>
+              </>
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
       <Modal
         visible={showDeleteModal}
         transparent
@@ -316,6 +582,12 @@ const styles = (theme: Theme) =>
       color: theme.colors['toffee-400'],
       ...theme.typography.h4,
     },
+    sectionTitle: {
+      color: theme.colors['toffee-400'],
+      ...theme.typography.h4,
+      alignSelf: 'flex-start',
+      marginBottom: 8,
+    },
     menuGroup: {
       width: '100%',
       borderRadius: 8,
@@ -391,7 +663,30 @@ const styles = (theme: Theme) =>
     modalBody: {
       color: theme.colors['toffee-400'],
       ...theme.typography.h2,
+      marginBottom: 16,
+    },
+    codeInput: {
+      borderWidth: 1,
+      borderColor: theme.colors['neutral-300'],
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
       marginBottom: 24,
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['neutral-800'],
+      textAlign: 'center',
+      letterSpacing: 4,
+    },
+    joinButton: {
+      backgroundColor: theme.colors['yellow-400'],
+      padding: 12,
+      borderRadius: 25,
+      alignItems: 'center' as const,
+      marginBottom: 12,
+    },
+    joinButtonText: {
+      ...theme.typography['h2-emphasized'],
+      color: theme.colors['on-yellow'],
     },
     confirmDeleteButton: {
       backgroundColor: '#c0392b',
@@ -414,5 +709,19 @@ const styles = (theme: Theme) =>
     cancelText: {
       color: theme.colors['neutral-800'],
       ...theme.typography['h2-emphasized'],
+    },
+    copiedPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    copiedPillText: {
+      ...theme.typography.h4,
+      color: theme.colors['neutral-800'],
+      lineHeight: 18,
+    },
+    removeMemberText: {
+      ...theme.typography.h2,
+      color: '#c0392b',
     },
   });

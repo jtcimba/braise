@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,17 @@ import {
   Platform,
   ScrollView,
   TouchableWithoutFeedback,
+  RefreshControl,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useTheme} from '../../theme/ThemeProvider';
 import {Theme} from '../../theme/types';
 import {categorizeIngredient} from '../services';
 import FilterChip from './FilterChip';
 import {isTablet, MODAL_MAX_WIDTH} from '../hooks/useTablet';
+import {useHousehold} from '../hooks/useHousehold';
+import {supabase} from '../supabase-client';
 
 interface GroceryItem {
   id: string;
@@ -42,10 +44,9 @@ const CATEGORIES = [
   'Other',
 ];
 
-const STORAGE_KEY = 'grocery_list_items';
-
 export default function GroceryListScreen() {
   const theme = useTheme() as unknown as Theme;
+  const {householdId} = useHousehold();
   const [items, setItems] = useState<GroceryItem[]>([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
@@ -59,25 +60,7 @@ export default function GroceryListScreen() {
   const [sortBy, setSortBy] = useState<'category' | 'checked' | 'recipe'>(
     'category',
   );
-  const isInitialLoad = useRef(true);
-
-  useEffect(() => {
-    loadItems();
-  }, []);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      loadItems();
-    }, []),
-  );
-
-  useEffect(() => {
-    if (!isInitialLoad.current) {
-      saveItems(items);
-    } else {
-      isInitialLoad.current = false;
-    }
-  }, [items]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     if (!isCategoryManuallySelected && newItemName.trim()) {
@@ -86,88 +69,141 @@ export default function GroceryListScreen() {
     }
   }, [newItemName, isCategoryManuallySelected]);
 
-  const loadItems = async () => {
+  const loadItems = useCallback(async () => {
+    if (!householdId) {
+      return;
+    }
     try {
-      const storedItems = await AsyncStorage.getItem(STORAGE_KEY);
-      if (storedItems) {
-        setItems(JSON.parse(storedItems));
-      } else {
-        setItems([]);
+      const {data, error} = await supabase
+        .from('grocery_list_items')
+        .select('id, name, category, completed, amount')
+        .eq('household_id', householdId)
+        .order('updated_at', {ascending: true});
+
+      if (!error && data) {
+        setItems(
+          data.map(row => ({
+            ...row,
+            amount: row.amount ?? '',
+            category: row.category ?? 'Other',
+          })),
+        );
       }
     } catch (error) {
-      console.error('Error loading items from AsyncStorage:', error);
-      setItems([]);
+      console.error('Error loading grocery list:', error);
     }
-  };
+  }, [householdId]);
 
-  const saveItems = async (itemsToSave: GroceryItem[]) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(itemsToSave));
-    } catch (error) {
-      console.error('Error saving items to AsyncStorage:', error);
+  useEffect(() => {
+    if (householdId) {
+      loadItems();
     }
-  };
+  }, [householdId, loadItems]);
 
-  const toggleItem = (id: string) => {
+  useFocusEffect(
+    useCallback(() => {
+      if (householdId) {
+        loadItems();
+      }
+    }, [householdId, loadItems]),
+  );
+
+  const toggleItem = async (id: string) => {
+    const item = items.find(i => i.id === id);
+    if (!item) {
+      return;
+    }
+    const newCompleted = !item.completed;
+
     setAnimatingItems(prev => new Set(prev).add(id));
-
     setTimeout(() => {
-      setItems(prevItems =>
-        prevItems.map(item =>
-          item.id === id ? {...item, completed: !item.completed} : item,
-        ),
+      setItems(prev =>
+        prev.map(i => (i.id === id ? {...i, completed: newCompleted} : i)),
       );
       setAnimatingItems(prev => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
       });
     }, 500);
+
+    await supabase
+      .from('grocery_list_items')
+      .update({completed: newCompleted, updated_at: new Date().toISOString()})
+      .eq('id', id);
   };
 
-  const deleteItem = (id: string) => {
-    setItems(prevItems => prevItems.filter(item => item.id !== id));
+  const deleteItem = async (id: string) => {
+    setItems(prev => prev.filter(i => i.id !== id));
+    await supabase.from('grocery_list_items').delete().eq('id', id);
   };
 
-  const addItem = () => {
-    if (newItemName.trim()) {
-      const newItem: GroceryItem = {
-        id: Date.now().toString(),
+  const addItem = async () => {
+    if (!newItemName.trim() || !householdId) {
+      return;
+    }
+
+    const {data, error} = await supabase
+      .from('grocery_list_items')
+      .insert({
+        household_id: householdId,
         name: newItemName.trim(),
         category: newItemCategory,
         completed: false,
-        amount: newItemAmount.trim(),
-      };
-      setItems(prevItems => [...prevItems, newItem]);
-      setNewItemName('');
-      setNewItemCategory('Other');
-      setNewItemAmount('');
-      setIsCategoryManuallySelected(false);
-      setIsAddModalVisible(false);
+        amount: newItemAmount.trim() || null,
+      })
+      .select('id, name, category, completed, amount')
+      .single();
+
+    if (!error && data) {
+      setItems(prev => [
+        ...prev,
+        {
+          ...data,
+          amount: data.amount ?? '',
+          category: data.category ?? 'Other',
+        },
+      ]);
     }
+
+    setNewItemName('');
+    setNewItemCategory('Other');
+    setNewItemAmount('');
+    setIsCategoryManuallySelected(false);
+    setIsAddModalVisible(false);
   };
 
-  const editItem = () => {
-    if (editingItem && newItemName.trim()) {
-      setItems(prevItems =>
-        prevItems.map(item =>
-          item.id === editingItem.id
-            ? {
-                ...item,
-                name: newItemName.trim(),
-                category: newItemCategory,
-                amount: newItemAmount.trim(),
-              }
-            : item,
-        ),
-      );
-      setNewItemName('');
-      setNewItemCategory('Other');
-      setNewItemAmount('');
-      setIsCategoryManuallySelected(false);
-      setEditingItem(null);
-      setIsEditModalVisible(false);
+  const editItem = async () => {
+    if (!editingItem || !newItemName.trim()) {
+      return;
     }
+
+    const updated = {
+      name: newItemName.trim(),
+      category: newItemCategory,
+      amount: newItemAmount.trim() || null,
+      updated_at: new Date().toISOString(),
+    };
+
+    setItems(prev =>
+      prev.map(i =>
+        i.id === editingItem.id
+          ? {...i, ...updated, amount: updated.amount ?? ''}
+          : i,
+      ),
+    );
+
+    await supabase
+      .from('grocery_list_items')
+      .update(updated)
+      .eq('id', editingItem.id);
+
+    setNewItemName('');
+    setNewItemCategory('Other');
+    setNewItemAmount('');
+    setIsCategoryManuallySelected(false);
+    setEditingItem(null);
+    setIsEditModalVisible(false);
   };
 
   const startEdit = (item: GroceryItem) => {
@@ -179,8 +215,21 @@ export default function GroceryListScreen() {
     setIsEditModalVisible(true);
   };
 
-  const clearCompletedItems = () => {
-    setItems(prevItems => prevItems.filter(item => !item.completed));
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    await loadItems();
+    setIsRefreshing(false);
+  }, [loadItems]);
+
+  const clearCompletedItems = async () => {
+    setItems(prev => prev.filter(i => !i.completed));
+    if (householdId) {
+      await supabase
+        .from('grocery_list_items')
+        .delete()
+        .eq('household_id', householdId)
+        .eq('completed', true);
+    }
   };
 
   const hasCompletedItems = items.some(item => item.completed);
@@ -435,14 +484,22 @@ export default function GroceryListScreen() {
   return (
     <View style={styles(theme).container}>
       {groupedItems.length === 0 ? (
-        <View style={styles(theme).emptyState}>
+        <ScrollView
+          contentContainerStyle={styles(theme).emptyState}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={theme.colors['toffee-400']}
+            />
+          }>
           <Text style={styles(theme).emptyText}>
             Your grocery list is empty
           </Text>
           <Text style={styles(theme).emptySubtext}>
-            Tap the + button to add items
+            Your list is shared with your household
           </Text>
-        </View>
+        </ScrollView>
       ) : (
         <>
           <View style={styles(theme).controlsContainer}>
@@ -450,11 +507,6 @@ export default function GroceryListScreen() {
               label="Category"
               selected={sortBy === 'category'}
               onPress={() => setSortBy('category')}
-            />
-            <FilterChip
-              label="Recipe"
-              selected={sortBy === 'recipe'}
-              onPress={() => setSortBy('recipe')}
             />
             <FilterChip
               label="Checked"
@@ -478,6 +530,13 @@ export default function GroceryListScreen() {
             keyExtractor={([category]) => category}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles(theme).listContainer}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={onRefresh}
+                tintColor={theme.colors['toffee-400']}
+              />
+            }
           />
         </>
       )}
@@ -485,7 +544,7 @@ export default function GroceryListScreen() {
       <TouchableOpacity
         style={styles(theme).floatingAddButton}
         onPress={() => setIsAddModalVisible(true)}>
-        <Text style={styles(theme).floatingAddButtonText}>+</Text>
+        <Ionicons name="add" size={28} color={theme.colors['on-yellow']} />
       </TouchableOpacity>
       {renderItemModal()}
     </View>
@@ -508,19 +567,6 @@ const styles = (theme: any) =>
       borderRadius: 28,
       justifyContent: 'center',
       alignItems: 'center',
-      elevation: 8,
-      shadowColor: '#000',
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-    },
-    floatingAddButtonText: {
-      color: theme.colors['on-yellow'],
-      fontSize: 28,
-      fontWeight: 'bold',
     },
     listContainer: {
       paddingBottom: 75,
@@ -693,7 +739,7 @@ const styles = (theme: any) =>
       fontSize: 12,
     },
     selectedCategoryButtonText: {
-      color: theme.colors['neutral-100'],
+      color: theme.colors['on-yellow'],
     },
     buttonContainer: {
       flexDirection: 'row',

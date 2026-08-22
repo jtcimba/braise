@@ -47,6 +47,6 @@ const styles = (theme: Theme) =>
       color: theme.colors['neutral-800'],
     },
     selectedLabel: {
-      color: theme.colors['neutral-100'],
+      color: theme.colors['on-yellow'],
     },
   });

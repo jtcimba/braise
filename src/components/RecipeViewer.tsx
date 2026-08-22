@@ -330,9 +330,7 @@ const styles = (theme: any) =>
     imageContainer: {
       position: 'relative',
       height: 260,
-      marginHorizontal: 10,
       marginBottom: 20,
-      borderRadius: 25,
       overflow: 'hidden',
     },
     image: {
