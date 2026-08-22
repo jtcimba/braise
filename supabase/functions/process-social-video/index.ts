@@ -108,6 +108,7 @@ async function callImportFromTranscript(
   caption: string,
   title: string,
   sourceUrl: string,
+  platform: string,
   jwt: string,
 ): Promise<{recipe: Record<string, unknown>; lowConfidence: boolean} | null> {
   const response = await fetch(
@@ -118,7 +119,7 @@ async function callImportFromTranscript(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
-      body: JSON.stringify({caption, title, sourceUrl}),
+      body: JSON.stringify({caption, title, sourceUrl, platform}),
       signal: AbortSignal.timeout(30_000),
     },
   );
@@ -159,6 +160,7 @@ async function processJob(
       metadata.description,
       metadata.title,
       url,
+      platform,
       jwt,
     );
 
