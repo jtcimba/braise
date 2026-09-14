@@ -58,7 +58,7 @@ export default function RecipesScreen({route}: RecipesScreenProps) {
   const navigation = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
-  const [sortIndex, setSortIndex] = useState(0);
+  const [sortIndex, setSortIndex] = useState(2);
   const [showCollectionOptions, setShowCollectionOptions] = useState(false);
   const [collectionOptionsView, setCollectionOptionsView] = useState<
     'menu' | 'rename'

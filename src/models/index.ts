@@ -15,6 +15,7 @@ export interface Recipe {
   created_at?: string;
   modified_at?: string;
   viewed_at?: string;
+  import_status?: 'pending' | 'complete';
 }
 
 export interface Collection {
