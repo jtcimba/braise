@@ -338,6 +338,7 @@ export default function RecipeViewer({
                       ]}>
                       {showEnhanced ? 'Enhanced' : 'Enhance'}
                     </Text>
+
                     {isEnhancing ? (
                       <ActivityIndicator
                         size="small"
@@ -469,23 +470,23 @@ const styles = (theme: any) =>
       flexDirection: 'row',
       alignItems: 'center',
       alignSelf: 'flex-end',
-      marginRight: 20,
-      marginTop: 10,
+      marginTop: 20,
       gap: 8,
     },
     enhanceButtonText: {
       ...theme.typography.h4,
-      color: theme.colors['neutral-800'],
+      color: theme.colors['toffee-400'],
     },
     enhanceButtonTextActive: {
       ...theme.typography['h4-emphasized'],
+      color: theme.colors['neutral-800'],
     },
     enhanceCircle: {
       width: 16,
       height: 16,
       borderRadius: 8,
       borderWidth: 1,
-      borderColor: theme.colors['neutral-300'],
+      borderColor: theme.colors['toffee-400'],
     },
     enhanceCircleActive: {
       backgroundColor: theme.colors['yellow-400'],

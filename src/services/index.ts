@@ -3,3 +3,4 @@ export * from './servingsService';
 export * from './groceryListService';
 export * from './categoryService';
 export * from './recipeService';
+export * from './socialImportService';

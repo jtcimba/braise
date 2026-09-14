@@ -2,7 +2,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import React, {useEffect, useRef, useState} from 'react';
-import {View, StyleSheet, Linking, AppState, Alert} from 'react-native';
+import {View, StyleSheet, Linking, AppState} from 'react-native';
 import BraiseLogoDark from './src/assets/images/braise-logo-dark.svg';
 import {
   NavigationContainer,
@@ -32,7 +32,7 @@ import {Theme} from './theme/types';
 import {supabase} from './src/supabase-client';
 import {Session} from '@supabase/supabase-js';
 import Auth from './src/components/Auth';
-import {NativeModules, Platform, DeviceEventEmitter} from 'react-native';
+import {NativeModules, Platform} from 'react-native';
 import Purchases, {
   LOG_LEVEL,
   CustomerInfoUpdateListener,
@@ -41,7 +41,7 @@ import {useSubscription} from './src/hooks/useSubscription';
 import {isTablet, useHeaderStatusBarHeight} from './src/hooks/useTablet';
 import store from './src/redux/store';
 import {changeViewMode} from './src/redux/slices/viewModeSlice';
-import {recipeService, ingredientRowsFromText} from './src/services';
+import {finalizeSocialImport} from './src/services';
 
 const {AppGroupStorage} = NativeModules;
 const Stack = createStackNavigator();
@@ -366,80 +366,26 @@ export default function App({}: AppProps): React.JSX.Element {
         return;
       }
 
-      // Check for pending social video import job
       const pendingJobId = await AppGroupStorage.getItem('pendingSocialJobId');
       if (pendingJobId) {
         try {
-          const response = await fetch(
-            `${process.env.SUPABASE_URL}/rest/v1/video_import_jobs?id=eq.${pendingJobId}&select=*`,
-            {
-              headers: {
-                apikey: process.env.SUPABASE_ANON_KEY!,
-                Authorization: `Bearer ${
-                  (
-                    await supabase.auth.getSession()
-                  ).data.session?.access_token ?? ''
-                }`,
-              },
-            },
-          );
-          const jobs = await response.json();
+          const {data: jobs} = await supabase
+            .from('video_import_jobs')
+            .select('*')
+            .eq('id', pendingJobId)
+            .limit(1);
           const job = jobs?.[0];
-          if (job?.status === 'ready_for_review') {
-            await AppGroupStorage.removeItem('pendingSocialJobId');
-            try {
-              const extracted = job.extracted_recipe || {};
-              const savedRecipe = await recipeService.createRecipe({
-                ...extracted,
-                id: '',
-                ingredientRows: ingredientRowsFromText(extracted.ingredients),
-              });
-              store.dispatch(changeViewMode('view'));
-              if (navigationRef.current?.isReady()) {
-                navigationRef.current.navigate('RecipeDetailsScreen', {
-                  item: savedRecipe,
-                  lowConfidence: job.low_confidence,
-                  sourceUrl: extracted.original_url ?? '',
-                  sourcePlatform: job.platform,
-                });
-              }
-            } catch (err) {
-              console.error('Failed to save social recipe:', err);
-              Alert.alert(
-                'Import Failed',
-                "We couldn't save the recipe. Please try again.",
-              );
+          const pendingRecipeId = await AppGroupStorage.getItem(
+            'pendingRecipeId',
+          );
+          await finalizeSocialImport(job ?? null, pendingRecipeId, () => {
+            store.dispatch(changeViewMode('view'));
+            if (navigationRef.current?.isReady()) {
+              navigationRef.current.navigate('Recipes', {refresh: true});
             }
-          } else if (job?.status === 'failed') {
-            await AppGroupStorage.removeItem('pendingSocialJobId');
-            Alert.alert(
-              'Import Failed',
-              "We couldn't find a recipe in that video. The creator may not have included the recipe in their caption.",
-            );
-          }
-          // job null (stale key) or status === 'processing': fall through to importedRecipe check
+          });
         } catch (err) {
           console.error('Failed to check social import job:', err);
-        }
-      }
-
-      // Check for auto-saved recipe from share extension
-      const importedRecipeJson = await AppGroupStorage.getItem(
-        'importedRecipe',
-      );
-      if (importedRecipeJson) {
-        try {
-          const recipe = JSON.parse(importedRecipeJson);
-          await AppGroupStorage.removeItem('importedRecipe');
-          store.dispatch(changeViewMode('view'));
-          if (navigationRef.current?.isReady()) {
-            navigationRef.current.navigate('RecipeDetailsScreen', {
-              item: recipe,
-            });
-          }
-        } catch (err) {
-          console.error('Failed to parse importedRecipe:', err);
-          await AppGroupStorage.removeItem('importedRecipe');
         }
       }
     };
@@ -447,15 +393,6 @@ export default function App({}: AppProps): React.JSX.Element {
     const appStateSubscription = AppState.addEventListener(
       'change',
       handleAppStateChange,
-    );
-
-    const importSubscription = DeviceEventEmitter.addListener(
-      'ImportCompleted',
-      (recipe: any) => {
-        if (navigationRef.current?.isReady()) {
-          navigationRef.current.navigate('RecipeDetailsScreen', {item: recipe});
-        }
-      },
     );
 
     supabase.auth.getSession().then(async ({data: {session}}) => {
@@ -485,7 +422,6 @@ export default function App({}: AppProps): React.JSX.Element {
       subscription.unsubscribe();
       linkingSubscription.remove();
       appStateSubscription.remove();
-      importSubscription.remove();
       Purchases.removeCustomerInfoUpdateListener(syncIsPro);
     };
   }, []);

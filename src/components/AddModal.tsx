@@ -27,7 +27,11 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {useAppDispatch} from '../redux/hooks';
 import {changeViewMode} from '../redux/slices/viewModeSlice';
 import {supabase} from '../supabase-client';
-import {recipeService, ingredientRowsFromText} from '../services';
+import {
+  recipeService,
+  ingredientRowsFromText,
+  finalizeSocialImport,
+} from '../services';
 
 function isTikTokUrl(url: string): boolean {
   try {
@@ -117,7 +121,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         throw new Error(error?.message || 'Failed to extract recipe');
       }
 
-      const savedRecipe = await recipeService.createRecipe({
+      await recipeService.createRecipe({
         ...data,
         id: '',
         ingredientRows: ingredientRowsFromText(data.ingredients),
@@ -125,7 +129,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
 
       handleClose();
       dispatch(changeViewMode('view'));
-      navigation.navigate('RecipeDetailsScreen', {item: savedRecipe});
+      navigation.navigate('Recipes', {refresh: true});
     } catch (err: any) {
       console.error('Photo import error:', err.message);
       Alert.alert(
@@ -186,9 +190,22 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         }
         const jobId: string = data.job_id;
         const {AppGroupStorage} = NativeModules;
+
+        // Create stub recipe so the user sees a pending item in the list immediately
+        const stub = await recipeService.createRecipe({
+          title: 'Importing recipe…',
+          id: '',
+          import_status: 'pending',
+        });
+
         if (Platform.OS === 'ios' && AppGroupStorage) {
           await AppGroupStorage.setItem('pendingSocialJobId', jobId);
+          await AppGroupStorage.setItem('pendingRecipeId', String(stub.id));
         }
+
+        handleClose();
+        dispatch(changeViewMode('view'));
+        navigation.navigate('Recipes', {refresh: true});
 
         // Poll for job completion while the user stays in the app.
         // AppState-based polling in App.tsx only fires on foreground transitions,
@@ -206,37 +223,12 @@ export default function AddModal({visible, onClose}: AddModalProps) {
             if (!job) {
               continue;
             }
-
-            if (job.status === 'ready_for_review') {
-              if (Platform.OS === 'ios' && AppGroupStorage) {
-                await AppGroupStorage.removeItem('pendingSocialJobId');
-              }
-              const extracted = job.extracted_recipe ?? {};
-              const savedRecipe = await recipeService.createRecipe({
-                ...extracted,
-                id: '',
-                ingredientRows: ingredientRowsFromText(extracted.ingredients),
-              });
-              handleClose();
-              dispatch(changeViewMode('view'));
-              navigation.navigate('RecipeDetailsScreen', {
-                item: savedRecipe,
-                lowConfidence: job.low_confidence,
-                sourceUrl: extracted.host_url ?? '',
-                sourcePlatform: job.platform,
-              });
-              return;
-            }
-
-            if (job.status === 'failed') {
-              if (Platform.OS === 'ios' && AppGroupStorage) {
-                await AppGroupStorage.removeItem('pendingSocialJobId');
-              }
-              Alert.alert(
-                'Import Failed',
-                "We couldn't find a recipe in that video. The creator may not have included the recipe in their caption.",
-                [{text: 'OK', style: 'cancel'}],
-              );
+            const result = await finalizeSocialImport(
+              job,
+              String(stub.id),
+              () => navigation.navigate('Recipes', {refresh: true}),
+            );
+            if (result !== 'pending') {
               return;
             }
           } catch {
@@ -244,12 +236,12 @@ export default function AddModal({visible, onClose}: AddModalProps) {
           }
         }
 
-        // Timed out: leave pendingSocialJobId stored so the AppState handler
-        // can pick it up if the user backgrounds and re-foregrounds the app.
-        handleClose();
+        // Timed out: pendingSocialJobId and pendingRecipeId remain in storage
+        // so the AppState handler can complete the import on next foreground.
         Alert.alert(
-          'Import Started',
-          'Your TikTok recipe is taking a moment to process. Open Braise in a bit to see it.',
+          'Still importing…',
+          "This one is taking longer than usual. We'll finish saving it in the background — come back in a moment.",
+          [{text: 'OK'}],
         );
         return;
       }
@@ -281,7 +273,7 @@ export default function AddModal({visible, onClose}: AddModalProps) {
         throw new Error(error?.message || 'Failed to extract recipe');
       }
 
-      const savedRecipe = await recipeService.createRecipe({
+      await recipeService.createRecipe({
         ...data,
         id: '',
         ingredientRows: ingredientRowsFromText(data.ingredients),
@@ -289,13 +281,13 @@ export default function AddModal({visible, onClose}: AddModalProps) {
 
       handleClose();
       dispatch(changeViewMode('view'));
-      navigation.navigate('RecipeDetailsScreen', {item: savedRecipe});
+      navigation.navigate('Recipes', {refresh: true});
     } catch (err: any) {
       console.error('URL import error:', err.message);
       Alert.alert(
         'Import Failed',
         "We couldn't import a recipe from that link. Make sure it's a recipe page and try again.",
-        [{text: 'Try Again', style: 'cancel'}],
+        [{text: 'OK'}],
       );
     } finally {
       setIsImporting(false);
